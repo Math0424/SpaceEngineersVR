@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Linked game binary folder
+/Bin64
+
+# Rider
+/.idea
