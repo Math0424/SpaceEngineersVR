@@ -96,8 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
+    <Content Include="Assets\icon.ico" />
+    <Content Include="Assets\logo.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\0Harmony.dll</HintPath>
