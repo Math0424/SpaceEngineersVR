@@ -62,7 +62,7 @@ namespace SpaceEngineersVR.Player
         {
             GetNewPositions();
 
-            log.Write("Frame update");
+            // log.Write("Frame update");
 
             var cam = MySector.MainCamera;
             if (cam == null)
