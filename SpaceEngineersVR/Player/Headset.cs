@@ -23,7 +23,7 @@ namespace SpaceEngineersVR.Player
     {
         Logger log = new Logger();
 
-        public Quaternion AddedRotation = Quaternion.Identity;
+        public Quaternion AddedRotation = Quaternion.CreateFromYawPitchRoll(0f, MathHelper.PiOver2, 0f) * Quaternion.CreateFromYawPitchRoll(-MathHelper.PiOver2, 0f, 0f);
         public MatrixD WorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
