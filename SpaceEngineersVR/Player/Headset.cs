@@ -93,7 +93,7 @@ namespace SpaceEngineersVR.Player
             rightEye.Translation += newViewMatrix.Translation;
             leftEye.Translation += newViewMatrix.Translation;
 
-            MyRender11.FullDrawScene(false);
+            //MyRender11.FullDrawScene(false);
             texture?.Release();
             texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)Width, (int)Height, Format.R8G8B8A8_UNorm_SRgb);
 

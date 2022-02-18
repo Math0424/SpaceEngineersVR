@@ -17,7 +17,7 @@ namespace SpaceEngineersVR.Patches
 
             SpaceVR.Harmony.Patch(AccessTools.Method(t, "Present"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_Present)));
 
-            SpaceVR.Harmony.Patch(AccessTools.Method(typeof(MyDX11Render), "Draw"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
+            SpaceVR.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
             
             new Logger().Write("Applied harmony game injections");
         }
