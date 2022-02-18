@@ -62,6 +62,8 @@ namespace SpaceEngineersVR.Player
         {
             GetNewPositions();
 
+            log.Write("Frame update");
+
             var cam = MySector.MainCamera;
             if (cam == null)
             {
@@ -105,7 +107,7 @@ namespace SpaceEngineersVR.Player
              
             //FrameInjections.DisablePresent = false;
 
-            return false;
+            return true;
         }
 
         private void DrawEye(EVREye eye)
@@ -121,6 +123,7 @@ namespace SpaceEngineersVR.Player
                 handle = texture2D.NativePointer
             };
             OpenVR.Compositor.Submit(eye, ref input, ref TextureBounds, EVRSubmitFlags.Submit_Default);
+
         }
 
         private void UploadCameraViewMatrix()

@@ -21,12 +21,12 @@ namespace SpaceEngineersVR.Wrappers
         {
             Type t = AccessTools.TypeByName("VRageRender.MyRender11");
 
-            log.Write("Fields:");
+            /*log.Write("Fields:");
             foreach (var s in AccessTools.GetFieldNames(t))
                 log.Write(s);         
             log.Write("Methods:");
             foreach (var s in AccessTools.GetMethodNames(t))
-                log.Write(s);
+                log.Write(s);*/
 
             m_debugOverrides = AccessTools.Field(t, "m_debugOverrides");
             m_rc = AccessTools.Field(t, "m_rc");

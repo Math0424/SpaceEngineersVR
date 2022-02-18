@@ -21,8 +21,6 @@ namespace SpaceEngineersVR
     public class SpaceVR : IPlugin
     {
 
-        //https://github.com/ValveSoftware/openvr/wiki/API-Documentation
-
         public static Harmony Harmony { get; private set; }
         public static bool IsValid { get; private set; }
         static Headset Headset;
@@ -88,8 +86,7 @@ namespace SpaceEngineersVR
                 return;
 
             Headset.GameUpdate();
-
-            //https://github.com/osudrl/CassieVrControls/wiki/OpenVR-Quick-Start
+            log.Write("Game update");
         }
 
         public void AfterLoadedWorld()
