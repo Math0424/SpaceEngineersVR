@@ -23,7 +23,7 @@ namespace SpaceEngineersVR.Player
     {
         Logger log = new Logger();
 
-        public Quaternion AddedRotation = Quaternion.Identity;
+        public Quaternion AddedRotation = Quaternion.CreateFromYawPitchRoll(0f, MathHelper.PiOver2, 0f) * Quaternion.CreateFromYawPitchRoll(-MathHelper.PiOver2, 0f, 0f);
         public MatrixD WorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
@@ -93,7 +93,7 @@ namespace SpaceEngineersVR.Player
             rightEye.Translation += newViewMatrix.Translation;
             leftEye.Translation += newViewMatrix.Translation;
 
-            MyRender11.FullDrawScene(false);
+            //MyRender11.FullDrawScene(false);
             texture?.Release();
             texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)Width, (int)Height, Format.R8G8B8A8_UNorm_SRgb);
 

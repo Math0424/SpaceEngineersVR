@@ -66,7 +66,7 @@ namespace SpaceEngineersVR
             MyPerGameSettings.BasicGameInfo.GameName = "SpaceEngineersVR";
             MyPerGameSettings.BasicGameInfo.ApplicationName = "SpaceEngineersVR";
             MyPerGameSettings.BasicGameInfo.SplashScreenImage = (Util.GetAssetFolder() + "logo.png");
-            MyPerGameSettings.BasicGameInfo.GameAcronym = "SERV";
+            MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
             log.Write("Creating VR enviroment");
             Harmony = new Harmony("SpaceEngineersVR");
