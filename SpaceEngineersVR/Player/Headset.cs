@@ -12,7 +12,6 @@ using System.IO;
 using System.Text;
 using Valve.VR;
 using VRage.Game.ModAPI;
-using VRage.Game.Utils;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
@@ -27,6 +26,8 @@ namespace SpaceEngineersVR.Player
         public MatrixD WorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
+        bool IsHeadsetConnected => OpenVR.IsHmdPresent();
+        bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
 
         uint pnX, pnY, Height, Width;
 
@@ -78,6 +79,21 @@ namespace SpaceEngineersVR.Player
                 MyRender11.CreateScreenResources();
                 firstUpdate = false;
                 return true;
+            }
+
+            //UNTESTED
+            //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
+            if (IsControllersConnected)
+            {
+                MyMessageBox.Show("One of your controllers got disconnected, please reconnect it to continue gameplay.", "Controller Disconnected", VRage.MessageBoxOptions.OkOnly);
+                return true;
+            }
+
+            //UNTESTED
+            //Checks if the headset got disconnected, shows a message if the headset is disconnected.
+            if (!IsHeadsetConnected)
+            {
+                MyMessageBox.Show("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected", VRage.MessageBoxOptions.OkOnly);
             }
 
             //New Code

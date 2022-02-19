@@ -28,7 +28,6 @@ namespace SpaceEngineersVR
 
         public void Init(object gameInstance)
         {
-            
             if (!OpenVR.IsRuntimeInstalled())
             {
                 MySandboxGame.Log.WriteLine("SpaceEngineersVR: OpenVR not found!");
