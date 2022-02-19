@@ -23,8 +23,7 @@ namespace SpaceEngineersVR.Player
     {
         Logger log = new Logger();
 
-        public Quaternion AddedRotation = Quaternion.Identity;
-        public MatrixD WorldPos;
+        public MatrixD RealWorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
 
@@ -80,18 +79,14 @@ namespace SpaceEngineersVR.Player
                 return true;
             }
 
-            //New Code
-            MatrixD newViewMatrix = Matrix.Invert(WorldPos).GetOrientation();
-            newViewMatrix = Matrix.Transform(newViewMatrix, AddedRotation);
-            Quaternion rot = Quaternion.CreateFromRotationMatrix(newViewMatrix);
+            // Eye position and orientation
+            MatrixD orientation = Matrix.Invert(RealWorldPos).GetOrientation();
 
-            newViewMatrix.Translation = cam.Position;
+            var rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
+            var leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
 
-            var rightEye = MatrixD.Transform(OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix(), rot);
-            var leftEye = MatrixD.Transform(OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix(), rot);
-
-            rightEye.Translation += newViewMatrix.Translation;
-            leftEye.Translation += newViewMatrix.Translation;
+            rightEye = MatrixD.Multiply(rightEye, cam.WorldMatrix);
+            leftEye = MatrixD.Multiply(leftEye, cam.WorldMatrix);
 
             //MyRender11.FullDrawScene(false);
             texture?.Release();
@@ -103,15 +98,10 @@ namespace SpaceEngineersVR.Player
             var originalWM = cam.WorldMatrix;
             var originalVM = cam.ViewMatrix;
 
-            //
-            var halfDistance = 0.6;
-
+            // Stereo rendering
             cam.WorldMatrix = rightEye;
-            cam.WorldMatrix.Translation += cam.WorldMatrix.Right * halfDistance;
             DrawEye(EVREye.Eye_Right);
-
             cam.WorldMatrix = leftEye;
-            cam.WorldMatrix.Translation += cam.WorldMatrix.Left * halfDistance;
             DrawEye(EVREye.Eye_Left);
 
             // Restore original matrices to remove the flickering
@@ -198,7 +188,7 @@ namespace SpaceEngineersVR.Player
                 return;
             }
 
-            WorldPos = RenderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
+            RealWorldPos = RenderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
 
             if (!RightHand.IsConnected || !LeftHand.IsConnected)
             {
