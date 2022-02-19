@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using ParallelTasks;
+using Sandbox;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using SharpDX.Direct3D11;
@@ -10,6 +11,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 using Valve.VR;
 using VRage.Game.ModAPI;
 using VRageMath;
@@ -28,6 +30,7 @@ namespace SpaceEngineersVR.Player
         public Controller LeftHand = default;
         public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
         public bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
+        public bool IsMessageboxOpen = false;
 
         uint pnX, pnY, Height, Width;
 
@@ -85,16 +88,14 @@ namespace SpaceEngineersVR.Player
             //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
             if (IsControllersConnected)
             {
-                MyMessageBox.Show("One of your controllers got disconnected, please reconnect it to continue gameplay.", "Controller Disconnected", VRage.MessageBoxOptions.OkOnly);
-                return true;
+                CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
             }
 
             //UNTESTED
             //Checks if the headset got disconnected, shows a message if the headset is disconnected.
             if (!IsHeadsetConnected)
             {
-                MyMessageBox.Show("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected", VRage.MessageBoxOptions.OkOnly);
-                return true;
+                ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
             }
 
             //New Code
@@ -353,6 +354,29 @@ namespace SpaceEngineersVR.Player
             log.Write("Pop-up created with message: " + message);
 
             bitmap.UnlockBits(TextureData);
+        }
+
+        /// <summary>
+        /// Shows a messagebox async to prevent calling thread from being paused.
+        /// </summary>
+        /// <param name="msg">The message of the messagebox.</param>
+        /// <param name="caption">The caption of the messagebox.</param>
+        /// <returns>The button that the user clicked as System.Windows.Forms.DialogResult</returns>
+        public DialogResult ShowMessageBoxAsync(string msg, string caption)
+        {
+            if (!IsMessageboxOpen)
+            {
+                Parallel.Start(() =>
+                {
+                    IsMessageboxOpen = true;
+                    log.Write($"Messagebox created with the message: {msg}");
+                    DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
+                    IsMessageboxOpen = false;
+                    return result;
+                });
+            }
+            log.Write("Messagebox already open.");
+            return DialogResult.None;
         }
         #endregion
 
