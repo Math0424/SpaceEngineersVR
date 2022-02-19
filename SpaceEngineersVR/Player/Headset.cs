@@ -94,6 +94,7 @@ namespace SpaceEngineersVR.Player
             if (!IsHeadsetConnected)
             {
                 MyMessageBox.Show("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected", VRage.MessageBoxOptions.OkOnly);
+                return true;
             }
 
             //New Code
