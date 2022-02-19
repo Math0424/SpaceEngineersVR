@@ -99,11 +99,24 @@ namespace SpaceEngineersVR.Player
 
             //FrameInjections.DisablePresent = true;
 
+            // Store the original matrices to remove the flickering
+            var originalWM = cam.WorldMatrix;
+            var originalVM = cam.ViewMatrix;
+
+            //
+            var halfDistance = 0.6;
+
             cam.WorldMatrix = rightEye;
+            cam.WorldMatrix.Translation += cam.WorldMatrix.Right * halfDistance;
             DrawEye(EVREye.Eye_Right);
 
             cam.WorldMatrix = leftEye;
+            cam.WorldMatrix.Translation += cam.WorldMatrix.Left * halfDistance;
             DrawEye(EVREye.Eye_Left);
+
+            // Restore original matrices to remove the flickering
+            cam.WorldMatrix = originalWM;
+            cam.ViewMatrix = originalVM;
              
             //FrameInjections.DisablePresent = false;
 
