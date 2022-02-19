@@ -22,7 +22,7 @@ namespace SpaceEngineersVR.Player
     {
         Logger log = new Logger();
 
-        public Quaternion AddedRotation = Quaternion.CreateFromYawPitchRoll(0f, MathHelper.PiOver2, 0f) * Quaternion.CreateFromYawPitchRoll(-MathHelper.PiOver2, 0f, 0f);
+        public Quaternion AddedRotation = Quaternion.Identity;
         public MatrixD WorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
@@ -63,7 +63,7 @@ namespace SpaceEngineersVR.Player
         {
             GetNewPositions();
 
-            log.Write("Frame update");
+            // log.Write("Frame update");
 
             var cam = MySector.MainCamera;
             if (cam == null)
@@ -115,11 +115,24 @@ namespace SpaceEngineersVR.Player
 
             //FrameInjections.DisablePresent = true;
 
+            // Store the original matrices to remove the flickering
+            var originalWM = cam.WorldMatrix;
+            var originalVM = cam.ViewMatrix;
+
+            //
+            var halfDistance = 0.6;
+
             cam.WorldMatrix = rightEye;
+            cam.WorldMatrix.Translation += cam.WorldMatrix.Right * halfDistance;
             DrawEye(EVREye.Eye_Right);
 
             cam.WorldMatrix = leftEye;
+            cam.WorldMatrix.Translation += cam.WorldMatrix.Left * halfDistance;
             DrawEye(EVREye.Eye_Left);
+
+            // Restore original matrices to remove the flickering
+            cam.WorldMatrix = originalWM;
+            cam.ViewMatrix = originalVM;
              
             //FrameInjections.DisablePresent = false;
 
