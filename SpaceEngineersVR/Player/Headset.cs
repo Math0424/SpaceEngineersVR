@@ -26,8 +26,8 @@ namespace SpaceEngineersVR.Player
         public MatrixD WorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
-        bool IsHeadsetConnected => OpenVR.IsHmdPresent();
-        bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
+        public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
+        public bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
 
         uint pnX, pnY, Height, Width;
 
