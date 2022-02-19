@@ -86,7 +86,7 @@ namespace SpaceEngineersVR
                 return;
 
             Headset.GameUpdate();
-            log.Write("Game update");
+            // log.Write("Game update");
         }
 
         public void AfterLoadedWorld()
