@@ -155,11 +155,6 @@ namespace SpaceEngineersVR.Player
                 IsHeadsetAlreadyDisconnected = false;
             }
 
-            //New Code
-            MatrixD newViewMatrix = Matrix.Invert(WorldPos).GetOrientation();
-            newViewMatrix = Matrix.Transform(newViewMatrix, AddedRotation);
-            Quaternion rot = Quaternion.CreateFromRotationMatrix(newViewMatrix);
-
             // Eye position and orientation
             MatrixD orientation = Matrix.Invert(RealWorldPos).GetOrientation();
 
