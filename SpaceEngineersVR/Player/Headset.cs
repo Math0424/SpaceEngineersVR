@@ -13,6 +13,7 @@ using System.Text;
 using Valve.VR;
 using VRage.Game.ModAPI;
 using VRage.Game.Utils;
+using VRage.Input;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
@@ -32,6 +33,10 @@ namespace SpaceEngineersVR.Player
         VRTextureBounds_t TextureBounds;
         TrackedDevicePose_t[] RenderPositions;
         TrackedDevicePose_t[] GamePositions;
+
+        private float ipd;
+        private float ipdCorrection;
+        private float ipdCorrectionStep = 5e-5f;
 
         public Headset()
         {
@@ -85,6 +90,8 @@ namespace SpaceEngineersVR.Player
             var rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
             var leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
 
+            ipd = (float)(rightEye.Translation - leftEye.Translation).Length();
+
             rightEye = MatrixD.Multiply(rightEye, cam.WorldMatrix);
             leftEye = MatrixD.Multiply(leftEye, cam.WorldMatrix);
 
@@ -110,12 +117,29 @@ namespace SpaceEngineersVR.Player
              
             //FrameInjections.DisablePresent = false;
 
+            var input = MyInput.Static;
+            if (input.IsAnyAltKeyPressed() && input.IsAnyCtrlKeyPressed())
+            {
+                var before = ipdCorrection;
+                if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.02)
+                    ipdCorrection += ipdCorrectionStep;
+
+                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.02)
+                    ipdCorrection -= ipdCorrectionStep;
+
+                if (ipdCorrection != before)
+                {
+                    var sign = ipdCorrection >= 0 ? '+' : '-';
+                    log.Write($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
+                }
+            }
+
             return true;
         }
 
         private void DrawEye(EVREye eye)
         {
-            UploadCameraViewMatrix();
+            UploadCameraViewMatrix(eye);
             MyRender11.DrawGameScene(texture, out _);
 
             Texture2D texture2D = texture.GetResource();//(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
@@ -129,7 +153,7 @@ namespace SpaceEngineersVR.Player
 
         }
 
-        private void UploadCameraViewMatrix()
+        private void UploadCameraViewMatrix(EVREye eye)
         {
             var cam = MySector.MainCamera;
 
@@ -152,7 +176,7 @@ namespace SpaceEngineersVR.Player
 
             msg.UpdateTime = VRage.Library.Utils.MyTimeSpan.Zero;
             msg.LastMomentUpdateIndex = 0;
-            msg.ProjectionOffsetX = 0;
+            msg.ProjectionOffsetX = (eye == EVREye.Eye_Left ? -1 : 1) * (ipd + ipdCorrection);
             msg.ProjectionOffsetY = 0;
             msg.Smooth = false;
 
