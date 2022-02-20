@@ -14,6 +14,8 @@ using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
 using VRage.Game.ModAPI;
+using VRage.Game.Utils;
+using VRage.Input;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
@@ -24,8 +26,7 @@ namespace SpaceEngineersVR.Player
     {
         Logger log = new Logger();
 
-        public Quaternion AddedRotation = Quaternion.Identity;
-        public MatrixD WorldPos;
+        public MatrixD RealWorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
         public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
@@ -38,6 +39,10 @@ namespace SpaceEngineersVR.Player
         VRTextureBounds_t TextureBounds;
         TrackedDevicePose_t[] RenderPositions;
         TrackedDevicePose_t[] GamePositions;
+
+        private float ipd;
+        private float ipdCorrection;
+        private float ipdCorrectionStep = 5e-5f;
 
         public Headset()
         {
@@ -84,6 +89,7 @@ namespace SpaceEngineersVR.Player
                 firstUpdate = false;
                 return true;
             }
+
 
             //UNTESTED
             //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
@@ -154,13 +160,16 @@ namespace SpaceEngineersVR.Player
             newViewMatrix = Matrix.Transform(newViewMatrix, AddedRotation);
             Quaternion rot = Quaternion.CreateFromRotationMatrix(newViewMatrix);
 
-            newViewMatrix.Translation = cam.Position;
+            // Eye position and orientation
+            MatrixD orientation = Matrix.Invert(RealWorldPos).GetOrientation();
 
-            var rightEye = MatrixD.Transform(OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix(), rot);
-            var leftEye = MatrixD.Transform(OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix(), rot);
+            var rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
+            var leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
 
-            rightEye.Translation += newViewMatrix.Translation;
-            leftEye.Translation += newViewMatrix.Translation;
+            ipd = (float)(rightEye.Translation - leftEye.Translation).Length();
+
+            rightEye = MatrixD.Multiply(rightEye, cam.WorldMatrix);
+            leftEye = MatrixD.Multiply(leftEye, cam.WorldMatrix);
 
             //MyRender11.FullDrawScene(false);
             texture?.Release();
@@ -172,15 +181,10 @@ namespace SpaceEngineersVR.Player
             var originalWM = cam.WorldMatrix;
             var originalVM = cam.ViewMatrix;
 
-            //
-            var halfDistance = 0.6;
-
+            // Stereo rendering
             cam.WorldMatrix = rightEye;
-            cam.WorldMatrix.Translation += cam.WorldMatrix.Right * halfDistance;
             DrawEye(EVREye.Eye_Right);
-
             cam.WorldMatrix = leftEye;
-            cam.WorldMatrix.Translation += cam.WorldMatrix.Left * halfDistance;
             DrawEye(EVREye.Eye_Left);
 
             // Restore original matrices to remove the flickering
@@ -189,12 +193,29 @@ namespace SpaceEngineersVR.Player
              
             //FrameInjections.DisablePresent = false;
 
+            var input = MyInput.Static;
+            if (input.IsAnyAltKeyPressed() && input.IsAnyCtrlKeyPressed())
+            {
+                var before = ipdCorrection;
+                if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.02)
+                    ipdCorrection += ipdCorrectionStep;
+
+                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.02)
+                    ipdCorrection -= ipdCorrectionStep;
+
+                if (ipdCorrection != before)
+                {
+                    var sign = ipdCorrection >= 0 ? '+' : '-';
+                    log.Write($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
+                }
+            }
+
             return true;
         }
 
         private void DrawEye(EVREye eye)
         {
-            UploadCameraViewMatrix();
+            UploadCameraViewMatrix(eye);
             MyRender11.DrawGameScene(texture, out _);
 
             Texture2D texture2D = texture.GetResource();//(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
@@ -208,7 +229,7 @@ namespace SpaceEngineersVR.Player
 
         }
 
-        private void UploadCameraViewMatrix()
+        private void UploadCameraViewMatrix(EVREye eye)
         {
             var cam = MySector.MainCamera;
 
@@ -223,15 +244,18 @@ namespace SpaceEngineersVR.Player
             msg.ProjectionMatrix = cam.ProjectionMatrix;
             msg.ProjectionFarMatrix = cam.ProjectionMatrixFar;
 
-            msg.FOV = cam.FovWithZoom;
-            msg.FOVForSkybox = cam.FovWithZoom;
+            var matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance, EGraphicsAPIConvention.API_DirectX).ToMatrix();
+            float fov = MathHelper.Atan(1.0f / matrix.M22) * 2f;
+
+            msg.FOV = fov;
+            msg.FOVForSkybox = fov;
             msg.NearPlane = cam.NearPlaneDistance;
             msg.FarPlane = cam.FarPlaneDistance;
             msg.FarFarPlane = cam.FarFarPlaneDistance;
 
             msg.UpdateTime = VRage.Library.Utils.MyTimeSpan.Zero;
             msg.LastMomentUpdateIndex = 0;
-            msg.ProjectionOffsetX = 0;
+            msg.ProjectionOffsetX = (eye == EVREye.Eye_Left ? -1 : 1) * (ipd + ipdCorrection);
             msg.ProjectionOffsetY = 0;
             msg.Smooth = false;
 
@@ -267,7 +291,7 @@ namespace SpaceEngineersVR.Player
                 return;
             }
 
-            WorldPos = RenderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
+            RealWorldPos = RenderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
 
             if (!RightHand.IsConnected || !LeftHand.IsConnected)
             {
@@ -317,17 +341,16 @@ namespace SpaceEngineersVR.Player
 
             if (!character.EnabledThrusts) 
             {
-                if (RightHand.IsValid)
-                {
-                    var vec = RightHand.GetAxis(Axis.Joystick);
-                    move.X = vec.X;
-                    move.Z = -vec.Y;
-                }
-                move *= 10;
-
                 if (LeftHand.IsValid)
                 {
                     var vec = LeftHand.GetAxis(Axis.Joystick);
+                    move.X = vec.X;
+                    move.Z = -vec.Y;
+                }
+
+                if (RightHand.IsValid)
+                {
+                    var vec = RightHand.GetAxis(Axis.Joystick);
                     rotate.Y = vec.X * 10;
                 }
 
@@ -347,6 +370,10 @@ namespace SpaceEngineersVR.Player
                         //move += v;
                     }
 
+                    var vec = RightHand.GetAxis(Axis.Joystick);
+                    rotate.Y = vec.X * 10;
+                    rotate.X = -vec.Y * 10;
+
                     //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Down, 0, 0, 255);
                     //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, Vector3D.Normalize(Vector3D.Lerp(RightHand.WorldPos.Down, RightHand.WorldPos.Forward, .5)), 255, 0, 0);
                     //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Forward, 0, 255, 0);
@@ -360,19 +387,16 @@ namespace SpaceEngineersVR.Player
                         //move += v;
                     }
 
-                    var vec = LeftHand.GetAxis(Axis.Joystick);
-                    rotate.Y = vec.X * 10;
-                    rotate.X = -vec.Y * 10;
                 }
             }
 
-            if (RightHand.IsNewButtonDown(Button.A))
+            if (LeftHand.IsNewButtonDown(Button.A))
             {
                 //TODO: wrist GUI
                 character.SwitchThrusts();
             }
 
-            //character.MoveAndRotate(move, rotate, 0f);
+            character.MoveAndRotate(move, rotate, 0f);
         }
         #endregion
 

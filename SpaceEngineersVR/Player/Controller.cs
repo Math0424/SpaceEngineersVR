@@ -8,6 +8,7 @@ using VRageMath;
 
 namespace SpaceEngineersVR.Player
 {
+    [Flags]
     public enum Button : ulong
     {
         System = 1ul << EVRButtonId.k_EButton_System,
@@ -68,13 +69,13 @@ namespace SpaceEngineersVR.Player
 
         public Vector2 GetAxis(Axis axis = Axis.Joystick)
         {
-            switch ((int)axis)
+            switch (axis)
             {
-                case 0: return new Vector2(CurrentState.rAxis0.x, CurrentState.rAxis0.y);
-                case 1: return new Vector2(CurrentState.rAxis1.x, CurrentState.rAxis1.y);
-                case 2: return new Vector2(CurrentState.rAxis2.x, CurrentState.rAxis2.y);
-                case 3: return new Vector2(CurrentState.rAxis3.x, CurrentState.rAxis3.y);
-                case 4: return new Vector2(CurrentState.rAxis4.x, CurrentState.rAxis4.y);
+                case Axis.Joystick: return new Vector2(CurrentState.rAxis0.x, CurrentState.rAxis0.y);
+                case Axis.Trigger: return new Vector2(CurrentState.rAxis1.x, CurrentState.rAxis1.y);
+                case Axis.Grip: return new Vector2(CurrentState.rAxis2.x, CurrentState.rAxis2.y);
+                case Axis.Axis3: return new Vector2(CurrentState.rAxis3.x, CurrentState.rAxis3.y);
+                case Axis.Axis4: return new Vector2(CurrentState.rAxis4.x, CurrentState.rAxis4.y);
             }
             return Vector2.Zero;
         }
