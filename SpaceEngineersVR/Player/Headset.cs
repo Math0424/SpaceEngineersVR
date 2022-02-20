@@ -89,11 +89,31 @@ namespace SpaceEngineersVR.Player
             //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
             if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
             {
-                CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+                //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    log.Write("Controller disconnected, pausing game.");
+                }
+                else
+                {
+                    log.Write("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
                 IsControllersAlreadyDisconnected = true;
             }
             else if (IsControllersConnected && IsControllersAlreadyDisconnected)
             {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    log.Write("Controller reconnected, unpausing game.");
+                }
+                else
+                {
+                    log.Write("Controller reconnected, unable to unpause game as game is already unpaused.");
+                }
+
                 IsControllersAlreadyDisconnected = false;
             }
 
@@ -101,11 +121,31 @@ namespace SpaceEngineersVR.Player
             //Checks if the headset got disconnected, shows a message if the headset is disconnected.
             if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
             {
-                ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+                //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    log.Write("Headset disconnected, pausing game.");
+                }
+                else
+                {
+                    log.Write("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
                 IsHeadsetAlreadyDisconnected = true;
             }
             else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
             {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    log.Write("Headset reconnected, unpausing game.");
+                }
+                else
+                {
+                    log.Write("Headset reconnected, unable to unpause game as game is already unpaused.");
+                }
+
                 IsHeadsetAlreadyDisconnected = false;
             }
 
