@@ -168,8 +168,11 @@ namespace SpaceEngineersVR.Player
             msg.ProjectionMatrix = cam.ProjectionMatrix;
             msg.ProjectionFarMatrix = cam.ProjectionMatrixFar;
 
-            msg.FOV = cam.FovWithZoom;
-            msg.FOVForSkybox = cam.FovWithZoom;
+            var matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance, EGraphicsAPIConvention.API_DirectX).ToMatrix();
+            float fov = MathHelper.Atan(1.0f / matrix.M22) * 2f;
+
+            msg.FOV = fov;
+            msg.FOVForSkybox = fov;
             msg.NearPlane = cam.NearPlaneDistance;
             msg.FarPlane = cam.FarPlaneDistance;
             msg.FarFarPlane = cam.FarFarPlaneDistance;
@@ -262,17 +265,16 @@ namespace SpaceEngineersVR.Player
 
             if (!character.EnabledThrusts) 
             {
-                if (RightHand.IsValid)
-                {
-                    var vec = RightHand.GetAxis(Axis.Joystick);
-                    move.X = vec.X;
-                    move.Z = -vec.Y;
-                }
-                move *= 10;
-
                 if (LeftHand.IsValid)
                 {
                     var vec = LeftHand.GetAxis(Axis.Joystick);
+                    move.X = vec.X;
+                    move.Z = -vec.Y;
+                }
+
+                if (RightHand.IsValid)
+                {
+                    var vec = RightHand.GetAxis(Axis.Joystick);
                     rotate.Y = vec.X * 10;
                 }
 
@@ -292,6 +294,10 @@ namespace SpaceEngineersVR.Player
                         //move += v;
                     }
 
+                    var vec = RightHand.GetAxis(Axis.Joystick);
+                    rotate.Y = vec.X * 10;
+                    rotate.X = -vec.Y * 10;
+
                     //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Down, 0, 0, 255);
                     //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, Vector3D.Normalize(Vector3D.Lerp(RightHand.WorldPos.Down, RightHand.WorldPos.Forward, .5)), 255, 0, 0);
                     //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Forward, 0, 255, 0);
@@ -305,19 +311,16 @@ namespace SpaceEngineersVR.Player
                         //move += v;
                     }
 
-                    var vec = LeftHand.GetAxis(Axis.Joystick);
-                    rotate.Y = vec.X * 10;
-                    rotate.X = -vec.Y * 10;
                 }
             }
 
-            if (RightHand.IsNewButtonDown(Button.A))
+            if (LeftHand.IsNewButtonDown(Button.A))
             {
                 //TODO: wrist GUI
                 character.SwitchThrusts();
             }
 
-            //character.MoveAndRotate(move, rotate, 0f);
+            character.MoveAndRotate(move, rotate, 0f);
         }
         #endregion
 
