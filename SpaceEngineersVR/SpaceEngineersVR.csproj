@@ -80,7 +80,7 @@
   <ItemGroup>
     <Compile Include="Globals.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
-    <Compile Include="Patches\MouseMovementDisabler.cs" />
+    <Compile Include="Patches\PlayerAndCameraDisabler.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
     <Compile Include="Player\Controller.cs" />
     <Compile Include="Player\Headset.cs" />
