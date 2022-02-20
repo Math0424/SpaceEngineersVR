@@ -134,7 +134,7 @@ namespace SpaceEngineersVR.Player
                 }
             }
 
-            return true;
+            return false;
         }
 
         private void DrawEye(EVREye eye)
