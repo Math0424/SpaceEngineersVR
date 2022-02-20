@@ -103,6 +103,7 @@ namespace SpaceEngineersVR
         public void UnloadingWorld()
         {
             MyRender11.Resolution = DesktopResolution;
+            MouseMovementDisabler.DisableCameraMovementByMouse = false;
             log.Write("Unloading SE game");
             Headset.CreatePopup("Unloaded Game");
         }

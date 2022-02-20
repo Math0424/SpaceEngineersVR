@@ -86,6 +86,7 @@ namespace SpaceEngineersVR.Player
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
                 MyRender11.Resolution = new Vector2I((int)Width, (int)Height);
                 MyRender11.CreateScreenResources();
+                MouseMovementDisabler.DisableCameraMovementByMouse = true;
                 firstUpdate = false;
                 return true;
             }
