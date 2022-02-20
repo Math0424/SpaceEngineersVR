@@ -15,6 +15,12 @@ namespace SpaceEngineersVR.Wrappers
 {
     public static class MyRender11
     {
+        public static Vector2I Resolution
+        {
+            get { return (Vector2I)resolution.GetValue(null); }
+            set { SetResolution(value); }
+        }
+
         static Logger log = new Logger();
 
         static MyRender11()
@@ -86,7 +92,7 @@ namespace SpaceEngineersVR.Wrappers
         }
 
         private static readonly FieldInfo resolution;
-        public static void SetResolution(Vector2I vector)
+        private static void SetResolution(Vector2I vector)
         {
             resolution.SetValue(null, vector);
         }

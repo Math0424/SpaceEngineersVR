@@ -29,8 +29,9 @@ namespace SpaceEngineersVR.Player
         public Controller RightHand = default;
         public Controller LeftHand = default;
         public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
+        public bool IsHeadsetAlreadyDisconnected = false;
         public bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
-        public bool IsMessageboxOpen = false;
+        public bool IsControllersAlreadyDisconnected = false;
 
         uint pnX, pnY, Height, Width;
 
@@ -78,7 +79,7 @@ namespace SpaceEngineersVR.Player
             if (firstUpdate)
             {
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
-                MyRender11.SetResolution(new Vector2I((int)Width, (int)Height));
+                MyRender11.Resolution = new Vector2I((int)Width, (int)Height);
                 MyRender11.CreateScreenResources();
                 firstUpdate = false;
                 return true;
@@ -86,16 +87,26 @@ namespace SpaceEngineersVR.Player
 
             //UNTESTED
             //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
-            if (IsControllersConnected)
+            if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
             {
                 CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+                IsControllersAlreadyDisconnected = true;
+            }
+            else if (IsControllersConnected && IsControllersAlreadyDisconnected)
+            {
+                IsControllersAlreadyDisconnected = false;
             }
 
             //UNTESTED
             //Checks if the headset got disconnected, shows a message if the headset is disconnected.
-            if (!IsHeadsetConnected)
+            if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
             {
                 ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+                IsHeadsetAlreadyDisconnected = true;
+            }
+            else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
+            {
+                IsHeadsetAlreadyDisconnected = false;
             }
 
             //New Code
@@ -361,21 +372,15 @@ namespace SpaceEngineersVR.Player
         /// </summary>
         /// <param name="msg">The message of the messagebox.</param>
         /// <param name="caption">The caption of the messagebox.</param>
-        /// <returns>The button that the user clicked as System.Windows.Forms.DialogResult</returns>
+        /// <returns>The button that the user clicked as System.Windows.Forms.DialogResult.</returns>
         public DialogResult ShowMessageBoxAsync(string msg, string caption)
         {
-            if (!IsMessageboxOpen)
+            Parallel.Start(() =>
             {
-                Parallel.Start(() =>
-                {
-                    IsMessageboxOpen = true;
-                    log.Write($"Messagebox created with the message: {msg}");
-                    DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
-                    IsMessageboxOpen = false;
-                    return result;
-                });
-            }
-            log.Write("Messagebox already open.");
+                log.Write($"Messagebox created with the message: {msg}");
+                DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
+                return result;
+            });
             return DialogResult.None;
         }
         #endregion

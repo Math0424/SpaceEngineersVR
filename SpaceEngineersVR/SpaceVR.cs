@@ -6,6 +6,7 @@ using SharpDX.Direct3D11;
 using SpaceEngineersVR.Patches;
 using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Utils;
+using SpaceEngineersVR.Wrappers;
 using System;
 using System.Drawing;
 using System.Text;
@@ -14,6 +15,7 @@ using Valve.VR;
 using VRage;
 using VRage.Plugins;
 using VRage.Utils;
+using VRageMath;
 using VRageRender;
 
 namespace SpaceEngineersVR
@@ -25,6 +27,8 @@ namespace SpaceEngineersVR
         public static bool IsValid { get; private set; }
         static Headset Headset;
         Logger log;
+
+        private Vector2I DesktopResolution;
 
         public void Init(object gameInstance)
         {
@@ -73,7 +77,9 @@ namespace SpaceEngineersVR
             Headset.CreatePopup("Booted successfully");
 
             MySession.AfterLoading += AfterLoadedWorld;
-            MySession.OnUnloading += UnLoadingWorld;
+            MySession.OnUnloading += UnloadingWorld;
+
+            DesktopResolution = MyRender11.Resolution;
 
             IsValid = true;
             log.Write("Cleaning up...");
@@ -94,10 +100,11 @@ namespace SpaceEngineersVR
             Headset.CreatePopup("Loaded Game");
         }
 
-        public void UnLoadingWorld()
+        public void UnloadingWorld()
         {
+            MyRender11.Resolution = DesktopResolution;
             log.Write("Unloading SE game");
-            Headset.CreatePopup("UnLoaded Game");
+            Headset.CreatePopup("Unloaded Game");
         }
 
         public void Dispose()
