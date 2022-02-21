@@ -97,6 +97,8 @@
     <Compile Include="Wrappers\MyRenderContext.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\.vrmanifest" />
+    <Content Include="Assets\actions.json" />
     <Content Include="Assets\icon.ico" />
     <Content Include="Assets\logo.png" />
   </ItemGroup>

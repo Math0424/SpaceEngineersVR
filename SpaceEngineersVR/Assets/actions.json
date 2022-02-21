@@ -1,0 +1,395 @@
+{
+  "version": 1,
+  "minimum_required_version": 1,
+  "default_bindings": [
+    {
+      "controller_type": "hpmotioncontroller",
+      "binding_url": "binding_hpmotioncontroller.json"
+    }
+  ],
+  "actions": [
+    {
+      "name": "/actions/movement/in/ThrustForwardBackward",
+      "requirement": "mandatory",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/ThrustLeftRight",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/ThrustUpDown",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/ThrustDirection",
+      "requirement": "optional",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/movement/in/RotateUpDown",
+      "requirement": "mandatory",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/RotateLeftRight",
+      "requirement": "mandatory",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/RollLeftRight",
+      "requirement": "optional",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/Jump",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/movement/in/Crouch",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tool/in/ToolHand",
+      "requirement": "mandatory",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/tool/in/Primary",
+      "requirement": "mandatory",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tool/in/Secondary",
+      "requirement": "mandatory",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tool/in/Reload",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tool/in/Unequip",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tool/in/Previous",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tool/in/Next",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Interact",
+      "requirement": "mandatory",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Helmet",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Jetpack",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Dampeners",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Broadcasting",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Park",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Power",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Lights",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/Respawn",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/system/in/VoxelHands",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/placement/in/Position",
+      "requirement": "mandatory",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/placement/in/ToggleSymmetry",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/placement/in/SymmetrySetup",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/placement/in/PlacementMode",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/placement/in/CubeSize",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tablet/out/TabletHand",
+      "requirement": "mandatory",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/tablet/in/Terminal",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tablet/in/Inventory",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/table/out/ColorSelector",
+      "requirement": "suggested",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/table/out/ColorPicker",
+      "requirement": "optional",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/tablet/in/BuildPlanner",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tablet/in/ToolbarConfig",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tablet/in/BlockSelector",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tablet/in/Contract",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/tablet/in/Chat",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/ToggleView",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/Pause",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/VoiceChat",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/SignalMode",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/SpectatorMode",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/game/in/Teleport",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/skeleton/in/LeftHandSkeleton",
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/left"
+    },
+    {
+      "name": "/actions/skeleton/in/RightHandSkeleton",
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/right"
+    },
+    {
+      "name": "/actions/feedback/out/Welding",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Drilling",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Grinding",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Shooting",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Placing",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Removing",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/PlacementFit",
+      "requirement": "optional",
+      "type": "vibration"
+    }
+  ],
+  "action_sets": [
+    {
+      "name": "/actions/movement",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/tool",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/system",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/placement",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/tablet",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/game",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/skeleton",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/feedback",
+      "usage": "leftright"
+    }
+  ],
+  "localization": [
+    {
+      "language_tag": "en_us",
+      "/actions/movement": "Movement",
+      "/actions/movement/in/ThrustForwardBackward": "Move forward/backward",
+      "/actions/movement/in/ThrustLeftRight": "Move left/right",
+      "/actions/movement/in/ThrustUpDown": "Move up/down",
+      "/actions/movement/in/ThrustDirection": "Thrust direction",
+      "/actions/movement/in/RotateUpDown": "Rotate up/down",
+      "/actions/movement/in/RotateLeftRight": "Rotate left/right",
+      "/actions/movement/in/RollLeftRight": "Roll left/right",
+      "/actions/movement/in/Jump": "Jump",
+      "/actions/movement/in/Crouch": "Crouch",
+      "/actions/tool": "Tool",
+      "/actions/tool/in/ToolHand": "Tool hand",
+      "/actions/tool/in/Primary": "Use primary",
+      "/actions/tool/in/Secondary": "Use secondary",
+      "/actions/tool/in/Reload": "Reload",
+      "/actions/tool/in/Unequip": "Unequip",
+      "/actions/tool/in/Previous": "Previous",
+      "/actions/tool/in/Next": "Next",
+      "/actions/system": "System",
+      "/actions/system/in/Interact": "Interact",
+      "/actions/system/in/Helmet": "Helmet",
+      "/actions/system/in/Jetpack": "Jetpack",
+      "/actions/system/in/Dampeners": "Dampener",
+      "/actions/system/in/Broadcasting": "Broadcasting",
+      "/actions/system/in/Park": "Park",
+      "/actions/system/in/Power": "Power",
+      "/actions/system/in/Lights": "Light",
+      "/actions/system/in/Respawn": "Respawn",
+      "/actions/system/in/VoxelHands": "Voxel hands",
+      "/actions/placement": "Placement",
+      "/actions/placement/in/Position": "Position",
+      "/actions/placement/in/ToggleSymmetry": "Toggle symmetry",
+      "/actions/placement/in/SymmetrySetup": "Symmetry setup",
+      "/actions/placement/in/PlacementMode": "Placement mode",
+      "/actions/placement/in/CubeSize": "Cube size",
+      "/actions/tablet": "Wrist tablet",
+      "/actions/tablet/out/TabletHand": "Tablet hand",
+      "/actions/tablet/in/Terminal": "Terminal",
+      "/actions/tablet/in/Inventory": "Inventory",
+      "/actions/table/out/ColorSelector": "Color selector",
+      "/actions/table/out/ColorPicker": "Color picker",
+      "/actions/tablet/in/BuildPlanner": "Build planner",
+      "/actions/tablet/in/ToolbarConfig": "Toolbar config",
+      "/actions/tablet/in/BlockSelector": "Block selector",
+      "/actions/tablet/in/Contract": "Contract",
+      "/actions/tablet/in/Chat": "Chat",
+      "/actions/game": "Game",
+      "/actions/game/in/ToggleView": "Toggle 1st/3rd person",
+      "/actions/game/in/Pause": "Pause",
+      "/actions/game/in/VoiceChat": "Voice chat",
+      "/actions/game/in/SignalMode": "Signal mode",
+      "/actions/game/in/SpectatorMode": "Spectator mode",
+      "/actions/game/in/Teleport": "Teleport character",
+      "/actions/skeleton": "Skeleton",
+      "/actions/skeleton/in/LeftHandSkeleton": "Left hand skeleton",
+      "/actions/skeleton/in/RightHandSkeleton": "Right hand skeleton",
+      "/actions/feedback": "Feedback",
+      "/actions/feedback/out/Welding": "Welding",
+      "/actions/feedback/out/Drilling": "Drilling",
+      "/actions/feedback/out/Grinding": "Grinding",
+      "/actions/feedback/out/Shooting": "Shooting",
+      "/actions/feedback/out/Placing": "Placing",
+      "/actions/feedback/out/Removing": "Removing",
+      "/actions/feedback/out/PlacementFit": "Placement fit"
+    }
+  ]
+}
