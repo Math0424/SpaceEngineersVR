@@ -97,9 +97,17 @@
     <Compile Include="Wrappers\MyRenderContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\.vrmanifest" />
-    <Content Include="Assets\actions.json" />
-    <Content Include="Assets\binding_generic.json" />
+    <Content Include="Assets\Controller\.vrmanifest" />
+    <Content Include="Assets\Controller\actions.json" />
+    <Content Include="Assets\Controller\binding_gamepad.json" />
+    <Content Include="Assets\Controller\binding_generic.json" />
+    <Content Include="Assets\Controller\binding_holographic_controller.json" />
+    <Content Include="Assets\Controller\binding_hpmotioncontroller.json" />
+    <Content Include="Assets\Controller\binding_knuckles.json" />
+    <Content Include="Assets\Controller\binding_knuckles_ev1.json" />
+    <Content Include="Assets\Controller\binding_oculus_touch.json" />
+    <Content Include="Assets\Controller\binding_vive_controller.json" />
+    <Content Include="Assets\Controller\binding_vive_cosmos_controller.json" />
     <Content Include="Assets\icon.ico" />
     <Content Include="Assets\logo.png" />
     <Content Include="deploy.bat" />

@@ -65,7 +65,7 @@ namespace SpaceEngineersVR
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
             log.Write("Creating VR environment");
-            OpenVR.Input.SetActionManifestPath(Path.Combine(assetFolder, "actions.json"));
+            OpenVR.Input.SetActionManifestPath(Path.Combine(assetFolder, "Controller", "actions.json"));
             Harmony = new Harmony("SpaceEngineersVR");
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
