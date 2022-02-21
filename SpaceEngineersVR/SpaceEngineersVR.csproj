@@ -101,6 +101,7 @@
     <Content Include="Assets\actions.json" />
     <Content Include="Assets\icon.ico" />
     <Content Include="Assets\logo.png" />
+    <Content Include="deploy.bat" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -202,7 +203,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "$(ProjectDir)..\Bin64\Plugins\Local\$(ProjectName).dll"</PostBuildEvent>
+    <PostBuildEvent>call "$(ProjectDir)\deploy.bat" "$(TargetPath)" "$(SolutionName)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>del /f "$(ProjectDir)..\Bin64\Plugins\Local\$(ProjectName).dll"</PreBuildEvent>
