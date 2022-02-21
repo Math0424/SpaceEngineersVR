@@ -405,7 +405,8 @@ namespace SpaceEngineersVR.Player
 
         public void CreatePopup(string message)
         {
-            Bitmap img = new Bitmap(File.OpenRead(Util.GetAssetFolder() + "logo.png"));
+            var logoPath = Path.Combine(Util.GetAssetFolder(), "logo.png");
+            Bitmap img = new Bitmap(File.OpenRead( logoPath));
             CreatePopup(EVRNotificationType.Transient, message, ref img);
         }
 

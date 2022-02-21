@@ -26,7 +26,7 @@ namespace SpaceEngineersVR
 
         public static string GetAssetFolder()
         {
-            return (GetPluginsFolder() + "/SEVRAssets/");
+            return Path.Combine(GetPluginsFolder(), "SEVRAssets");
         }
 
         public static string GetPluginsFolder()

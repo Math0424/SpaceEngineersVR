@@ -8,6 +8,7 @@ using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Utils;
 using System;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
@@ -58,17 +59,18 @@ namespace SpaceEngineersVR
 
             log.Write("De-Keenifying enviroment");
             Form GameWindow = (Form)AccessTools.Field(MyVRage.Platform.Windows.GetType(), "m_form").GetValue(MyVRage.Platform.Windows);
-            GameWindow.Icon = new Icon(Util.GetAssetFolder() + "icon.ico");
+            var assetFolder = Util.GetAssetFolder();
+            GameWindow.Icon = new Icon( Path.Combine(assetFolder, "icon.ico"));
             GameWindow.Text = "SpaceEngineersVR";
             GameWindow.AccessibleName = "SpaceEngineersVR";
-            
-            MyPerGameSettings.GameIcon = Util.GetAssetFolder() + "icon.ico";
+
+            MyPerGameSettings.GameIcon = Path.Combine(assetFolder, "icon.ico");
             MyPerGameSettings.BasicGameInfo.GameName = "SpaceEngineersVR";
             MyPerGameSettings.BasicGameInfo.ApplicationName = "SpaceEngineersVR";
-            MyPerGameSettings.BasicGameInfo.SplashScreenImage = (Util.GetAssetFolder() + "logo.png");
+            MyPerGameSettings.BasicGameInfo.SplashScreenImage = Path.Combine(assetFolder, "logo.png");
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
-            log.Write("Creating VR enviroment");
+            log.Write("Creating VR environment");
             Harmony = new Harmony("SpaceEngineersVR");
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
