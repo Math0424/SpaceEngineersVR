@@ -12,7 +12,6 @@ using System.IO;
 using System.Text;
 using Valve.VR;
 using VRage.Game.ModAPI;
-using VRage.Game.Utils;
 using VRage.Input;
 using VRageMath;
 using VRageRender;
@@ -25,18 +24,24 @@ namespace SpaceEngineersVR.Player
         Logger log = new Logger();
 
         public MatrixD RealWorldPos;
-        public Controller RightHand = default;
-        public Controller LeftHand = default;
+        public Controller RightHand = new Controller(ETrackedControllerRole.LeftHand);
+        public Controller LeftHand = new Controller(ETrackedControllerRole.RightHand);
 
-        uint pnX, pnY, Height, Width;
+        private readonly uint pnX;
+        private readonly uint pnY;
+        private readonly uint height;
+        private readonly uint width;
 
-        VRTextureBounds_t TextureBounds;
-        TrackedDevicePose_t[] RenderPositions;
-        TrackedDevicePose_t[] GamePositions;
+        private VRTextureBounds_t textureBounds;
+        private readonly TrackedDevicePose_t[] renderPositions;
+        private readonly TrackedDevicePose_t[] gamePositions;
 
         private float ipd;
         private float ipdCorrection;
-        private float ipdCorrectionStep = 5e-5f;
+        private const float IpdCorrectionStep = 5e-5f;
+
+        private bool enableNotifications = false;
+        private bool enableAxisLogging = true;
 
         public Headset()
         {
@@ -44,24 +49,25 @@ namespace SpaceEngineersVR.Player
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
             //MyRenderProxy.RenderThread.BeforeDraw += FrameUpdate;
 
-            OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Right, ref pnX, ref pnY, ref Width, ref Height);
+            OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Right, ref pnX, ref pnY, ref width, ref height);
 
-            RenderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-            GamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+            renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+            gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 
-            TextureBounds = new VRTextureBounds_t
+            textureBounds = new VRTextureBounds_t
             {
                 uMax = 1,
                 vMax = 1
             };
 
-            log.Write($"Found headset with eye resolution of '{Width}x{Height}'");
+            log.Write($"Found headset with eye resolution of '{width}x{height}'");
         }
 
         #region DrawingLogic
 
         bool firstUpdate = true;
         BorrowedRtvTexture texture;
+
         private bool FrameUpdate()
         {
             GetNewPositions();
@@ -78,7 +84,7 @@ namespace SpaceEngineersVR.Player
             if (firstUpdate)
             {
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
-                MyRender11.SetResolution(new Vector2I((int)Width, (int)Height));
+                MyRender11.SetResolution(new Vector2I((int)width, (int)height));
                 MyRender11.CreateScreenResources();
                 firstUpdate = false;
                 return true;
@@ -97,13 +103,13 @@ namespace SpaceEngineersVR.Player
 
             //MyRender11.FullDrawScene(false);
             texture?.Release();
-            texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)Width, (int)Height, Format.R8G8B8A8_UNorm_SRgb);
+            texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)width, (int)height, Format.R8G8B8A8_UNorm_SRgb);
 
             //FrameInjections.DisablePresent = true;
 
             // Store the original matrices to remove the flickering
-            var originalWM = cam.WorldMatrix;
-            var originalVM = cam.ViewMatrix;
+            var originalWm = cam.WorldMatrix;
+            var originalVm = cam.ViewMatrix;
 
             // Stereo rendering
             cam.WorldMatrix = rightEye;
@@ -112,29 +118,40 @@ namespace SpaceEngineersVR.Player
             DrawEye(EVREye.Eye_Left);
 
             // Restore original matrices to remove the flickering
-            cam.WorldMatrix = originalWM;
-            cam.ViewMatrix = originalVM;
-             
+            cam.WorldMatrix = originalWm;
+            cam.ViewMatrix = originalVm;
+
             //FrameInjections.DisablePresent = false;
 
+            UpdateIpdCorrection();
+
+            return false;
+        }
+
+        private void UpdateIpdCorrection()
+        {
             var input = MyInput.Static;
             if (input.IsAnyAltKeyPressed() && input.IsAnyCtrlKeyPressed())
             {
-                var before = ipdCorrection;
-                if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.02)
-                    ipdCorrection += ipdCorrectionStep;
+                var modified = false;
+                if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.1)
+                {
+                    ipdCorrection += IpdCorrectionStep;
+                    modified = true;
+                }
 
-                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.02)
-                    ipdCorrection -= ipdCorrectionStep;
+                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.1)
+                {
+                    ipdCorrection -= IpdCorrectionStep;
+                    modified = true;
+                }
 
-                if (ipdCorrection != before)
+                if (modified)
                 {
                     var sign = ipdCorrection >= 0 ? '+' : '-';
                     log.Write($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
                 }
             }
-
-            return false;
         }
 
         private void DrawEye(EVREye eye)
@@ -142,15 +159,14 @@ namespace SpaceEngineersVR.Player
             UploadCameraViewMatrix(eye);
             MyRender11.DrawGameScene(texture, out _);
 
-            Texture2D texture2D = texture.GetResource();//(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
+            Texture2D texture2D = texture.GetResource(); //(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
             var input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
                 eType = EGraphicsAPIConvention.API_DirectX,
                 handle = texture2D.NativePointer
             };
-            OpenVR.Compositor.Submit(eye, ref input, ref TextureBounds, EVRSubmitFlags.Submit_Default);
-
+            OpenVR.Compositor.Submit(eye, ref input, ref textureBounds, EVRSubmitFlags.Submit_Default);
         }
 
         private void UploadCameraViewMatrix(EVREye eye)
@@ -188,7 +204,7 @@ namespace SpaceEngineersVR.Player
 
         private void GetNewPositions()
         {
-            OpenVR.Compositor.WaitGetPoses(RenderPositions, GamePositions);
+            OpenVR.Compositor.WaitGetPoses(renderPositions, gamePositions);
             Compositor_FrameTiming timings = default;
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
@@ -209,13 +225,13 @@ namespace SpaceEngineersVR.Player
             }
 
             //Update positions
-            if (!RenderPositions[0].bPoseIsValid || !RenderPositions[0].bDeviceIsConnected)
+            if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
             {
                 log.Write("HMD pos invalid!");
                 return;
             }
 
-            RealWorldPos = RenderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
+            RealWorldPos = renderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
 
             if (!RightHand.IsConnected || !LeftHand.IsConnected)
             {
@@ -232,6 +248,7 @@ namespace SpaceEngineersVR.Player
                         {
                             LeftHand.ControllerID = i;
                         }
+
                         if (role == ETrackedControllerRole.RightHand)
                         {
                             RightHand.ControllerID = i;
@@ -240,91 +257,152 @@ namespace SpaceEngineersVR.Player
                 }
             }
         }
+
         #endregion
 
         #region GameLogic
+
         public void GameUpdate()
         {
-            RightHand.UpdateControllerPosition(RenderPositions[RightHand.ControllerID]);
-            LeftHand.UpdateControllerPosition(RenderPositions[LeftHand.ControllerID]);
+            RightHand.UpdateControllerPosition(renderPositions[RightHand.ControllerID]);
+            LeftHand.UpdateControllerPosition(renderPositions[LeftHand.ControllerID]);
         }
 
         private void UpdateBeforeSimulation()
         {
-            IMyCharacter character = MyAPIGateway.Session?.Player?.Character;
-            if (character != null)
-                CharacterMovement(character);
-            //TODO: movement
+            var character = MyAPIGateway.Session?.Player?.Character;
+            if (character == null)
+                return;
+
+            if (enableAxisLogging && MySession.Static.GameplayFrameCounter % 60 == 0)
+            {
+                LogAxis(LeftHand, Axis.Joystick);
+                LogAxis(LeftHand, Axis.Trigger);
+                LogAxis(LeftHand, Axis.Grip);
+                LogAxis(LeftHand, Axis.Axis3);
+                LogAxis(LeftHand, Axis.Axis4);
+                LogOffButtons(LeftHand);
+                LogAxis(RightHand, Axis.Joystick);
+                LogAxis(RightHand, Axis.Trigger);
+                LogAxis(RightHand, Axis.Grip);
+                LogAxis(RightHand, Axis.Axis3);
+                LogAxis(RightHand, Axis.Axis4);
+                LogOffButtons(LeftHand);
+            }
+
+            CharacterMovement(character);
+
+            // TODO: Wrist GUI
+
+            // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
+        }
+
+        private void LogAxis(Controller hand, Axis axis)
+        {
+            log.Write($"{hand.Role} {axis}: {hand.GetAxis(axis)}");
+        }
+
+        private void LogOffButtons(Controller hand)
+        {
+            log.Write($"{hand.Role} touched: {hand.CurrentState.ulButtonTouched}");
+            log.Write($"{hand.Role} pressed: {hand.CurrentState.ulButtonPressed}");
         }
 
         private void CharacterMovement(IMyCharacter character)
         {
             //((MyVRageInput)MyInput.Static).EnableInput(false);
-            Vector3 move = Vector3.Zero;
-            Vector2 rotate = Vector2.Zero;
 
-            if (!character.EnabledThrusts) 
+            var move = Vector3.Zero;
+            var rotate = Vector2.Zero;
+            var roll = 0f;
+
+            if (character.EnabledThrusts)
+                JetpackMovement(character, ref move, ref rotate, ref roll);
+            else
+                WalkMovement(character, ref move, ref rotate);
+
+            // X button on left hand
+            if (LeftHand.IsNewButtonDown(Button.A))
+                character.SwitchThrusts();
+
+            character.MoveAndRotate(move, rotate, roll);
+        }
+
+        private void WalkMovement(IMyCharacter character, ref Vector3 move, ref Vector2 rotate)
+        {
+            if (LeftHand.IsValid)
             {
-                if (LeftHand.IsValid)
-                {
-                    var vec = LeftHand.GetAxis(Axis.Joystick);
-                    move.X = vec.X;
-                    move.Z = -vec.Y;
-                }
+                var joystick = LeftHand.GetAxis();
 
-                if (RightHand.IsValid)
-                {
-                    var vec = RightHand.GetAxis(Axis.Joystick);
-                    rotate.Y = vec.X * 10;
-                }
+                // Stride
+                move.X = joystick.X;
+
+                if (LeftHand.IsButtonDown(Button.Grip))
+                    // Ladder up/down
+                    move.Y = joystick.Y;
+                else
+                    // Flat surface forward/backward
+                    move.Z = -joystick.Y;
+            }
+
+            if (RightHand.IsValid)
+            {
+                var joystick = RightHand.GetAxis();
+
+                // Rotate left/right
+                rotate.Y = joystick.X * 10;
+
+                // Look up/down
+                rotate.X = -joystick.Y * 10;
+            }
+
+            if (RightHand.IsNewButtonDown(Button.A))
+                character.Crouch();
+
+            if (RightHand.IsNewButtonDown(Button.B))
+                character.Jump();
+        }
+
+        private void JetpackMovement(IMyCharacter character, ref Vector3 move, ref Vector2 rotate, ref float roll)
+        {
+            if (LeftHand.IsValid)
+            {
+                var joystick = LeftHand.GetAxis();
+
+                // Stride
+                move.X = joystick.X;
+
+                if (LeftHand.IsButtonDown(Button.Grip))
+                    // Up/down
+                    move.Y = joystick.Y;
+                else
+                    // Forward/backward
+                    move.Z = -joystick.Y;
+            }
+
+            if (RightHand.IsValid)
+            {
+                var joystick = RightHand.GetAxis();
 
                 if (RightHand.IsNewButtonDown(Button.A))
-                {
-                    //character.Jump();
-                }
-            }
-            else
-            {
-                if (RightHand.IsValid)
-                {
-                    if (RightHand.IsButtonDown(Button.B))
-                    {
-                        var v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
-                        v.Y *= -1;
-                        //move += v;
-                    }
+                    // Roll left/right
+                    roll = joystick.X * 10;
+                else
+                    // Rotate left/right
+                    rotate.Y = joystick.X * 10;
 
-                    var vec = RightHand.GetAxis(Axis.Joystick);
-                    rotate.Y = vec.X * 10;
-                    rotate.X = -vec.Y * 10;
-
-                    //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Down, 0, 0, 255);
-                    //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, Vector3D.Normalize(Vector3D.Lerp(RightHand.WorldPos.Down, RightHand.WorldPos.Forward, .5)), 255, 0, 0);
-                    //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Forward, 0, 255, 0);
-                }
-                if (LeftHand.IsValid)
-                {
-                    if (LeftHand.IsButtonDown(Button.B))
-                    {
-                        var v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
-                        v.Y *= -1;
-                        //move += v;
-                    }
-
-                }
+                // Look up/down
+                rotate.X = -joystick.Y * 10;
             }
 
-            if (LeftHand.IsNewButtonDown(Button.A))
-            {
-                //TODO: wrist GUI
-                character.SwitchThrusts();
-            }
-
-            character.MoveAndRotate(move, rotate, 0f);
+            if (RightHand.IsButtonDown(Button.B))
+                character.SwitchDamping();
         }
+
         #endregion
 
         #region Utils
+
         public void CreatePopup(string message)
         {
             Bitmap img = new Bitmap(File.OpenRead(Util.GetAssetFolder() + "logo.png"));
@@ -333,28 +411,33 @@ namespace SpaceEngineersVR.Player
 
         public void CreatePopup(EVRNotificationType type, string message, ref Bitmap bitmap)
         {
+            if (!enableNotifications)
+                return;
+
             ulong handle = 0;
             OpenVR.Overlay.CreateOverlay(Guid.NewGuid().ToString(), "SpaceEngineersVR", ref handle);
 
-            System.Drawing.Imaging.BitmapData TextureData =
-            bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb
-            );
+            System.Drawing.Imaging.BitmapData textureData =
+                bitmap.LockBits(
+                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb
+                );
+
             var image = new NotificationBitmap_t()
             {
-                bytes = TextureData.Scan0,
-                width = TextureData.Width,
-                height = TextureData.Height,
+                bytes = textureData.Scan0,
+                width = textureData.Width,
+                height = textureData.Height,
                 depth = 4
             };
+            // FIXME: Notification on overlay
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
             log.Write("Pop-up created with message: " + message);
 
-            bitmap.UnlockBits(TextureData);
+            bitmap.UnlockBits(textureData);
         }
-        #endregion
 
+        #endregion
     }
 }

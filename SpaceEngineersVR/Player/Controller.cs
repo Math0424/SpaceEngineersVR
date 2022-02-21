@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpaceEngineersVR.Utils;
 using Valve.VR;
 using VRageMath;
 
@@ -34,11 +35,13 @@ namespace SpaceEngineersVR.Player
 
     struct Controller
     {
+        public readonly ETrackedControllerRole Role;
+
         private Queue<Vector3> TenFrameSpeed;
 
         public MatrixD WorldPos;
         
-        public Vector3 TenFramVel;
+        public Vector3 TenFrameVel;
         public Vector3 CurrentVel;
         public Vector3 AngularVel;
 
@@ -51,6 +54,11 @@ namespace SpaceEngineersVR.Player
 
         private float hairTriggerLimit;
         private bool hairTriggerState, hairTriggerPrevState;
+
+        public Controller(ETrackedControllerRole role) : this()
+        {
+            Role = role;
+        }
 
         public bool IsButtonDown(Button btn) => (CurrentState.ulButtonPressed & (ulong)btn) != 0;
         public bool IsNewButtonDown(Button btn) => (CurrentState.ulButtonPressed & (ulong)btn) != 0 && (PrevState.ulButtonPressed & (ulong)btn) == 0;
@@ -71,9 +79,9 @@ namespace SpaceEngineersVR.Player
         {
             switch (axis)
             {
-                case Axis.Joystick: return new Vector2(CurrentState.rAxis0.x, CurrentState.rAxis0.y);
+                case Axis.Grip: return new Vector2(CurrentState.rAxis0.x, CurrentState.rAxis0.y);
                 case Axis.Trigger: return new Vector2(CurrentState.rAxis1.x, CurrentState.rAxis1.y);
-                case Axis.Grip: return new Vector2(CurrentState.rAxis2.x, CurrentState.rAxis2.y);
+                case Axis.Joystick: return new Vector2(CurrentState.rAxis2.x, CurrentState.rAxis2.y);
                 case Axis.Axis3: return new Vector2(CurrentState.rAxis3.x, CurrentState.rAxis3.y);
                 case Axis.Axis4: return new Vector2(CurrentState.rAxis4.x, CurrentState.rAxis4.y);
             }
@@ -103,8 +111,8 @@ namespace SpaceEngineersVR.Player
             if (TenFrameSpeed.Count > 10)
                 TenFrameSpeed.Dequeue();
             foreach (var q in TenFrameSpeed)
-                TenFramVel += q;
-            TenFramVel /= 10;
+                TenFrameVel += q;
+            TenFrameVel /= 10;
 
 
             hairTriggerPrevState = hairTriggerState;
