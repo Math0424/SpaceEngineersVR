@@ -163,7 +163,7 @@ namespace SpaceEngineersVR.Player
             var input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
-                eType = EGraphicsAPIConvention.API_DirectX,
+                eType = ETextureType.DirectX,
                 handle = texture2D.NativePointer
             };
             OpenVR.Compositor.Submit(eye, ref input, ref textureBounds, EVRSubmitFlags.Submit_Default);
@@ -184,7 +184,7 @@ namespace SpaceEngineersVR.Player
             msg.ProjectionMatrix = cam.ProjectionMatrix;
             msg.ProjectionFarMatrix = cam.ProjectionMatrixFar;
 
-            var matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance, EGraphicsAPIConvention.API_DirectX).ToMatrix();
+            var matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance).ToMatrix();
             float fov = MathHelper.Atan(1.0f / matrix.M22) * 2f;
 
             msg.FOV = fov;
@@ -218,7 +218,6 @@ namespace SpaceEngineersVR.Player
                 builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                builder.AppendLine("FidelityLevel: " + timings.m_nFidelityLevel);
                 log.Write(builder.ToString());
                 log.DecreaseIndent();
                 log.Write("");
@@ -406,7 +405,7 @@ namespace SpaceEngineersVR.Player
         public void CreatePopup(string message)
         {
             var logoPath = Path.Combine(Util.GetAssetFolder(), "logo.png");
-            Bitmap img = new Bitmap(File.OpenRead( logoPath));
+            Bitmap img = new Bitmap(File.OpenRead(logoPath));
             CreatePopup(EVRNotificationType.Transient, message, ref img);
         }
 
@@ -427,10 +426,10 @@ namespace SpaceEngineersVR.Player
 
             var image = new NotificationBitmap_t()
             {
-                bytes = textureData.Scan0,
-                width = textureData.Width,
-                height = textureData.Height,
-                depth = 4
+                m_pImageData = textureData.Scan0,
+                m_nWidth = textureData.Width,
+                m_nHeight = textureData.Height,
+                m_nBytesPerPixel = 4
             };
             // FIXME: Notification on overlay
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SpaceEngineersVR.Utils;
 using Valve.VR;
 using VRageMath;
 
@@ -33,7 +29,7 @@ namespace SpaceEngineersVR.Player
         Axis4 = 4,
     }
 
-    struct Controller
+    public struct Controller
     {
         public readonly ETrackedControllerRole Role;
 
@@ -98,7 +94,7 @@ namespace SpaceEngineersVR.Player
             PrevState = CurrentState;
 
             IsConnected = pos.bDeviceIsConnected;
-            IsValid = OpenVR.System.GetControllerStateWithPose(ETrackingUniverseOrigin.TrackingUniverseStanding, ControllerID, ref CurrentState, ref pos);
+            IsValid = false; // OpenVR.System.GetControllerStateWithPose(ETrackingUniverseOrigin.TrackingUniverseStanding, ControllerID, ref CurrentState, sizeof(VRControllerState_t), ref pos);
 
             WorldPos = pos.mDeviceToAbsoluteTracking.ToMatrix();
 

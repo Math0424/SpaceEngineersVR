@@ -1,22 +1,14 @@
-﻿using Sandbox;
-using Sandbox.ModAPI;
-using SpaceEngineersVR.Player;
+﻿using SpaceEngineersVR.Player;
 using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Valve.VR;
 using VRage.Game;
 using VRage.Utils;
 using VRageMath;
 using VRageRender;
+using Vector4 = VRageMath.Vector4;
 
 namespace SpaceEngineersVR
 {
@@ -36,7 +28,7 @@ namespace SpaceEngineersVR
 
         public static void DrawDebugLine(Vector3D pos, Vector3D dir, int r, int g, int b)
         {
-            Vector4 color = new Vector4(r / 255, g / 255, b / 255, 1);
+            Vector4 color = new Vector4(r / 255f, g / 255f, b / 255f, 1);
             MySimpleObjectDraw.DrawLine(pos, pos + dir * 10, SQUARE, ref color, 0.01f);
         }
 
@@ -44,7 +36,7 @@ namespace SpaceEngineersVR
         {
             MatrixD x = MatrixD.Identity;
             x.Translation = pos;
-            Color color = new Vector4(r / 255, g / 255, b / 255, 1);
+            Color color = new Vector4(r / 255f, g / 255f, b / 255f, 1);
             MySimpleObjectDraw.DrawTransparentSphere(ref x, radius, ref color, MySimpleObjectRasterizer.SolidAndWireframe, 1, SQUARE, SQUARE);
         }
 
