@@ -2,20 +2,14 @@
 using Sandbox;
 using Sandbox.Game;
 using Sandbox.Game.World;
-using SharpDX.Direct3D11;
-using SpaceEngineersVR.Patches;
 using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Utils;
-using System;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
 using VRage;
 using VRage.Plugins;
-using VRage.Utils;
-using VRageRender;
 
 namespace SpaceEngineersVR
 {
@@ -71,6 +65,7 @@ namespace SpaceEngineersVR
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
             log.Write("Creating VR environment");
+            OpenVR.Input.SetActionManifestPath(Path.Combine(assetFolder, "actions.json"));
             Harmony = new Harmony("SpaceEngineersVR");
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
@@ -87,7 +82,6 @@ namespace SpaceEngineersVR
             if (!IsValid || OpenVR.System == null)
                 return;
 
-            Headset.GameUpdate();
             // log.Write("Game update");
         }
 

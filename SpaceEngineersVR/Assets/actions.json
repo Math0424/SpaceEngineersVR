@@ -3,8 +3,8 @@
   "minimum_required_version": 1,
   "default_bindings": [
     {
-      "controller_type": "hpmotioncontroller",
-      "binding_url": "binding_hpmotioncontroller.json"
+      "controller_type": "generic",
+      "binding_url": "binding_generic.json"
     }
   ],
   "actions": [
@@ -179,12 +179,12 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/table/out/ColorSelector",
+      "name": "/actions/tablet/out/ColorSelector",
       "requirement": "suggested",
       "type": "pose"
     },
     {
-      "name": "/actions/table/out/ColorPicker",
+      "name": "/actions/tablet/out/ColorPicker",
       "requirement": "optional",
       "type": "pose"
     },
@@ -365,8 +365,8 @@
       "/actions/tablet/out/TabletHand": "Tablet hand",
       "/actions/tablet/in/Terminal": "Terminal",
       "/actions/tablet/in/Inventory": "Inventory",
-      "/actions/table/out/ColorSelector": "Color selector",
-      "/actions/table/out/ColorPicker": "Color picker",
+      "/actions/tablet/out/ColorSelector": "Color selector",
+      "/actions/tablet/out/ColorPicker": "Color picker",
       "/actions/tablet/in/BuildPlanner": "Build planner",
       "/actions/tablet/in/ToolbarConfig": "Toolbar config",
       "/actions/tablet/in/BlockSelector": "Block selector",

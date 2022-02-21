@@ -24,8 +24,6 @@ namespace SpaceEngineersVR.Player
         Logger log = new Logger();
 
         public MatrixD RealWorldPos;
-        public Controller RightHand = new Controller(ETrackedControllerRole.LeftHand);
-        public Controller LeftHand = new Controller(ETrackedControllerRole.RightHand);
 
         private readonly uint pnX;
         private readonly uint pnY;
@@ -41,7 +39,8 @@ namespace SpaceEngineersVR.Player
         private const float IpdCorrectionStep = 5e-5f;
 
         private bool enableNotifications = false;
-        private bool enableAxisLogging = true;
+
+        private readonly Actions actions = new Actions();
 
         public Headset()
         {
@@ -231,41 +230,11 @@ namespace SpaceEngineersVR.Player
             }
 
             RealWorldPos = renderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
-
-            if (!RightHand.IsConnected || !LeftHand.IsConnected)
-            {
-                if (MySandboxGame.TotalTimeInTicks % 1000 == 0)
-                    log.Write("Unable to find controller(s)!");
-
-                for (uint i = 0; i < OpenVR.k_unMaxTrackedDeviceCount; i++)
-                {
-                    var x = OpenVR.System.GetTrackedDeviceClass(i);
-                    if (x == ETrackedDeviceClass.Controller)
-                    {
-                        var role = OpenVR.System.GetControllerRoleForTrackedDeviceIndex(i);
-                        if (role == ETrackedControllerRole.LeftHand)
-                        {
-                            LeftHand.ControllerID = i;
-                        }
-
-                        if (role == ETrackedControllerRole.RightHand)
-                        {
-                            RightHand.ControllerID = i;
-                        }
-                    }
-                }
-            }
         }
 
         #endregion
 
         #region GameLogic
-
-        public void GameUpdate()
-        {
-            RightHand.UpdateControllerPosition(renderPositions[RightHand.ControllerID]);
-            LeftHand.UpdateControllerPosition(renderPositions[LeftHand.ControllerID]);
-        }
 
         private void UpdateBeforeSimulation()
         {
@@ -273,38 +242,13 @@ namespace SpaceEngineersVR.Player
             if (character == null)
                 return;
 
-            if (enableAxisLogging && MySession.Static.GameplayFrameCounter % 60 == 0)
-            {
-                LogAxis(LeftHand, Axis.Joystick);
-                LogAxis(LeftHand, Axis.Trigger);
-                LogAxis(LeftHand, Axis.Grip);
-                LogAxis(LeftHand, Axis.Axis3);
-                LogAxis(LeftHand, Axis.Axis4);
-                LogOffButtons(LeftHand);
-                LogAxis(RightHand, Axis.Joystick);
-                LogAxis(RightHand, Axis.Trigger);
-                LogAxis(RightHand, Axis.Grip);
-                LogAxis(RightHand, Axis.Axis3);
-                LogAxis(RightHand, Axis.Axis4);
-                LogOffButtons(LeftHand);
-            }
+            actions.Update();
 
             CharacterMovement(character);
 
             // TODO: Wrist GUI
 
             // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
-        }
-
-        private void LogAxis(Controller hand, Axis axis)
-        {
-            log.Write($"{hand.Role} {axis}: {hand.GetAxis(axis)}");
-        }
-
-        private void LogOffButtons(Controller hand)
-        {
-            log.Write($"{hand.Role} touched: {hand.CurrentState.ulButtonTouched}");
-            log.Write($"{hand.Role} pressed: {hand.CurrentState.ulButtonPressed}");
         }
 
         private void CharacterMovement(IMyCharacter character)
@@ -321,7 +265,7 @@ namespace SpaceEngineersVR.Player
                 WalkMovement(character, ref move, ref rotate);
 
             // X button on left hand
-            if (LeftHand.IsNewButtonDown(Button.A))
+            if (actions.Jetpack.bState && actions.Jetpack.bChanged)
                 character.SwitchThrusts();
 
             character.MoveAndRotate(move, rotate, roll);
@@ -329,73 +273,77 @@ namespace SpaceEngineersVR.Player
 
         private void WalkMovement(IMyCharacter character, ref Vector3 move, ref Vector2 rotate)
         {
-            if (LeftHand.IsValid)
-            {
-                var joystick = LeftHand.GetAxis();
+            move.Z = -actions.ThrustForwardBackward.x;
 
-                // Stride
-                move.X = joystick.X;
-
-                if (LeftHand.IsButtonDown(Button.Grip))
-                    // Ladder up/down
-                    move.Y = joystick.Y;
-                else
-                    // Flat surface forward/backward
-                    move.Z = -joystick.Y;
-            }
-
-            if (RightHand.IsValid)
-            {
-                var joystick = RightHand.GetAxis();
-
-                // Rotate left/right
-                rotate.Y = joystick.X * 10;
-
-                // Look up/down
-                rotate.X = -joystick.Y * 10;
-            }
-
-            if (RightHand.IsNewButtonDown(Button.A))
-                character.Crouch();
-
-            if (RightHand.IsNewButtonDown(Button.B))
-                character.Jump();
+            // if (LeftHand.IsValid)
+            // {
+            //     var joystick = LeftHand.GetAxis();
+            //
+            //     // Stride
+            //     move.X = joystick.X;
+            //
+            //     if (LeftHand.IsButtonDown(Button.Grip))
+            //         // Ladder up/down
+            //         move.Y = joystick.Y;
+            //     else
+            //         // Flat surface forward/backward
+            //         move.Z = -joystick.Y;
+            // }
+            //
+            // if (RightHand.IsValid)
+            // {
+            //     var joystick = RightHand.GetAxis();
+            //
+            //     // Rotate left/right
+            //     rotate.Y = joystick.X * 10;
+            //
+            //     // Look up/down
+            //     rotate.X = -joystick.Y * 10;
+            // }
+            //
+            // if (RightHand.IsNewButtonDown(Button.A))
+            //     character.Crouch();
+            //
+            // if (RightHand.IsNewButtonDown(Button.B))
+            //     character.Jump();
         }
 
         private void JetpackMovement(IMyCharacter character, ref Vector3 move, ref Vector2 rotate, ref float roll)
         {
-            if (LeftHand.IsValid)
-            {
-                var joystick = LeftHand.GetAxis();
+            move.Z = -actions.ThrustForwardBackward.x;
 
-                // Stride
-                move.X = joystick.X;
-
-                if (LeftHand.IsButtonDown(Button.Grip))
-                    // Up/down
-                    move.Y = joystick.Y;
-                else
-                    // Forward/backward
-                    move.Z = -joystick.Y;
-            }
-
-            if (RightHand.IsValid)
-            {
-                var joystick = RightHand.GetAxis();
-
-                if (RightHand.IsNewButtonDown(Button.A))
-                    // Roll left/right
-                    roll = joystick.X * 10;
-                else
-                    // Rotate left/right
-                    rotate.Y = joystick.X * 10;
-
-                // Look up/down
-                rotate.X = -joystick.Y * 10;
-            }
-
-            if (RightHand.IsButtonDown(Button.B))
-                character.SwitchDamping();
+            // if (LeftHand.IsValid)
+            // {
+            //     var joystick = LeftHand.GetAxis();
+            //
+            //     // Stride
+            //     move.X = joystick.X;
+            //
+            //     if (LeftHand.IsButtonDown(Button.Grip))
+            //         // Up/down
+            //         move.Y = joystick.Y;
+            //     else
+            //         // Forward/backward
+            //         move.Z = -joystick.Y;
+            // }
+            //
+            // if (RightHand.IsValid)
+            // {
+            //     var joystick = RightHand.GetAxis();
+            //
+            //     if (RightHand.IsNewButtonDown(Button.A))
+            //         // Roll left/right
+            //         roll = joystick.X * 10;
+            //     else
+            //         // Rotate left/right
+            //         rotate.Y = joystick.X * 10;
+            //
+            //     // Look up/down
+            //     rotate.X = -joystick.Y * 10;
+            // }
+            //
+            // if (RightHand.IsButtonDown(Button.B))
+            //     character.SwitchDamping();
         }
 
         #endregion
