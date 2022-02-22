@@ -296,7 +296,7 @@ namespace SpaceEngineersVR.Player
 
                 move.X = pos.X;
 
-                if (actions.Vertical.IsPressed)
+                if (actions.Vertical.IsPressed || actions.Thrust.Active || actions.Forward.Active && actions.Backward.Active)
                     move.Y = pos.Y;
                 else
                     move.Z = -pos.Y;
@@ -309,6 +309,12 @@ namespace SpaceEngineersVR.Player
 
                 if (actions.Crouch.HasPressed)
                     move = -actions.TabletHand.AbsoluteTracking.Forward;
+
+                if (actions.Forward.Active)
+                    move += actions.Forward.Position.X * actions.TabletHand.AbsoluteTracking.Forward;
+
+                if (actions.Backward.Active)
+                    move = -actions.Backward.Position.X * actions.TabletHand.AbsoluteTracking.Forward;
             }
         }
 

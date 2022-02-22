@@ -52,27 +52,37 @@
     },
     {
       "name": "/actions/movement/in/Thrust",
-      "requirement": "optional",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/Forward",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/Backward",
+      "requirement": "suggested",
       "type": "vector1"
     },
     {
       "name": "/actions/movement/in/Vertical",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/movement/in/Roll",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/movement/in/Jump",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/movement/in/Crouch",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -97,17 +107,17 @@
     },
     {
       "name": "/actions/tool/in/Unequip",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tool/in/Previous",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tool/in/Next",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -117,7 +127,7 @@
     },
     {
       "name": "/actions/system/in/Helmet",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -132,17 +142,17 @@
     },
     {
       "name": "/actions/system/in/Broadcasting",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/system/in/Park",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/system/in/Power",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -152,22 +162,22 @@
     },
     {
       "name": "/actions/system/in/Respawn",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/system/in/VoxelHands",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/placement/in/ToggleSymmetry",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/placement/in/SymmetrySetup",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -177,7 +187,7 @@
     },
     {
       "name": "/actions/placement/in/CubeSize",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -187,12 +197,12 @@
     },
     {
       "name": "/actions/tablet/in/Terminal",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tablet/in/Inventory",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -202,62 +212,62 @@
     },
     {
       "name": "/actions/tablet/out/ColorPicker",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "pose"
     },
     {
       "name": "/actions/tablet/in/BuildPlanner",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tablet/in/ToolbarConfig",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tablet/in/BlockSelector",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tablet/in/Contract",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tablet/in/Chat",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/game/in/ToggleView",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/game/in/Pause",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/game/in/VoiceChat",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/game/in/SignalMode",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/game/in/SpectatorMode",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/game/in/Teleport",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -272,37 +282,37 @@
     },
     {
       "name": "/actions/feedback/out/Welding",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     },
     {
       "name": "/actions/feedback/out/Drilling",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     },
     {
       "name": "/actions/feedback/out/Grinding",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     },
     {
       "name": "/actions/feedback/out/Shooting",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     },
     {
       "name": "/actions/feedback/out/Placing",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     },
     {
       "name": "/actions/feedback/out/Removing",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     },
     {
       "name": "/actions/feedback/out/PlacementFit",
-      "requirement": "optional",
+      "requirement": "suggested",
       "type": "vibration"
     }
   ],
@@ -347,6 +357,8 @@
       "/actions/movement/in/Move": "Move",
       "/actions/movement/in/Rotate": "Rotate",
       "/actions/movement/in/Thrust": "Thrust",
+      "/actions/movement/in/Forward": "Forward",
+      "/actions/movement/in/Backward": "Backward",
       "/actions/movement/in/Vertical": "Move vertically",
       "/actions/movement/in/Roll": "Rotate in roll axis",
       "/actions/movement/in/Jump": "Jump or forward thrust",

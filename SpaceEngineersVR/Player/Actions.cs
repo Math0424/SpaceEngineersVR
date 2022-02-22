@@ -5,7 +5,9 @@ namespace SpaceEngineersVR.Player
         // Movement
         public readonly Joystick Move;
         public readonly Joystick Rotate;
-        public readonly Button Thrust;
+        public readonly Joystick Thrust;
+        public readonly Joystick Forward;
+        public readonly Joystick Backward;
         public readonly Button Vertical;
         public readonly Button Roll;
         public readonly Button Jump;
@@ -75,7 +77,9 @@ namespace SpaceEngineersVR.Player
         {
             Move = new Joystick("/actions/movement/in/Move");
             Rotate = new Joystick("/actions/movement/in/Rotate");
-            Thrust = new Button("/actions/movement/in/Thrust");
+            Thrust = new Joystick("/actions/movement/in/Thrust");
+            Forward = new Joystick("/actions/movement/in/Forward");
+            Backward = new Joystick("/actions/movement/in/Backward");
             Vertical = new Button("/actions/movement/in/Vertical");
             Roll = new Button("/actions/movement/in/Roll");
             Jump = new Button("/actions/movement/in/Jump");
@@ -136,6 +140,8 @@ namespace SpaceEngineersVR.Player
             Move.Update();
             Rotate.Update();
             Thrust.Update();
+            Forward.Update();
+            Backward.Update();
             Vertical.Update();
             Roll.Update();
             Jump.Update();
