@@ -4,7 +4,7 @@ using VRageMath;
 
 namespace SpaceEngineersVR.Player
 {
-    public class Joystick
+    public class Analog
     {
         private static readonly unsafe uint InputAnalogActionData_t_size = (uint)sizeof(InputAnalogActionData_t);
 
@@ -15,7 +15,7 @@ namespace SpaceEngineersVR.Player
         public Vector2 Position => new Vector2(data.x, data.y);
         public Vector2 Delta => new Vector2(data.deltaX, data.deltaY);
 
-        public Joystick(string name)
+        public Analog(string name)
         {
             OpenVR.Input.GetActionHandle(name, ref handle);
         }

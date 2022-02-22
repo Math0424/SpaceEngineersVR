@@ -1,0 +1,239 @@
+using System.IO;
+using Valve.VR;
+
+// See:
+// https://github.com/ValveSoftware/openvr/wiki/SteamVR-Input
+// https://github.com/ValveSoftware/openvr/wiki/Action-manifest
+
+namespace SpaceEngineersVR.Player
+{
+    public class Controls
+    {
+        // Walking
+        public readonly Analog Walk;
+        public readonly Analog WalkForward;
+        public readonly Analog WalkBackward;
+        public readonly Analog WalkRotate;
+        public readonly Button JumpOrClimbUp;
+        public readonly Button CrouchOrClimbDown;
+
+        // Flying
+        public readonly Analog ThrustLRUD;
+        public readonly Analog ThrustLRFB;
+        public readonly Analog ThrustUp;
+        public readonly Analog ThrustDown;
+        public readonly Analog ThrustForward;
+        public readonly Analog ThrustBackward;
+        public readonly Analog ThrustRotate;
+        public readonly Button ThrustRoll;
+        public readonly Button Dampeners;
+
+        // Tool
+        public readonly Button Primary;
+        public readonly Button Secondary;
+        public readonly Button Reload;
+        public readonly Button Unequip;
+        public readonly Button Previous;
+        public readonly Button Next;
+
+        // System
+        public readonly Button Interact;
+        public readonly Button Helmet;
+        public readonly Button Jetpack;
+        public readonly Button Broadcasting;
+        public readonly Button Park;
+        public readonly Button Power;
+        public readonly Button Lights;
+        public readonly Button Respawn;
+        public readonly Button VoxelHands;
+
+        // Placement
+        public readonly Button ToggleSymmetry;
+        public readonly Button SymmetrySetup;
+        public readonly Button PlacementMode;
+        public readonly Button CubeSize;
+
+        // Wrist tablet
+        public readonly Button Terminal;
+        public readonly Button Inventory;
+        public readonly Button ColorSelector;
+        public readonly Button ColorPicker;
+        public readonly Button BuildPlanner;
+        public readonly Button ToolbarConfig;
+        public readonly Button BlockSelector;
+        public readonly Button Contract;
+        public readonly Button Chat;
+
+        // Game
+        public readonly Button ToggleView;
+        public readonly Button Pause;
+        public readonly Button VoiceChat;
+        public readonly Button SignalMode;
+        public readonly Button SpectatorMode;
+        public readonly Button Teleport;
+
+        // Hands
+        public readonly Pose LeftHand;
+        public readonly Pose RightHand;
+
+        // Feedback
+        public readonly Haptic Welding;
+        public readonly Haptic Drilling;
+        public readonly Haptic Grinding;
+        public readonly Haptic Shooting;
+        public readonly Haptic Placing;
+        public readonly Haptic Removing;
+        public readonly Haptic PlacementFit;
+
+        // Input sources
+        private readonly InputSource HeadSource;
+        private readonly InputSource LeftHandSource;
+        private readonly InputSource RightHandSource;
+
+        // Action sets
+        private readonly ActionSets Walking;
+        private readonly ActionSets Flying;
+
+        public Controls()
+        {
+            OpenVR.Input.SetActionManifestPath(Path.Combine(Util.GetAssetFolder(), "Controls", "actions.json"));
+
+            Walk = new Analog("/actions/walking/in/Walk");
+            WalkForward = new Analog("/actions/walking/in/WalkForward");
+            WalkBackward = new Analog("/actions/walking/in/WalkBackward");
+            WalkRotate = new Analog("/actions/walking/in/WalkRotate");
+            JumpOrClimbUp = new Button("/actions/walking/in/JumpOrClimbUp");
+            CrouchOrClimbDown = new Button("/actions/walking/in/CrouchOrClimbDown");
+            ThrustLRUD = new Analog("/actions/flying/in/ThrustLRUD");
+            ThrustLRFB = new Analog("/actions/flying/in/ThrustLRFB");
+            ThrustUp = new Analog("/actions/flying/in/ThrustUp");
+            ThrustDown = new Analog("/actions/flying/in/ThrustDown");
+            ThrustForward = new Analog("/actions/flying/in/ThrustForward");
+            ThrustBackward = new Analog("/actions/flying/in/ThrustBackward");
+            ThrustRotate = new Analog("/actions/flying/in/ThrustRotate");
+            ThrustRoll = new Button("/actions/flying/in/ThrustRoll");
+            Dampeners = new Button("/actions/flying/in/Dampeners");
+            Primary = new Button("/actions/common/in/Primary");
+            Secondary = new Button("/actions/common/in/Secondary");
+            Reload = new Button("/actions/common/in/Reload");
+            Unequip = new Button("/actions/common/in/Unequip");
+            Previous = new Button("/actions/common/in/Previous");
+            Next = new Button("/actions/common/in/Next");
+            Interact = new Button("/actions/common/in/Interact");
+            Helmet = new Button("/actions/common/in/Helmet");
+            Jetpack = new Button("/actions/common/in/Jetpack");
+            Broadcasting = new Button("/actions/common/in/Broadcasting");
+            Park = new Button("/actions/common/in/Park");
+            Power = new Button("/actions/common/in/Power");
+            Lights = new Button("/actions/common/in/Lights");
+            Respawn = new Button("/actions/common/in/Respawn");
+            VoxelHands = new Button("/actions/common/in/VoxelHands");
+            ToggleSymmetry = new Button("/actions/common/in/ToggleSymmetry");
+            SymmetrySetup = new Button("/actions/common/in/SymmetrySetup");
+            PlacementMode = new Button("/actions/common/in/PlacementMode");
+            CubeSize = new Button("/actions/common/in/CubeSize");
+            Terminal = new Button("/actions/common/in/Terminal");
+            Inventory = new Button("/actions/common/in/Inventory");
+            ColorSelector = new Button("/actions/common/out/ColorSelector");
+            ColorPicker = new Button("/actions/common/out/ColorPicker");
+            BuildPlanner = new Button("/actions/common/in/BuildPlanner");
+            ToolbarConfig = new Button("/actions/common/in/ToolbarConfig");
+            BlockSelector = new Button("/actions/common/in/BlockSelector");
+            Contract = new Button("/actions/common/in/Contract");
+            Chat = new Button("/actions/common/in/Chat");
+            ToggleView = new Button("/actions/common/in/ToggleView");
+            Pause = new Button("/actions/common/in/Pause");
+            VoiceChat = new Button("/actions/common/in/VoiceChat");
+            SignalMode = new Button("/actions/common/in/SignalMode");
+            SpectatorMode = new Button("/actions/common/in/SpectatorMode");
+            Teleport = new Button("/actions/common/in/Teleport");
+            LeftHand = new Pose("/actions/common/in/LeftHand");
+            RightHand = new Pose("/actions/common/in/RightHand");
+            Welding = new Haptic("/actions/feedback/out/Welding");
+            Drilling = new Haptic("/actions/feedback/out/Drilling");
+            Grinding = new Haptic("/actions/feedback/out/Grinding");
+            Shooting = new Haptic("/actions/feedback/out/Shooting");
+            Placing = new Haptic("/actions/feedback/out/Placing");
+            Removing = new Haptic("/actions/feedback/out/Removing");
+            PlacementFit = new Haptic("/actions/feedback/out/PlacementFit");
+
+            HeadSource = new InputSource("/user/head");
+            LeftHandSource = new InputSource("/user/hand/left");
+            RightHandSource = new InputSource("/user/hand/right");
+
+            Walking = new ActionSets("/actions/walking", "/actions/common");
+            Flying = new ActionSets("/actions/walking", "/actions/common");
+        }
+
+        public void ControlWalk()
+        {
+            Walk.Update();
+            WalkForward.Update();
+            WalkBackward.Update();
+            WalkRotate.Update();
+            JumpOrClimbUp.Update();
+            CrouchOrClimbDown.Update();
+
+            UpdateCommon();
+        }
+
+        public void ControlFlight()
+        {
+            ThrustLRUD.Update();
+            ThrustLRFB.Update();
+            ThrustUp.Update();
+            ThrustDown.Update();
+            ThrustForward.Update();
+            ThrustBackward.Update();
+            ThrustRotate.Update();
+            ThrustRoll.Update();
+            Dampeners.Update();
+
+            UpdateCommon();
+        }
+
+        private void UpdateCommon()
+        {
+            // NOTE: I know, it could be a loop.
+            // But I don't want the overhead of the virtual function calls
+            // and the loop itself for maximum performance. All these calls
+            // should be inlined, so the method calls are also saved.
+            Primary.Update();
+            Secondary.Update();
+            Reload.Update();
+            Unequip.Update();
+            Previous.Update();
+            Next.Update();
+            Interact.Update();
+            Helmet.Update();
+            Jetpack.Update();
+            Broadcasting.Update();
+            Park.Update();
+            Power.Update();
+            Lights.Update();
+            Respawn.Update();
+            VoxelHands.Update();
+            ToggleSymmetry.Update();
+            SymmetrySetup.Update();
+            PlacementMode.Update();
+            CubeSize.Update();
+            Terminal.Update();
+            Inventory.Update();
+            ColorSelector.Update();
+            ColorPicker.Update();
+            BuildPlanner.Update();
+            ToolbarConfig.Update();
+            BlockSelector.Update();
+            Contract.Update();
+            Chat.Update();
+            ToggleView.Update();
+            Pause.Update();
+            VoiceChat.Update();
+            SignalMode.Update();
+            SpectatorMode.Update();
+            Teleport.Update();
+            LeftHand.Update();
+            RightHand.Update();
+        }
+    }
+}

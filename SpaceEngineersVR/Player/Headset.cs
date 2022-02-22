@@ -1,5 +1,4 @@
-﻿using Sandbox;
-using Sandbox.Game.World;
+﻿using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -40,7 +39,7 @@ namespace SpaceEngineersVR.Player
 
         private bool enableNotifications = false;
 
-        private readonly Actions actions = new Actions();
+        private readonly Controls controls = new Controls();
 
         public Headset()
         {
@@ -234,7 +233,10 @@ namespace SpaceEngineersVR.Player
 
         #endregion
 
-        #region GameLogic
+        #region Control logic
+
+        // TODO: Configurable rotation speed and step by step rotation instead of continuous
+        private const float RotationSpeed = 10f;
 
         private void UpdateBeforeSimulation()
         {
@@ -242,96 +244,117 @@ namespace SpaceEngineersVR.Player
             if (character == null)
                 return;
 
-            actions.Update();
+            //((MyVRageInput)MyInput.Static).EnableInput(false);
 
-            CharacterMovement(character);
+            if (character.EnabledThrusts)
+                ControlFlight(character);
+            else
+                ControlWalk(character);
+
+            ControlCommonFunctions(character);
 
             // TODO: Wrist GUI
 
             // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
         }
 
-        private void CharacterMovement(IMyCharacter character)
+        private void ControlWalk(IMyCharacter character)
         {
-            //((MyVRageInput)MyInput.Static).EnableInput(false);
+            var move = Vector3.Zero;
+            var rotate = Vector2.Zero;
 
+            if (controls.Walk.Active)
+            {
+                var v = controls.Walk.Position;
+                move.X += v.X;
+                move.Z -= v.Y;
+            }
+
+            if (controls.WalkForward.Active)
+                move.Z -= controls.WalkForward.Position.X;
+
+            if (controls.WalkBackward.Active)
+                move.Z += controls.WalkForward.Position.X;
+
+            // TODO: Configurable rotation speed and step by step rotation instead of continuous
+            if (controls.WalkRotate.Active)
+            {
+                var v = controls.WalkRotate.Position;
+                rotate.Y = v.X * RotationSpeed;
+                rotate.X = -v.Y * RotationSpeed;
+            }
+
+            if (controls.JumpOrClimbUp.HasPressed)
+                character.Jump();
+
+            if (controls.CrouchOrClimbDown.HasPressed)
+                character.Crouch();
+
+            if (controls.JumpOrClimbUp.IsPressed)
+                move.Y = 1f;
+
+            if (controls.CrouchOrClimbDown.IsPressed)
+                move.Y = -1f;
+
+            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
+            character.MoveAndRotate(move, rotate, 0f);
+        }
+
+        private void ControlFlight(IMyCharacter character)
+        {
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
             var roll = 0f;
 
-            CommonMovement(ref move);
-            CommonRotation(ref rotate, ref roll);
+            if (controls.ThrustLRUD.Active)
+            {
+                var v = controls.ThrustLRUD.Position;
+                move.X += v.X;
+                move.Y += v.Y;
+            }
 
-            if (character.EnabledThrusts)
-                JetpackMovement(character, ref move);
-            else
-                WalkMovement(character);
+            if (controls.ThrustLRFB.Active)
+            {
+                var v = controls.ThrustLRFB.Position;
+                move.X += v.X;
+                move.Z -= v.Y;
+            }
 
-            if (actions.Jetpack.HasPressed)
-                character.SwitchThrusts();
+            if (controls.ThrustUp.Active)
+                move.Y += controls.ThrustUp.Position.X;
 
+            if (controls.ThrustDown.Active)
+                move.Y -= controls.ThrustDown.Position.X;
+
+            if (controls.ThrustForward.Active)
+                move.Z -= controls.ThrustForward.Position.X;
+
+            if (controls.ThrustBackward.Active)
+                move.Z += controls.ThrustBackward.Position.X;
+
+            if (controls.ThrustRotate.Active)
+            {
+                var v = controls.ThrustRotate.Position;
+                rotate.Y = v.X * RotationSpeed;
+                rotate.X = -v.Y * RotationSpeed;
+            }
+
+            if (controls.ThrustRoll.Active)
+            {
+                roll = controls.ThrustRotate.Position.X * RotationSpeed;
+            }
+
+            if (controls.Dampeners.HasPressed)
+                 character.SwitchDamping();
+
+            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
             character.MoveAndRotate(move, rotate, roll);
         }
 
-        private void WalkMovement(IMyCharacter character)
+        private void ControlCommonFunctions(IMyCharacter character)
         {
-            if (actions.Jump.HasPressed)
-                character.Jump();
-
-            if (actions.Crouch.HasPressed)
-                character.Crouch();
-        }
-
-        private void JetpackMovement(IMyCharacter character, ref Vector3 move)
-        {
-            if (actions.Dampeners.HasPressed)
-                 character.SwitchDamping();
-        }
-
-        private void CommonMovement(ref Vector3 move)
-        {
-            if (actions.Move.Active)
-            {
-                var pos = actions.Move.Position;
-
-                move.X = pos.X;
-
-                if (actions.Vertical.IsPressed || actions.Thrust.Active || actions.Forward.Active && actions.Backward.Active)
-                    move.Y = pos.Y;
-                else
-                    move.Z = -pos.Y;
-            }
-
-            if (actions.TabletHand.Active)
-            {
-                if (actions.Jump.IsPressed)
-                    move = actions.TabletHand.AbsoluteTracking.Forward;
-
-                if (actions.Crouch.HasPressed)
-                    move = -actions.TabletHand.AbsoluteTracking.Forward;
-
-                if (actions.Forward.Active)
-                    move += actions.Forward.Position.X * actions.TabletHand.AbsoluteTracking.Forward;
-
-                if (actions.Backward.Active)
-                    move = -actions.Backward.Position.X * actions.TabletHand.AbsoluteTracking.Forward;
-            }
-        }
-
-        private const float RotationSpeed = 10f;
-
-        private void CommonRotation(ref Vector2 rotate, ref float roll)
-        {
-            if (!actions.Move.Active)
-                return;
-
-            var pos = actions.Rotate.Position;
-            rotate.X = -pos.Y * RotationSpeed;
-
-            if (actions.Roll.IsPressed)
-                roll = pos.X * RotationSpeed;
-            else
-                rotate.Y = pos.X * RotationSpeed;
+            if (controls.Jetpack.HasPressed)
+                character.SwitchThrusts();
         }
 
         #endregion

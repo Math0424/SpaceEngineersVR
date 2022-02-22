@@ -82,11 +82,13 @@
     <Compile Include="Globals.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
-    <Compile Include="Player\Actions.cs" />
+    <Compile Include="Player\Controls.cs" />
+    <Compile Include="Player\ActionSets.cs" />
     <Compile Include="Player\Button.cs" />
     <Compile Include="Player\Haptic.cs" />
     <Compile Include="Player\Headset.cs" />
-    <Compile Include="Player\Joystick.cs" />
+    <Compile Include="Player\InputSource.cs" />
+    <Compile Include="Player\Analog.cs" />
     <Compile Include="Player\Pose.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Logger.cs" />
@@ -101,17 +103,17 @@
     <Compile Include="Wrappers\MyRenderContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Controller\.vrmanifest" />
-    <Content Include="Assets\Controller\actions.json" />
-    <Content Include="Assets\Controller\binding_gamepad.json" />
-    <Content Include="Assets\Controller\binding_generic.json" />
-    <Content Include="Assets\Controller\binding_holographic_controller.json" />
-    <Content Include="Assets\Controller\binding_hpmotioncontroller.json" />
-    <Content Include="Assets\Controller\binding_knuckles.json" />
-    <Content Include="Assets\Controller\binding_knuckles_ev1.json" />
-    <Content Include="Assets\Controller\binding_oculus_touch.json" />
-    <Content Include="Assets\Controller\binding_vive_controller.json" />
-    <Content Include="Assets\Controller\binding_vive_cosmos_controller.json" />
+    <Content Include="Assets\Controls\.vrmanifest" />
+    <Content Include="Assets\Controls\actions.json" />
+    <Content Include="Assets\Controls\binding_gamepad.json" />
+    <Content Include="Assets\Controls\binding_generic.json" />
+    <Content Include="Assets\Controls\binding_holographic_controller.json" />
+    <Content Include="Assets\Controls\binding_hpmotioncontroller.json" />
+    <Content Include="Assets\Controls\binding_knuckles.json" />
+    <Content Include="Assets\Controls\binding_knuckles_ev1.json" />
+    <Content Include="Assets\Controls\binding_oculus_touch.json" />
+    <Content Include="Assets\Controls\binding_vive_controller.json" />
+    <Content Include="Assets\Controls\binding_vive_cosmos_controller.json" />
     <Content Include="Assets\icon.ico" />
     <Content Include="Assets\logo.png" />
     <Content Include="deploy.bat" />
