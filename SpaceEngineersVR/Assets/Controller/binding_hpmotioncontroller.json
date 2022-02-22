@@ -1,6 +1,6 @@
 {
   "bindings": {},
   "controller_type": "generic",
-  "description": "Space Engineers VR bindings for the generic controller",
-  "name": "Space Engineers VR generic controller bindings"
+  "description": "Space Engineers VR HP Motion Controller (HP G2) bindings",
+  "name": ""
 }
