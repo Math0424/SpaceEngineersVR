@@ -21,7 +21,7 @@ IF %ERRORLEVEL% NEQ 0 GOTO :RETRY
 echo Copying "%SRC%\..\..\SEVRAssets\*.*" into "%TARGET%\SEVRAssets\"
 copy /y "%SRC%\OVRSharp.dll" "%TARGET%\"
 copy /y "%SRC%\openvr_api.dll" "%TARGET%\"
-copy /y "%SRC%\..\..\Assets\*.*" "%TARGET%\SEVRAssets\"
+xcopy /s /e /y "%SRC%\..\..\Assets\*.*" "%TARGET%\SEVRAssets\"
 echo Done
 echo.
 exit 0
