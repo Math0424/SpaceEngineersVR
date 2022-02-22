@@ -87,17 +87,17 @@
     },
     {
       "name": "/actions/tool/in/ToolHand",
-      "requirement": "mandatory",
+      "requirement": "suggested",
       "type": "pose"
     },
     {
       "name": "/actions/tool/in/Primary",
-      "requirement": "mandatory",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
       "name": "/actions/tool/in/Secondary",
-      "requirement": "mandatory",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -122,7 +122,7 @@
     },
     {
       "name": "/actions/system/in/Interact",
-      "requirement": "mandatory",
+      "requirement": "suggested",
       "type": "boolean"
     },
     {
@@ -192,7 +192,7 @@
     },
     {
       "name": "/actions/tablet/out/TabletHand",
-      "requirement": "mandatory",
+      "requirement": "suggested",
       "type": "pose"
     },
     {
@@ -208,12 +208,12 @@
     {
       "name": "/actions/tablet/out/ColorSelector",
       "requirement": "suggested",
-      "type": "pose"
+      "type": "boolean"
     },
     {
       "name": "/actions/tablet/out/ColorPicker",
       "requirement": "suggested",
-      "type": "pose"
+      "type": "boolean"
     },
     {
       "name": "/actions/tablet/in/BuildPlanner",
