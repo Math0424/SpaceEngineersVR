@@ -259,91 +259,73 @@ namespace SpaceEngineersVR.Player
             var rotate = Vector2.Zero;
             var roll = 0f;
 
-            if (character.EnabledThrusts)
-                JetpackMovement(character, ref move, ref rotate, ref roll);
-            else
-                WalkMovement(character, ref move, ref rotate);
+            CommonMovement(ref move);
+            CommonRotation(ref rotate, ref roll);
 
-            // X button on left hand
-            if (actions.Jetpack.bState && actions.Jetpack.bChanged)
+            if (character.EnabledThrusts)
+                JetpackMovement(character, ref move);
+            else
+                WalkMovement(character);
+
+            if (actions.Jetpack.HasPressed)
                 character.SwitchThrusts();
 
             character.MoveAndRotate(move, rotate, roll);
         }
 
-        private void WalkMovement(IMyCharacter character, ref Vector3 move, ref Vector2 rotate)
+        private void WalkMovement(IMyCharacter character)
         {
-            move.Z = -actions.ThrustForwardBackward.x;
+            if (actions.Jump.HasPressed)
+                character.Jump();
 
-            // if (LeftHand.IsValid)
-            // {
-            //     var joystick = LeftHand.GetAxis();
-            //
-            //     // Stride
-            //     move.X = joystick.X;
-            //
-            //     if (LeftHand.IsButtonDown(Button.Grip))
-            //         // Ladder up/down
-            //         move.Y = joystick.Y;
-            //     else
-            //         // Flat surface forward/backward
-            //         move.Z = -joystick.Y;
-            // }
-            //
-            // if (RightHand.IsValid)
-            // {
-            //     var joystick = RightHand.GetAxis();
-            //
-            //     // Rotate left/right
-            //     rotate.Y = joystick.X * 10;
-            //
-            //     // Look up/down
-            //     rotate.X = -joystick.Y * 10;
-            // }
-            //
-            // if (RightHand.IsNewButtonDown(Button.A))
-            //     character.Crouch();
-            //
-            // if (RightHand.IsNewButtonDown(Button.B))
-            //     character.Jump();
+            if (actions.Crouch.HasPressed)
+                character.Crouch();
         }
 
-        private void JetpackMovement(IMyCharacter character, ref Vector3 move, ref Vector2 rotate, ref float roll)
+        private void JetpackMovement(IMyCharacter character, ref Vector3 move)
         {
-            move.Z = -actions.ThrustForwardBackward.x;
+            if (actions.Dampeners.HasPressed)
+                 character.SwitchDamping();
+        }
 
-            // if (LeftHand.IsValid)
-            // {
-            //     var joystick = LeftHand.GetAxis();
-            //
-            //     // Stride
-            //     move.X = joystick.X;
-            //
-            //     if (LeftHand.IsButtonDown(Button.Grip))
-            //         // Up/down
-            //         move.Y = joystick.Y;
-            //     else
-            //         // Forward/backward
-            //         move.Z = -joystick.Y;
-            // }
-            //
-            // if (RightHand.IsValid)
-            // {
-            //     var joystick = RightHand.GetAxis();
-            //
-            //     if (RightHand.IsNewButtonDown(Button.A))
-            //         // Roll left/right
-            //         roll = joystick.X * 10;
-            //     else
-            //         // Rotate left/right
-            //         rotate.Y = joystick.X * 10;
-            //
-            //     // Look up/down
-            //     rotate.X = -joystick.Y * 10;
-            // }
-            //
-            // if (RightHand.IsButtonDown(Button.B))
-            //     character.SwitchDamping();
+        private void CommonMovement(ref Vector3 move)
+        {
+            if (actions.Move.Active)
+            {
+                var pos = actions.Move.Position;
+
+                move.X = pos.X;
+
+                if (actions.Vertical.IsPressed)
+                    move.Y = pos.Y;
+                else
+                    move.Z = -pos.Y;
+            }
+
+            if (actions.TabletHand.Active)
+            {
+                if (actions.Jump.IsPressed)
+                    move = actions.TabletHand.AbsoluteTracking.Forward;
+
+                if (actions.Crouch.HasPressed)
+                    move = -actions.TabletHand.AbsoluteTracking.Forward;
+            }
+        }
+
+        private const float RotationSpeed = 10f;
+
+        private void CommonRotation(ref Vector2 rotate, ref float roll)
+        {
+            if (!actions.Move.Active)
+                return;
+
+            var pos = actions.Rotate.Position;
+            rotate.X = -pos.Y * RotationSpeed;
+
+            if (actions.Roll.IsPressed)
+                roll = pos.X * RotationSpeed;
+            else
+                rotate.Y = pos.X * RotationSpeed;
         }
 
         #endregion

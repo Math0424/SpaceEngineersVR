@@ -1,320 +1,184 @@
-using Valve.VR;
-
 namespace SpaceEngineersVR.Player
 {
     public class Actions
     {
-        #region Action handles
-
         // Movement
-        private ulong ThrustForwardBackwardHandle;
-        private ulong ThrustLeftRightHandle;
-        private ulong ThrustUpDownHandle;
-        private ulong ThrustDirectionHandle;
-        private ulong RotateUpDownHandle;
-        private ulong RotateLeftRightHandle;
-        private ulong RollLeftRightHandle;
-        private ulong JumpHandle;
-        private ulong CrouchHandle;
+        public readonly Joystick Move;
+        public readonly Joystick Rotate;
+        public readonly Button Thrust;
+        public readonly Button Vertical;
+        public readonly Button Roll;
+        public readonly Button Jump;
+        public readonly Button Crouch;
 
         // Tool
-        private ulong ToolHandHandle;
-        private ulong PrimaryHandle;
-        private ulong SecondaryHandle;
-        private ulong ReloadHandle;
-        private ulong UnequipHandle;
-        private ulong PreviousHandle;
-        private ulong NextHandle;
+        public readonly Pose ToolHand;
+        public readonly Button Primary;
+        public readonly Button Secondary;
+        public readonly Button Reload;
+        public readonly Button Unequip;
+        public readonly Button Previous;
+        public readonly Button Next;
 
         // System
-        private ulong InteractHandle;
-        private ulong HelmetHandle;
-        private ulong JetpackHandle;
-        private ulong DampenersHandle;
-        private ulong BroadcastingHandle;
-        private ulong ParkHandle;
-        private ulong PowerHandle;
-        private ulong LightsHandle;
-        private ulong RespawnHandle;
-        private ulong VoxelHandsHandle;
+        public readonly Button Interact;
+        public readonly Button Helmet;
+        public readonly Button Jetpack;
+        public readonly Button Dampeners;
+        public readonly Button Broadcasting;
+        public readonly Button Park;
+        public readonly Button Power;
+        public readonly Button Lights;
+        public readonly Button Respawn;
+        public readonly Button VoxelHands;
 
         // Placement
-        private ulong PositionHandle;
-        private ulong ToggleSymmetryHandle;
-        private ulong SymmetrySetupHandle;
-        private ulong PlacementModeHandle;
-        private ulong CubeSizeHandle;
+        public readonly Button ToggleSymmetry;
+        public readonly Button SymmetrySetup;
+        public readonly Button PlacementMode;
+        public readonly Button CubeSize;
 
         // Wrist tablet
-        private ulong TabletHandHandle;
-        private ulong TerminalHandle;
-        private ulong InventoryHandle;
-        private ulong ColorSelectorHandle;
-        private ulong ColorPickerHandle;
-        private ulong BuildPlannerHandle;
-        private ulong ToolbarConfigHandle;
-        private ulong BlockSelectorHandle;
-        private ulong ContractHandle;
-        private ulong ChatHandle;
+        public readonly Pose TabletHand;
+        public readonly Button Terminal;
+        public readonly Button Inventory;
+        public readonly Button ColorSelector;
+        public readonly Button ColorPicker;
+        public readonly Button BuildPlanner;
+        public readonly Button ToolbarConfig;
+        public readonly Button BlockSelector;
+        public readonly Button Contract;
+        public readonly Button Chat;
 
         // Game
-        private ulong ToggleViewHandle;
-        private ulong PauseHandle;
-        private ulong VoiceChatHandle;
-        private ulong SignalModeHandle;
-        private ulong SpectatorModeHandle;
-        private ulong TeleportHandle;
+        public readonly Button ToggleView;
+        public readonly Button Pause;
+        public readonly Button VoiceChat;
+        public readonly Button SignalMode;
+        public readonly Button SpectatorMode;
+        public readonly Button Teleport;
 
         // Skeleton
-        private ulong LeftHandSkeletonHandle;
-        private ulong RightHandSkeletonHandle;
+        public readonly Button LeftHandSkeleton;
+        public readonly Button RightHandSkeleton;
 
         // Feedback
-        private ulong WeldingHandle;
-        private ulong DrillingHandle;
-        private ulong GrindingHandle;
-        private ulong ShootingHandle;
-        private ulong PlacingHandle;
-        private ulong RemovingHandle;
-        private ulong PlacementFitHandle;
-
-        #endregion
-
-        #region Action values
-
-        private static readonly unsafe uint InputAnalogActionData_t_size = (uint)sizeof(InputAnalogActionData_t);
-        private static readonly unsafe uint InputDigitalActionData_t_size = (uint)sizeof(InputDigitalActionData_t);
-
-        // Movement
-        public InputAnalogActionData_t ThrustForwardBackward;
-        public ulong ThrustLeftRight;
-        public ulong ThrustUpDown;
-        public ulong ThrustDirection;
-        public ulong RotateUpDown;
-        public ulong RotateLeftRight;
-        public ulong RollLeftRight;
-        public ulong Jump;
-        public ulong Crouch;
-
-        // Tool
-        public ulong ToolHand;
-        public ulong Primary;
-        public ulong Secondary;
-        public ulong Reload;
-        public ulong Unequip;
-        public ulong Previous;
-        public ulong Next;
-
-        // System
-        public ulong Interact;
-        public ulong Helmet;
-        public InputDigitalActionData_t Jetpack;
-        public ulong Dampeners;
-        public ulong Broadcasting;
-        public ulong Park;
-        public ulong Power;
-        public ulong Lights;
-        public ulong Respawn;
-        public ulong VoxelHands;
-
-        // Placement
-        public ulong Position;
-        public ulong ToggleSymmetry;
-        public ulong SymmetrySetup;
-        public ulong PlacementMode;
-        public ulong CubeSize;
-
-        // Wrist tablet
-        public ulong TabletHand;
-        public ulong Terminal;
-        public ulong Inventory;
-        public ulong ColorSelector;
-        public ulong ColorPicker;
-        public ulong BuildPlanner;
-        public ulong ToolbarConfig;
-        public ulong BlockSelector;
-        public ulong Contract;
-        public ulong Chat;
-
-        // Game
-        public ulong ToggleView;
-        public ulong Pause;
-        public ulong VoiceChat;
-        public ulong SignalMode;
-        public ulong SpectatorMode;
-        public ulong Teleport;
-
-        // Skeleton
-        public ulong LeftHandSkeleton;
-        public ulong RightHandSkeleton;
-
-        // Feedback
-        public ulong Welding;
-        public ulong Drilling;
-        public ulong Grinding;
-        public ulong Shooting;
-        public ulong Placing;
-        public ulong Removing;
-        public ulong PlacementFit;
-
-        #endregion
+        public readonly Haptic Welding;
+        public readonly Haptic Drilling;
+        public readonly Haptic Grinding;
+        public readonly Haptic Shooting;
+        public readonly Haptic Placing;
+        public readonly Haptic Removing;
+        public readonly Haptic PlacementFit;
 
         public Actions()
         {
-            var input = OpenVR.Input;
-
-            // Movement
-            input.GetActionHandle("/actions/movement/in/ThrustForwardBackward", ref ThrustForwardBackwardHandle);
-            input.GetActionHandle("/actions/movement/in/ThrustLeftRight", ref ThrustLeftRightHandle);
-            input.GetActionHandle("/actions/movement/in/ThrustUpDown", ref ThrustUpDownHandle);
-            input.GetActionHandle("/actions/movement/in/ThrustDirection", ref ThrustDirectionHandle);
-            input.GetActionHandle("/actions/movement/in/RotateUpDown", ref RotateUpDownHandle);
-            input.GetActionHandle("/actions/movement/in/RotateLeftRight", ref RotateLeftRightHandle);
-            input.GetActionHandle("/actions/movement/in/RollLeftRight", ref RollLeftRightHandle);
-            input.GetActionHandle("/actions/movement/in/Jump", ref JumpHandle);
-            input.GetActionHandle("/actions/movement/in/Crouch", ref CrouchHandle);
-
-            // Tool
-            input.GetActionHandle("/actions/tool/in/ToolHand", ref ToolHandHandle);
-            input.GetActionHandle("/actions/tool/in/Primary", ref PrimaryHandle);
-            input.GetActionHandle("/actions/tool/in/Secondary", ref SecondaryHandle);
-            input.GetActionHandle("/actions/tool/in/Reload", ref ReloadHandle);
-            input.GetActionHandle("/actions/tool/in/Unequip", ref UnequipHandle);
-            input.GetActionHandle("/actions/tool/in/Previous", ref PreviousHandle);
-            input.GetActionHandle("/actions/tool/in/Next", ref NextHandle);
-
-            // System
-            input.GetActionHandle("/actions/system/in/Interact", ref InteractHandle);
-            input.GetActionHandle("/actions/system/in/Helmet", ref HelmetHandle);
-            input.GetActionHandle("/actions/system/in/Jetpack", ref JetpackHandle);
-            input.GetActionHandle("/actions/system/in/Dampeners", ref DampenersHandle);
-            input.GetActionHandle("/actions/system/in/Broadcasting", ref BroadcastingHandle);
-            input.GetActionHandle("/actions/system/in/Park", ref ParkHandle);
-            input.GetActionHandle("/actions/system/in/Power", ref PowerHandle);
-            input.GetActionHandle("/actions/system/in/Lights", ref LightsHandle);
-            input.GetActionHandle("/actions/system/in/Respawn", ref RespawnHandle);
-            input.GetActionHandle("/actions/system/in/VoxelHands", ref VoxelHandsHandle);
-
-            // Placement
-            input.GetActionHandle("/actions/placement/in/Position", ref PositionHandle);
-            input.GetActionHandle("/actions/placement/in/ToggleSymmetry", ref ToggleSymmetryHandle);
-            input.GetActionHandle("/actions/placement/in/SymmetrySetup", ref SymmetrySetupHandle);
-            input.GetActionHandle("/actions/placement/in/PlacementMode", ref PlacementModeHandle);
-            input.GetActionHandle("/actions/placement/in/CubeSize", ref CubeSizeHandle);
-
-            // Wrist tablet
-            input.GetActionHandle("/actions/tablet/out/TabletHand", ref TabletHandHandle);
-            input.GetActionHandle("/actions/tablet/in/Terminal", ref TerminalHandle);
-            input.GetActionHandle("/actions/tablet/in/Inventory", ref InventoryHandle);
-            input.GetActionHandle("/actions/tablet/out/ColorSelector", ref ColorSelectorHandle);
-            input.GetActionHandle("/actions/tablet/out/ColorPicker", ref ColorPickerHandle);
-            input.GetActionHandle("/actions/tablet/in/BuildPlanner", ref BuildPlannerHandle);
-            input.GetActionHandle("/actions/tablet/in/ToolbarConfig", ref ToolbarConfigHandle);
-            input.GetActionHandle("/actions/tablet/in/BlockSelector", ref BlockSelectorHandle);
-            input.GetActionHandle("/actions/tablet/in/Contract", ref ContractHandle);
-            input.GetActionHandle("/actions/tablet/in/Chat", ref ChatHandle);
-
-            // Game
-            input.GetActionHandle("/actions/game/in/ToggleView", ref ToggleViewHandle);
-            input.GetActionHandle("/actions/game/in/Pause", ref PauseHandle);
-            input.GetActionHandle("/actions/game/in/VoiceChat", ref VoiceChatHandle);
-            input.GetActionHandle("/actions/game/in/SignalMode", ref SignalModeHandle);
-            input.GetActionHandle("/actions/game/in/SpectatorMode", ref SpectatorModeHandle);
-            input.GetActionHandle("/actions/game/in/Teleport", ref TeleportHandle);
-
-            // Skeleton
-            input.GetActionHandle("/actions/skeleton/in/LeftHandSkeleton", ref LeftHandSkeletonHandle);
-            input.GetActionHandle("/actions/skeleton/in/RightHandSkeleton", ref RightHandSkeletonHandle);
-
-            // Feedback
-            input.GetActionHandle("/actions/feedback/out/Welding", ref WeldingHandle);
-            input.GetActionHandle("/actions/feedback/out/Drilling", ref DrillingHandle);
-            input.GetActionHandle("/actions/feedback/out/Grinding", ref GrindingHandle);
-            input.GetActionHandle("/actions/feedback/out/Shooting", ref ShootingHandle);
-            input.GetActionHandle("/actions/feedback/out/Placing", ref PlacingHandle);
-            input.GetActionHandle("/actions/feedback/out/Removing", ref RemovingHandle);
-            input.GetActionHandle("/actions/feedback/out/PlacementFit", ref PlacementFitHandle);
+            Move = new Joystick("/actions/movement/in/Move");
+            Rotate = new Joystick("/actions/movement/in/Rotate");
+            Thrust = new Button("/actions/movement/in/Thrust");
+            Vertical = new Button("/actions/movement/in/Vertical");
+            Roll = new Button("/actions/movement/in/Roll");
+            Jump = new Button("/actions/movement/in/Jump");
+            Crouch = new Button("/actions/movement/in/Crouch");
+            ToolHand = new Pose("/actions/tool/in/ToolHand");
+            Primary = new Button("/actions/tool/in/Primary");
+            Secondary = new Button("/actions/tool/in/Secondary");
+            Reload = new Button("/actions/tool/in/Reload");
+            Unequip = new Button("/actions/tool/in/Unequip");
+            Previous = new Button("/actions/tool/in/Previous");
+            Next = new Button("/actions/tool/in/Next");
+            Interact = new Button("/actions/system/in/Interact");
+            Helmet = new Button("/actions/system/in/Helmet");
+            Jetpack = new Button("/actions/system/in/Jetpack");
+            Dampeners = new Button("/actions/system/in/Dampeners");
+            Broadcasting = new Button("/actions/system/in/Broadcasting");
+            Park = new Button("/actions/system/in/Park");
+            Power = new Button("/actions/system/in/Power");
+            Lights = new Button("/actions/system/in/Lights");
+            Respawn = new Button("/actions/system/in/Respawn");
+            VoxelHands = new Button("/actions/system/in/VoxelHands");
+            ToggleSymmetry = new Button("/actions/placement/in/ToggleSymmetry");
+            SymmetrySetup = new Button("/actions/placement/in/SymmetrySetup");
+            PlacementMode = new Button("/actions/placement/in/PlacementMode");
+            CubeSize = new Button("/actions/placement/in/CubeSize");
+            TabletHand = new Pose("/actions/tablet/out/TabletHand");
+            Terminal = new Button("/actions/tablet/in/Terminal");
+            Inventory = new Button("/actions/tablet/in/Inventory");
+            ColorSelector = new Button("/actions/tablet/out/ColorSelector");
+            ColorPicker = new Button("/actions/tablet/out/ColorPicker");
+            BuildPlanner = new Button("/actions/tablet/in/BuildPlanner");
+            ToolbarConfig = new Button("/actions/tablet/in/ToolbarConfig");
+            BlockSelector = new Button("/actions/tablet/in/BlockSelector");
+            Contract = new Button("/actions/tablet/in/Contract");
+            Chat = new Button("/actions/tablet/in/Chat");
+            ToggleView = new Button("/actions/game/in/ToggleView");
+            Pause = new Button("/actions/game/in/Pause");
+            VoiceChat = new Button("/actions/game/in/VoiceChat");
+            SignalMode = new Button("/actions/game/in/SignalMode");
+            SpectatorMode = new Button("/actions/game/in/SpectatorMode");
+            Teleport = new Button("/actions/game/in/Teleport");
+            LeftHandSkeleton = new Button("/actions/skeleton/in/LeftHandSkeleton");
+            RightHandSkeleton = new Button("/actions/skeleton/in/RightHandSkeleton");
+            Welding = new Haptic("/actions/feedback/out/Welding");
+            Drilling = new Haptic("/actions/feedback/out/Drilling");
+            Grinding = new Haptic("/actions/feedback/out/Grinding");
+            Shooting = new Haptic("/actions/feedback/out/Shooting");
+            Placing = new Haptic("/actions/feedback/out/Placing");
+            Removing = new Haptic("/actions/feedback/out/Removing");
+            PlacementFit = new Haptic("/actions/feedback/out/PlacementFit");
         }
 
         public void Update()
         {
-            var input = OpenVR.Input;
-
-            input.GetAnalogActionData(ThrustForwardBackwardHandle, ref ThrustForwardBackward, InputAnalogActionData_t_size, OpenVR.k_ulInvalidInputValueHandle);
-
-            // Movement
-            // input.GetActionHandle("/actions/movement/in/ThrustForwardBackward", ref ThrustForwardBackwardHandle);
-            // input.GetActionHandle("/actions/movement/in/ThrustLeftRight", ref ThrustLeftRightHandle);
-            // input.GetActionHandle("/actions/movement/in/ThrustUpDown", ref ThrustUpDownHandle);
-            // input.GetActionHandle("/actions/movement/in/ThrustDirection", ref ThrustDirectionHandle);
-            // input.GetActionHandle("/actions/movement/in/RotateUpDown", ref RotateUpDownHandle);
-            // input.GetActionHandle("/actions/movement/in/RotateLeftRight", ref RotateLeftRightHandle);
-            // input.GetActionHandle("/actions/movement/in/RollLeftRight", ref RollLeftRightHandle);
-            // input.GetActionHandle("/actions/movement/in/Jump", ref JumpHandle);
-            // input.GetActionHandle("/actions/movement/in/Crouch", ref CrouchHandle);
-
-            // Tool
-            // input.GetActionHandle("/actions/tool/in/ToolHand", ref ToolHandHandle);
-            // input.GetActionHandle("/actions/tool/in/Primary", ref PrimaryHandle);
-            // input.GetActionHandle("/actions/tool/in/Secondary", ref SecondaryHandle);
-            // input.GetActionHandle("/actions/tool/in/Reload", ref ReloadHandle);
-            // input.GetActionHandle("/actions/tool/in/Unequip", ref UnequipHandle);
-            // input.GetActionHandle("/actions/tool/in/Previous", ref PreviousHandle);
-            // input.GetActionHandle("/actions/tool/in/Next", ref NextHandle);
-
-            // System
-            // input.GetActionHandle("/actions/system/in/Interact", ref InteractHandle);
-            // input.GetActionHandle("/actions/system/in/Helmet", ref HelmetHandle);
-            input.GetDigitalActionData(JetpackHandle, ref Jetpack, InputDigitalActionData_t_size, OpenVR.k_ulInvalidInputValueHandle);
-            // input.GetActionHandle("/actions/system/in/Dampeners", ref DampenersHandle);
-            // input.GetActionHandle("/actions/system/in/Broadcasting", ref BroadcastingHandle);
-            // input.GetActionHandle("/actions/system/in/Park", ref ParkHandle);
-            // input.GetActionHandle("/actions/system/in/Power", ref PowerHandle);
-            // input.GetActionHandle("/actions/system/in/Lights", ref LightsHandle);
-            // input.GetActionHandle("/actions/system/in/Respawn", ref RespawnHandle);
-            // input.GetActionHandle("/actions/system/in/VoxelHands", ref VoxelHandsHandle);
-
-            return;
-
-            // Placement
-            input.GetActionHandle("/actions/placement/in/Position", ref PositionHandle);
-            input.GetActionHandle("/actions/placement/in/ToggleSymmetry", ref ToggleSymmetryHandle);
-            input.GetActionHandle("/actions/placement/in/SymmetrySetup", ref SymmetrySetupHandle);
-            input.GetActionHandle("/actions/placement/in/PlacementMode", ref PlacementModeHandle);
-            input.GetActionHandle("/actions/placement/in/CubeSize", ref CubeSizeHandle);
-
-            // Wrist tablet
-            input.GetActionHandle("/actions/tablet/out/TabletHand", ref TabletHandHandle);
-            input.GetActionHandle("/actions/tablet/in/Terminal", ref TerminalHandle);
-            input.GetActionHandle("/actions/tablet/in/Inventory", ref InventoryHandle);
-            input.GetActionHandle("/actions/tablet/out/ColorSelector", ref ColorSelectorHandle);
-            input.GetActionHandle("/actions/tablet/out/ColorPicker", ref ColorPickerHandle);
-            input.GetActionHandle("/actions/tablet/in/BuildPlanner", ref BuildPlannerHandle);
-            input.GetActionHandle("/actions/tablet/in/ToolbarConfig", ref ToolbarConfigHandle);
-            input.GetActionHandle("/actions/tablet/in/BlockSelector", ref BlockSelectorHandle);
-            input.GetActionHandle("/actions/tablet/in/Contract", ref ContractHandle);
-            input.GetActionHandle("/actions/tablet/in/Chat", ref ChatHandle);
-
-            // Game
-            input.GetActionHandle("/actions/game/in/ToggleView", ref ToggleViewHandle);
-            input.GetActionHandle("/actions/game/in/Pause", ref PauseHandle);
-            input.GetActionHandle("/actions/game/in/VoiceChat", ref VoiceChatHandle);
-            input.GetActionHandle("/actions/game/in/SignalMode", ref SignalModeHandle);
-            input.GetActionHandle("/actions/game/in/SpectatorMode", ref SpectatorModeHandle);
-            input.GetActionHandle("/actions/game/in/Teleport", ref TeleportHandle);
-
-            // Skeleton
-            input.GetActionHandle("/actions/skeleton/in/LeftHandSkeleton", ref LeftHandSkeletonHandle);
-            input.GetActionHandle("/actions/skeleton/in/RightHandSkeleton", ref RightHandSkeletonHandle);
-
-            // Feedback
-            input.GetActionHandle("/actions/feedback/out/Welding", ref WeldingHandle);
-            input.GetActionHandle("/actions/feedback/out/Drilling", ref DrillingHandle);
-            input.GetActionHandle("/actions/feedback/out/Grinding", ref GrindingHandle);
-            input.GetActionHandle("/actions/feedback/out/Shooting", ref ShootingHandle);
-            input.GetActionHandle("/actions/feedback/out/Placing", ref PlacingHandle);
-            input.GetActionHandle("/actions/feedback/out/Removing", ref RemovingHandle);
-            input.GetActionHandle("/actions/feedback/out/PlacementFit", ref PlacementFitHandle);
+            // NOTE: I know, it could be a loop.
+            // But I don't want the overhead of the virtual function calls
+            // and the loop for maximum performance.
+            Move.Update();
+            Rotate.Update();
+            Thrust.Update();
+            Vertical.Update();
+            Roll.Update();
+            Jump.Update();
+            Crouch.Update();
+            ToolHand.Update();
+            Primary.Update();
+            Secondary.Update();
+            Reload.Update();
+            Unequip.Update();
+            Previous.Update();
+            Next.Update();
+            Interact.Update();
+            Helmet.Update();
+            Jetpack.Update();
+            Dampeners.Update();
+            Broadcasting.Update();
+            Park.Update();
+            Power.Update();
+            Lights.Update();
+            Respawn.Update();
+            VoxelHands.Update();
+            ToggleSymmetry.Update();
+            SymmetrySetup.Update();
+            PlacementMode.Update();
+            CubeSize.Update();
+            TabletHand.Update();
+            Terminal.Update();
+            Inventory.Update();
+            ColorSelector.Update();
+            ColorPicker.Update();
+            BuildPlanner.Update();
+            ToolbarConfig.Update();
+            BlockSelector.Update();
+            Contract.Update();
+            Chat.Update();
+            ToggleView.Update();
+            Pause.Update();
+            VoiceChat.Update();
+            SignalMode.Update();
+            SpectatorMode.Update();
+            Teleport.Update();
+            LeftHandSkeleton.Update();
+            RightHandSkeleton.Update();
         }
     }
 }

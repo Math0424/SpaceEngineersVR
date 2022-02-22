@@ -41,39 +41,29 @@
   ],
   "actions": [
     {
-      "name": "/actions/movement/in/ThrustForwardBackward",
-      "requirement": "mandatory",
-      "type": "vector1"
-    },
-    {
-      "name": "/actions/movement/in/ThrustLeftRight",
+      "name": "/actions/movement/in/Move",
       "requirement": "suggested",
-      "type": "vector1"
+      "type": "vector2"
     },
     {
-      "name": "/actions/movement/in/ThrustUpDown",
+      "name": "/actions/movement/in/Rotate",
       "requirement": "suggested",
-      "type": "vector1"
+      "type": "vector2"
     },
     {
-      "name": "/actions/movement/in/ThrustDirection",
-      "requirement": "optional",
-      "type": "pose"
-    },
-    {
-      "name": "/actions/movement/in/RotateUpDown",
-      "requirement": "mandatory",
-      "type": "vector1"
-    },
-    {
-      "name": "/actions/movement/in/RotateLeftRight",
-      "requirement": "mandatory",
-      "type": "vector1"
-    },
-    {
-      "name": "/actions/movement/in/RollLeftRight",
+      "name": "/actions/movement/in/Thrust",
       "requirement": "optional",
       "type": "vector1"
+    },
+    {
+      "name": "/actions/movement/in/Vertical",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/movement/in/Roll",
+      "requirement": "optional",
+      "type": "boolean"
     },
     {
       "name": "/actions/movement/in/Jump",
@@ -169,11 +159,6 @@
       "name": "/actions/system/in/VoxelHands",
       "requirement": "optional",
       "type": "boolean"
-    },
-    {
-      "name": "/actions/placement/in/Position",
-      "requirement": "mandatory",
-      "type": "pose"
     },
     {
       "name": "/actions/placement/in/ToggleSymmetry",
@@ -359,15 +344,13 @@
     {
       "language_tag": "en_us",
       "/actions/movement": "Movement",
-      "/actions/movement/in/ThrustForwardBackward": "Move forward/backward",
-      "/actions/movement/in/ThrustLeftRight": "Move left/right",
-      "/actions/movement/in/ThrustUpDown": "Move up/down",
-      "/actions/movement/in/ThrustDirection": "Thrust direction",
-      "/actions/movement/in/RotateUpDown": "Rotate up/down",
-      "/actions/movement/in/RotateLeftRight": "Rotate left/right",
-      "/actions/movement/in/RollLeftRight": "Roll left/right",
-      "/actions/movement/in/Jump": "Jump",
-      "/actions/movement/in/Crouch": "Crouch",
+      "/actions/movement/in/Move": "Move",
+      "/actions/movement/in/Rotate": "Rotate",
+      "/actions/movement/in/Thrust": "Thrust",
+      "/actions/movement/in/Vertical": "Move vertically",
+      "/actions/movement/in/Roll": "Rotate in roll axis",
+      "/actions/movement/in/Jump": "Jump or forward thrust",
+      "/actions/movement/in/Crouch": "Crouch or backward thrust",
       "/actions/tool": "Tool",
       "/actions/tool/in/ToolHand": "Tool hand",
       "/actions/tool/in/Primary": "Use primary",
@@ -388,7 +371,6 @@
       "/actions/system/in/Respawn": "Respawn",
       "/actions/system/in/VoxelHands": "Voxel hands",
       "/actions/placement": "Placement",
-      "/actions/placement/in/Position": "Position",
       "/actions/placement/in/ToggleSymmetry": "Toggle symmetry",
       "/actions/placement/in/SymmetrySetup": "Symmetry setup",
       "/actions/placement/in/PlacementMode": "Placement mode",

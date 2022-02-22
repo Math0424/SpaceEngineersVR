@@ -83,7 +83,11 @@
     <Compile Include="Patches\FrameInjections.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
     <Compile Include="Player\Actions.cs" />
+    <Compile Include="Player\Button.cs" />
+    <Compile Include="Player\Haptic.cs" />
     <Compile Include="Player\Headset.cs" />
+    <Compile Include="Player\Joystick.cs" />
+    <Compile Include="Player\Pose.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Utils\Util.cs" />
