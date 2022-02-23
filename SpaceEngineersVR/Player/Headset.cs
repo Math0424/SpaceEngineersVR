@@ -87,6 +87,7 @@ namespace SpaceEngineersVR.Player
                 MyRender11.Resolution = new Vector2I((int)Width, (int)Height);
                 MyRender11.CreateScreenResources();
                 PlayerAndCameraDisabler.DisablePlayerAndCameraMovement = true;
+                CharacterRenderDisabler.RenderCharacter = false;
                 firstUpdate = false;
                 return true;
             }

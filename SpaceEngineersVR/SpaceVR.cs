@@ -61,13 +61,13 @@ namespace SpaceEngineersVR
 
             log.Write("De-Keenifying enviroment");
             Form GameWindow = (Form)AccessTools.Field(MyVRage.Platform.Windows.GetType(), "m_form").GetValue(MyVRage.Platform.Windows);
-            GameWindow.Icon = new Icon(Util.GetAssetFolder() + "icon.ico");
-            GameWindow.Text = "SpaceEngineersVR";
-            GameWindow.AccessibleName = "SpaceEngineersVR";
+            GameWindow.Icon = Globals.Icon;
+            GameWindow.Text = Globals.Name;
+            GameWindow.AccessibleName = Globals.Name;
             
             MyPerGameSettings.GameIcon = Util.GetAssetFolder() + "icon.ico";
-            MyPerGameSettings.BasicGameInfo.GameName = "SpaceEngineersVR";
-            MyPerGameSettings.BasicGameInfo.ApplicationName = "SpaceEngineersVR";
+            MyPerGameSettings.BasicGameInfo.GameName = Globals.Name;
+            MyPerGameSettings.BasicGameInfo.ApplicationName = Globals.Name;
             MyPerGameSettings.BasicGameInfo.SplashScreenImage = (Util.GetAssetFolder() + "logo.png");
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 

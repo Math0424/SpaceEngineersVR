@@ -79,6 +79,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Globals.cs" />
+    <Compile Include="Patches\CharacterRenderDisabler.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
     <Compile Include="Patches\PlayerAndCameraDisabler.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
@@ -148,8 +149,10 @@
       <HintPath>..\Bin64\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="VRage">
       <HintPath>..\Bin64\VRage.dll</HintPath>
     </Reference>
