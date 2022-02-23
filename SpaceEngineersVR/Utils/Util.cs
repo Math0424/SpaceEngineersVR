@@ -1,18 +1,9 @@
-﻿using Sandbox;
-using Sandbox.ModAPI;
-using SpaceEngineersVR.Player;
+﻿using SpaceEngineersVR.Player;
 using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Valve.VR;
 using VRage.Game;
 using VRage.Utils;
 using VRageMath;
@@ -51,8 +42,8 @@ namespace SpaceEngineersVR
         public static void DrawDebugMatrix(MatrixD mat, Vector3D pos, string name)
         {
             DrawDebugLine(pos, mat.Forward, 255, 000, 000);
-            DrawDebugLine(pos, mat.Left   , 000, 255, 000);
-            DrawDebugLine(pos, mat.Up     , 000, 000, 255);
+            DrawDebugLine(pos, mat.Left, 000, 255, 000);
+            DrawDebugLine(pos, mat.Up, 000, 000, 255);
             DrawDebugText(pos, name);
         }
 
@@ -68,7 +59,7 @@ namespace SpaceEngineersVR
 
         public static void ExecuteInMain(Action action, bool sync)
         {
-            var synchronization = SynchronizationContext.Current;
+            SynchronizationContext synchronization = SynchronizationContext.Current;
             if (synchronization != null)
             {
                 if (sync)
@@ -81,7 +72,9 @@ namespace SpaceEngineersVR
                 }
             }
             else
+            {
                 Task.Factory.StartNew(action);
+            }
         }
 
         public static MatrixD MapViewToWorldMatrix(MatrixD view, MatrixD worldMatrix)

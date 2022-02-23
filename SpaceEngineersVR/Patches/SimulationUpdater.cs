@@ -5,7 +5,7 @@ using VRage.Game.Components;
 namespace SpaceEngineersVR.Patches
 {
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-    class SimulationUpdater : MySessionComponentBase
+    internal class SimulationUpdater : MySessionComponentBase
     {
         public static Action UpdateBeforeSim;
         public static Action UpdateAfterSim;

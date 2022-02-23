@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Valve.VR;
 using VRageMath;
 
@@ -32,12 +29,12 @@ namespace SpaceEngineersVR.Player
         Axis4 = 4,
     }
 
-    struct Controller
+    internal struct Controller
     {
         private Queue<Vector3> TenFrameSpeed;
 
         public MatrixD WorldPos;
-        
+
         public Vector3 TenFramVel;
         public Vector3 CurrentVel;
         public Vector3 AngularVel;
@@ -52,20 +49,53 @@ namespace SpaceEngineersVR.Player
         private float hairTriggerLimit;
         private bool hairTriggerState, hairTriggerPrevState;
 
-        public bool IsButtonDown(Button btn) => (CurrentState.ulButtonPressed & (ulong)btn) != 0;
-        public bool IsNewButtonDown(Button btn) => (CurrentState.ulButtonPressed & (ulong)btn) != 0 && (PrevState.ulButtonPressed & (ulong)btn) == 0;
-        public bool IsNewButtonUp(Button btn) => (CurrentState.ulButtonPressed & (ulong)btn) == 0 && (PrevState.ulButtonPressed & (ulong)btn) != 0;
+        public bool IsButtonDown(Button btn)
+        {
+            return (CurrentState.ulButtonPressed & (ulong)btn) != 0;
+        }
 
-        public bool IsTouchDown(Button btn) => (CurrentState.ulButtonTouched & (ulong)btn) != 0;
-        public bool IsNewTouchDown(Button btn) => (CurrentState.ulButtonTouched & (ulong)btn) != 0 && (PrevState.ulButtonTouched & (ulong)btn) == 0;
-        public bool IsNewTouchUp(Button btn) => (CurrentState.ulButtonTouched & (ulong)btn) == 0 && (PrevState.ulButtonTouched & (ulong)btn) != 0;
+        public bool IsNewButtonDown(Button btn)
+        {
+            return (CurrentState.ulButtonPressed & (ulong)btn) != 0 && (PrevState.ulButtonPressed & (ulong)btn) == 0;
+        }
+
+        public bool IsNewButtonUp(Button btn)
+        {
+            return (CurrentState.ulButtonPressed & (ulong)btn) == 0 && (PrevState.ulButtonPressed & (ulong)btn) != 0;
+        }
+
+        public bool IsTouchDown(Button btn)
+        {
+            return (CurrentState.ulButtonTouched & (ulong)btn) != 0;
+        }
+
+        public bool IsNewTouchDown(Button btn)
+        {
+            return (CurrentState.ulButtonTouched & (ulong)btn) != 0 && (PrevState.ulButtonTouched & (ulong)btn) == 0;
+        }
+
+        public bool IsNewTouchUp(Button btn)
+        {
+            return (CurrentState.ulButtonTouched & (ulong)btn) == 0 && (PrevState.ulButtonTouched & (ulong)btn) != 0;
+        }
 
         public ulong GetButtonPushed => CurrentState.ulButtonPressed;
 
 
-        public bool IsHairTrigger() => hairTriggerState;
-        public bool IsNewHairTriggerDown() => hairTriggerState && !hairTriggerPrevState;
-        public bool IsNewHairTriggerUp() => !hairTriggerState && hairTriggerPrevState;
+        public bool IsHairTrigger()
+        {
+            return hairTriggerState;
+        }
+
+        public bool IsNewHairTriggerDown()
+        {
+            return hairTriggerState && !hairTriggerPrevState;
+        }
+
+        public bool IsNewHairTriggerUp()
+        {
+            return !hairTriggerState && hairTriggerPrevState;
+        }
 
         public Vector2 GetAxis(Axis axis = Axis.Joystick)
         {
@@ -98,26 +128,39 @@ namespace SpaceEngineersVR.Player
             CurrentVel = pos.vVelocity.ToVector();
 
             if (TenFrameSpeed == null)
+            {
                 TenFrameSpeed = new Queue<Vector3>();
+            }
+
             TenFrameSpeed.Enqueue(CurrentVel);
             if (TenFrameSpeed.Count > 10)
+            {
                 TenFrameSpeed.Dequeue();
-            foreach (var q in TenFrameSpeed)
+            }
+
+            foreach (Vector3 q in TenFrameSpeed)
+            {
                 TenFramVel += q;
+            }
+
             TenFramVel /= 10;
 
 
             hairTriggerPrevState = hairTriggerState;
-            var value = CurrentState.rAxis1.x;
+            float value = CurrentState.rAxis1.x;
             if (hairTriggerState)
             {
                 if (value < hairTriggerLimit - 0.1 || value <= 0.0f)
+                {
                     hairTriggerState = false;
+                }
             }
             else
             {
                 if (value > hairTriggerLimit + 0.1 || value >= 1.0f)
+                {
                     hairTriggerState = true;
+                }
             }
             hairTriggerLimit = hairTriggerState ? Math.Max(hairTriggerLimit, value) : Math.Min(hairTriggerLimit, value);
         }

@@ -5,7 +5,6 @@ using Sandbox.ModAPI;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SpaceEngineersVR.Patches;
-using SpaceEngineersVR.Utils;
 using SpaceEngineersVR.Wrappers;
 using System;
 using System.Drawing;
@@ -14,7 +13,6 @@ using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
 using VRage.Game.ModAPI;
-using VRage.Game.Utils;
 using VRage.Input;
 using VRageMath;
 using VRageRender;
@@ -22,10 +20,8 @@ using VRageRender.Messages;
 
 namespace SpaceEngineersVR.Player
 {
-    class Headset
+    internal class Headset
     {
-        Logger log = new Logger();
-
         public MatrixD RealWorldPos;
         public Controller RightHand = default;
         public Controller LeftHand = default;
@@ -33,16 +29,14 @@ namespace SpaceEngineersVR.Player
         public bool IsHeadsetAlreadyDisconnected = false;
         public bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
         public bool IsControllersAlreadyDisconnected = false;
-
-        uint pnX, pnY, Height, Width;
-
-        VRTextureBounds_t TextureBounds;
-        TrackedDevicePose_t[] RenderPositions;
-        TrackedDevicePose_t[] GamePositions;
+        private readonly uint pnX, pnY, Height, Width;
+        private VRTextureBounds_t TextureBounds;
+        private readonly TrackedDevicePose_t[] RenderPositions;
+        private readonly TrackedDevicePose_t[] GamePositions;
 
         private float ipd;
         private float ipdCorrection;
-        private float ipdCorrectionStep = 5e-5f;
+        private readonly float ipdCorrectionStep = 5e-5f;
 
         public Headset()
         {
@@ -61,20 +55,20 @@ namespace SpaceEngineersVR.Player
                 vMax = 1
             };
 
-            log.Write($"Found headset with eye resolution of '{Width}x{Height}'");
+            Plugin.Instance.Log.Info($"Found headset with eye resolution of '{Width}x{Height}'");
         }
 
         #region DrawingLogic
 
-        bool firstUpdate = true;
-        BorrowedRtvTexture texture;
+        private bool firstUpdate = true;
+        private BorrowedRtvTexture texture;
         private bool FrameUpdate()
         {
             GetNewPositions();
 
             // log.Write("Frame update");
 
-            var cam = MySector.MainCamera;
+            VRage.Game.Utils.MyCamera cam = MySector.MainCamera;
             if (cam == null)
             {
                 firstUpdate = true;
@@ -101,11 +95,11 @@ namespace SpaceEngineersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePush();
-                    log.Write("Controller disconnected, pausing game.");
+                    Plugin.Instance.Log.Info("Controller disconnected, pausing game.");
                 }
                 else
                 {
-                    log.Write("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                    Plugin.Instance.Log.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
                 }
 
                 IsControllersAlreadyDisconnected = true;
@@ -115,11 +109,11 @@ namespace SpaceEngineersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePop();
-                    log.Write("Controller reconnected, unpausing game.");
+                    Plugin.Instance.Log.Info("Controller reconnected, unpausing game.");
                 }
                 else
                 {
-                    log.Write("Controller reconnected, unable to unpause game as game is already unpaused.");
+                    Plugin.Instance.Log.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
                 }
 
                 IsControllersAlreadyDisconnected = false;
@@ -133,11 +127,11 @@ namespace SpaceEngineersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePush();
-                    log.Write("Headset disconnected, pausing game.");
+                    Plugin.Instance.Log.Info("Headset disconnected, pausing game.");
                 }
                 else
                 {
-                    log.Write("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                    Plugin.Instance.Log.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
                 }
 
                 IsHeadsetAlreadyDisconnected = true;
@@ -147,11 +141,11 @@ namespace SpaceEngineersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePop();
-                    log.Write("Headset reconnected, unpausing game.");
+                    Plugin.Instance.Log.Info("Headset reconnected, unpausing game.");
                 }
                 else
                 {
-                    log.Write("Headset reconnected, unable to unpause game as game is already unpaused.");
+                    Plugin.Instance.Log.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
                 }
 
                 IsHeadsetAlreadyDisconnected = false;
@@ -160,8 +154,8 @@ namespace SpaceEngineersVR.Player
             // Eye position and orientation
             MatrixD orientation = Matrix.Invert(RealWorldPos).GetOrientation();
 
-            var rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
-            var leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
+            MatrixD rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
+            MatrixD leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
 
             ipd = (float)(rightEye.Translation - leftEye.Translation).Length();
 
@@ -175,8 +169,8 @@ namespace SpaceEngineersVR.Player
             //FrameInjections.DisablePresent = true;
 
             // Store the original matrices to remove the flickering
-            var originalWM = cam.WorldMatrix;
-            var originalVM = cam.ViewMatrix;
+            MatrixD originalWM = cam.WorldMatrix;
+            MatrixD originalVM = cam.ViewMatrix;
 
             // Stereo rendering
             cam.WorldMatrix = rightEye;
@@ -187,23 +181,27 @@ namespace SpaceEngineersVR.Player
             // Restore original matrices to remove the flickering
             cam.WorldMatrix = originalWM;
             cam.ViewMatrix = originalVM;
-             
+
             //FrameInjections.DisablePresent = false;
 
-            var input = MyInput.Static;
+            IMyInput input = MyInput.Static;
             if (input.IsAnyAltKeyPressed() && input.IsAnyCtrlKeyPressed())
             {
-                var before = ipdCorrection;
+                float before = ipdCorrection;
                 if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.02)
+                {
                     ipdCorrection += ipdCorrectionStep;
+                }
 
                 if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.02)
+                {
                     ipdCorrection -= ipdCorrectionStep;
+                }
 
                 if (ipdCorrection != before)
                 {
-                    var sign = ipdCorrection >= 0 ? '+' : '-';
-                    log.Write($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
+                    char sign = ipdCorrection >= 0 ? '+' : '-';
+                    Plugin.Instance.Log.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
                 }
             }
 
@@ -216,7 +214,7 @@ namespace SpaceEngineersVR.Player
             MyRender11.DrawGameScene(texture, out _);
 
             Texture2D texture2D = texture.GetResource();//(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
-            var input = new Texture_t
+            Texture_t input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
                 eType = EGraphicsAPIConvention.API_DirectX,
@@ -228,7 +226,7 @@ namespace SpaceEngineersVR.Player
 
         private void UploadCameraViewMatrix(EVREye eye)
         {
-            var cam = MySector.MainCamera;
+            VRage.Game.Utils.MyCamera cam = MySector.MainCamera;
 
             //ViewMatrix is the inverse of WorldMatrix
             cam.ViewMatrix = Matrix.Invert(cam.WorldMatrix);
@@ -241,7 +239,7 @@ namespace SpaceEngineersVR.Player
             msg.ProjectionMatrix = cam.ProjectionMatrix;
             msg.ProjectionFarMatrix = cam.ProjectionMatrixFar;
 
-            var matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance, EGraphicsAPIConvention.API_DirectX).ToMatrix();
+            Matrix matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance, EGraphicsAPIConvention.API_DirectX).ToMatrix();
             float fov = MathHelper.Atan(1.0f / matrix.M22) * 2f;
 
             msg.FOV = fov;
@@ -266,8 +264,8 @@ namespace SpaceEngineersVR.Player
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
             {
-                log.Write("Dropping frames!");
-                log.IncreaseIndent();
+                Plugin.Instance.Log.Warning("Dropping frames!");
+                Plugin.Instance.Log.IncreaseIndent();
                 StringBuilder builder = new StringBuilder();
                 builder.AppendLine("FrameInterval: " + timings.m_flClientFrameIntervalMs);
                 builder.AppendLine("IdleTime     : " + timings.m_flCompositorIdleCpuMs);
@@ -276,15 +274,14 @@ namespace SpaceEngineersVR.Player
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
                 builder.AppendLine("FidelityLevel: " + timings.m_nFidelityLevel);
-                log.Write(builder.ToString());
-                log.DecreaseIndent();
-                log.Write("");
+                Plugin.Instance.Log.Warning(builder.ToString());
+                Plugin.Instance.Log.Warning("");
             }
 
             //Update positions
             if (!RenderPositions[0].bPoseIsValid || !RenderPositions[0].bDeviceIsConnected)
             {
-                log.Write("HMD pos invalid!");
+                Plugin.Instance.Log.Error("HMD pos invalid!");
                 return;
             }
 
@@ -293,14 +290,16 @@ namespace SpaceEngineersVR.Player
             if (!RightHand.IsConnected || !LeftHand.IsConnected)
             {
                 if (MySandboxGame.TotalTimeInTicks % 1000 == 0)
-                    log.Write("Unable to find controller(s)!");
+                {
+                    Plugin.Instance.Log.Error("Unable to find controller(s)!");
+                }
 
                 for (uint i = 0; i < OpenVR.k_unMaxTrackedDeviceCount; i++)
                 {
-                    var x = OpenVR.System.GetTrackedDeviceClass(i);
+                    ETrackedDeviceClass x = OpenVR.System.GetTrackedDeviceClass(i);
                     if (x == ETrackedDeviceClass.Controller)
                     {
-                        var role = OpenVR.System.GetControllerRoleForTrackedDeviceIndex(i);
+                        ETrackedControllerRole role = OpenVR.System.GetControllerRoleForTrackedDeviceIndex(i);
                         if (role == ETrackedControllerRole.LeftHand)
                         {
                             LeftHand.ControllerID = i;
@@ -326,7 +325,9 @@ namespace SpaceEngineersVR.Player
         {
             IMyCharacter character = MyAPIGateway.Session?.Player?.Character;
             if (character != null)
+            {
                 CharacterMovement(character);
+            }
             //TODO: movement
         }
 
@@ -336,18 +337,18 @@ namespace SpaceEngineersVR.Player
             Vector3 move = Vector3.Zero;
             Vector2 rotate = Vector2.Zero;
 
-            if (!character.EnabledThrusts) 
+            if (!character.EnabledThrusts)
             {
                 if (LeftHand.IsValid)
                 {
-                    var vec = LeftHand.GetAxis(Axis.Joystick);
+                    Vector2 vec = LeftHand.GetAxis(Axis.Joystick);
                     move.X = vec.X;
                     move.Z = -vec.Y;
                 }
 
                 if (RightHand.IsValid)
                 {
-                    var vec = RightHand.GetAxis(Axis.Joystick);
+                    Vector2 vec = RightHand.GetAxis(Axis.Joystick);
                     rotate.Y = vec.X * 10;
                 }
 
@@ -362,12 +363,12 @@ namespace SpaceEngineersVR.Player
                 {
                     if (RightHand.IsButtonDown(Button.B))
                     {
-                        var v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
+                        Vector3D v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
                         v.Y *= -1;
                         //move += v;
                     }
 
-                    var vec = RightHand.GetAxis(Axis.Joystick);
+                    Vector2 vec = RightHand.GetAxis(Axis.Joystick);
                     rotate.Y = vec.X * 10;
                     rotate.X = -vec.Y * 10;
 
@@ -379,7 +380,7 @@ namespace SpaceEngineersVR.Player
                 {
                     if (LeftHand.IsButtonDown(Button.B))
                     {
-                        var v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
+                        Vector3D v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
                         v.Y *= -1;
                         //move += v;
                     }
@@ -415,7 +416,7 @@ namespace SpaceEngineersVR.Player
                 System.Drawing.Imaging.ImageLockMode.ReadOnly,
                 System.Drawing.Imaging.PixelFormat.Format32bppArgb
             );
-            var image = new NotificationBitmap_t()
+            NotificationBitmap_t image = new NotificationBitmap_t()
             {
                 bytes = TextureData.Scan0,
                 width = TextureData.Width,
@@ -423,7 +424,7 @@ namespace SpaceEngineersVR.Player
                 depth = 4
             };
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
-            log.Write("Pop-up created with message: " + message);
+            Plugin.Instance.Log.Info("Pop-up created with message: " + message);
 
             bitmap.UnlockBits(TextureData);
         }
@@ -438,7 +439,7 @@ namespace SpaceEngineersVR.Player
         {
             Parallel.Start(() =>
             {
-                log.Write($"Messagebox created with the message: {msg}");
+                Plugin.Instance.Log.Info($"Messagebox created with the message: {msg}");
                 DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
                 return result;
             });

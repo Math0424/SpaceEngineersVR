@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SpaceEngineersVR")]
-[assembly: AssemblyDescription("SpaceEngineers.... but in Spaaaaccceee *ahem* I mean VR")]
+[assembly: AssemblyDescription("Space Engineers.... but in Spaaaaccceee *ahem* I mean VR")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Math420 inc")]
+[assembly: AssemblyCompany("SpaceEngineersVR Developers")]
 [assembly: AssemblyProduct("SpaceEngineersVR")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("Copyright © Space Engineers VR Developers 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -10,7 +10,7 @@ namespace SpaceEngineersVR.Patches
         {
             Type t = AccessTools.TypeByName("Sandbox.Game.Components.MyRenderComponentCharacter");
 
-            SpaceVR.Harmony.Patch(AccessTools.Method(t, "Draw"), new HarmonyMethod(typeof(CharacterRenderDisabler), nameof(Prefix_Draw)));
+            Plugin.Instance.Harmony.Patch(AccessTools.Method(t, "Draw"), new HarmonyMethod(typeof(CharacterRenderDisabler), nameof(Prefix_Draw)));
         }
 
         public static bool Prefix_Draw()
