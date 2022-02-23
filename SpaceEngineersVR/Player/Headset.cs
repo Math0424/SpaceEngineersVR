@@ -252,7 +252,7 @@ namespace SpaceEngineersVR.Player
 
             //((MyVRageInput)MyInput.Static).EnableInput(false);
 
-            if (character.EnabledThrusts)
+            if (character.EnabledThrusts || MySession.Static.ControlledEntity is IMyShipController)
                 ControlFlight(character);
             else
                 ControlWalk(character);
@@ -305,7 +305,11 @@ namespace SpaceEngineersVR.Player
                 move.Y = -1f;
 
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-            character.MoveAndRotate(move, rotate, 0f);
+
+            if (move == Vector3.Zero && rotate == Vector2.Zero)
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
+            else
+                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, 0f);
         }
 
         private void ControlFlight(IMyCharacter character)
@@ -322,6 +326,13 @@ namespace SpaceEngineersVR.Player
             }
 
             controls.UpdateFlight();
+
+            if (controls.ThrustLRUD.Active)
+            {
+                var v = controls.ThrustLRUD.Position;
+                move.X += v.X;
+                move.Y += v.Y;
+            }
 
             if (controls.ThrustLRFB.Active)
             {
@@ -358,7 +369,11 @@ namespace SpaceEngineersVR.Player
                 character.SwitchDamping();
 
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-            character.MoveAndRotate(move, rotate, roll);
+
+            if (move == Vector3.Zero && rotate == Vector2.Zero && roll == 0f)
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
+            else
+                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
         }
 
         private void ControlCommonFunctions(IMyCharacter character)
