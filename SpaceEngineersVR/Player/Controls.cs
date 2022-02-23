@@ -33,8 +33,9 @@ namespace SpaceEngineersVR.Player
         public readonly Button Secondary;
         public readonly Button Reload;
         public readonly Button Unequip;
-        public readonly Button Previous;
-        public readonly Button Next;
+        public readonly Button CutGrid;
+        public readonly Button CopyGrid;
+        public readonly Button PasteGrid;
 
         // System
         public readonly Button Interact;
@@ -45,7 +46,7 @@ namespace SpaceEngineersVR.Player
         public readonly Button Power;
         public readonly Button Lights;
         public readonly Button Respawn;
-        public readonly Button VoxelHands;
+        public readonly Button ToggleSignals;
 
         // Placement
         public readonly Button ToggleSymmetry;
@@ -91,8 +92,8 @@ namespace SpaceEngineersVR.Player
         private readonly InputSource RightHandSource;
 
         // Action sets
-        private readonly ActionSets Walking;
-        private readonly ActionSets Flying;
+        private readonly ActionSets WalkingSets;
+        private readonly ActionSets FlyingSets;
 
         public Controls()
         {
@@ -117,8 +118,9 @@ namespace SpaceEngineersVR.Player
             Secondary = new Button("/actions/common/in/Secondary");
             Reload = new Button("/actions/common/in/Reload");
             Unequip = new Button("/actions/common/in/Unequip");
-            Previous = new Button("/actions/common/in/Previous");
-            Next = new Button("/actions/common/in/Next");
+            CutGrid = new Button("/actions/common/in/CutGrid");
+            CopyGrid = new Button("/actions/common/in/CopyGrid");
+            PasteGrid = new Button("/actions/common/in/PasteGrid");
             Interact = new Button("/actions/common/in/Interact");
             Helmet = new Button("/actions/common/in/Helmet");
             Jetpack = new Button("/actions/common/in/Jetpack");
@@ -127,7 +129,7 @@ namespace SpaceEngineersVR.Player
             Power = new Button("/actions/common/in/Power");
             Lights = new Button("/actions/common/in/Lights");
             Respawn = new Button("/actions/common/in/Respawn");
-            VoxelHands = new Button("/actions/common/in/VoxelHands");
+            ToggleSignals = new Button("/actions/common/in/ToggleSignals");
             ToggleSymmetry = new Button("/actions/common/in/ToggleSymmetry");
             SymmetrySetup = new Button("/actions/common/in/SymmetrySetup");
             PlacementMode = new Button("/actions/common/in/PlacementMode");
@@ -161,12 +163,14 @@ namespace SpaceEngineersVR.Player
             LeftHandSource = new InputSource("/user/hand/left");
             RightHandSource = new InputSource("/user/hand/right");
 
-            Walking = new ActionSets("/actions/walking", "/actions/common");
-            Flying = new ActionSets("/actions/walking", "/actions/common");
+            WalkingSets = new ActionSets("/actions/walking", "/actions/common");
+            FlyingSets = new ActionSets("/actions/flying", "/actions/common");
         }
 
-        public void ControlWalk()
+        public void UpdateWalk()
         {
+            WalkingSets.Update();
+
             Walk.Update();
             WalkForward.Update();
             WalkBackward.Update();
@@ -177,8 +181,10 @@ namespace SpaceEngineersVR.Player
             UpdateCommon();
         }
 
-        public void ControlFlight()
+        public void UpdateFlight()
         {
+            FlyingSets.Update();
+
             ThrustLRUD.Update();
             ThrustLRFB.Update();
             ThrustUp.Update();
@@ -202,8 +208,9 @@ namespace SpaceEngineersVR.Player
             Secondary.Update();
             Reload.Update();
             Unequip.Update();
-            Previous.Update();
-            Next.Update();
+            CutGrid.Update();
+            CopyGrid.Update();
+            PasteGrid.Update();
             Interact.Update();
             Helmet.Update();
             Jetpack.Update();
@@ -212,7 +219,7 @@ namespace SpaceEngineersVR.Player
             Power.Update();
             Lights.Update();
             Respawn.Update();
-            VoxelHands.Update();
+            ToggleSignals.Update();
             ToggleSymmetry.Update();
             SymmetrySetup.Update();
             PlacementMode.Update();

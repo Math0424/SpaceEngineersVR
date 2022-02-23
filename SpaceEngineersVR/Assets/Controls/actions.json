@@ -136,12 +136,17 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/common/in/Previous",
+      "name": "/actions/common/in/CutGrid",
       "requirement": "optional",
       "type": "boolean"
     },
     {
-      "name": "/actions/common/in/Next",
+      "name": "/actions/common/in/CopyGrid",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/PasteGrid",
       "requirement": "optional",
       "type": "boolean"
     },
@@ -186,7 +191,7 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/common/in/VoxelHands",
+      "name": "/actions/common/in/ToggleSignals",
       "requirement": "optional",
       "type": "boolean"
     },
@@ -376,8 +381,9 @@
       "/actions/common/in/Secondary": "Use secondary",
       "/actions/common/in/Reload": "Reload",
       "/actions/common/in/Unequip": "Unequip",
-      "/actions/common/in/Previous": "Previous",
-      "/actions/common/in/Next": "Next",
+      "/actions/common/in/CutGrid": "Cut grid",
+      "/actions/common/in/CopyGrid": "Copy grid",
+      "/actions/common/in/PasteGrid": "Paste grid",
       "/actions/common/in/Interact": "Interact",
       "/actions/common/in/Helmet": "Helmet",
       "/actions/common/in/Jetpack": "Jetpack",
@@ -386,7 +392,7 @@
       "/actions/common/in/Power": "Power",
       "/actions/common/in/Lights": "Light",
       "/actions/common/in/Respawn": "Respawn",
-      "/actions/common/in/VoxelHands": "Voxel hands",
+      "/actions/common/in/ToggleSignals": "Voxel hands",
       "/actions/common/in/ToggleSymmetry": "Toggle symmetry",
       "/actions/common/in/SymmetrySetup": "Symmetry setup",
       "/actions/common/in/PlacementMode": "Placement mode",

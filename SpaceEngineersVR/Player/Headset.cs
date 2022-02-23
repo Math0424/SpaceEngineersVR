@@ -9,12 +9,18 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using Sandbox;
+using Sandbox.Game.Entities;
+using Sandbox.Game.Screens.Helpers.RadialMenuActions;
+using Sandbox.Game.SessionComponents.Clipboard;
 using Valve.VR;
 using VRage.Game.ModAPI;
 using VRage.Input;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
+
+// See MyRadialMenuItemFactory for actions
 
 namespace SpaceEngineersVR.Player
 {
@@ -260,6 +266,8 @@ namespace SpaceEngineersVR.Player
 
         private void ControlWalk(IMyCharacter character)
         {
+            controls.UpdateWalk();
+
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
 
@@ -313,6 +321,8 @@ namespace SpaceEngineersVR.Player
                 move.Y += v.Y;
             }
 
+            controls.UpdateFlight();
+
             if (controls.ThrustLRFB.Active)
             {
                 var v = controls.ThrustLRFB.Position;
@@ -345,7 +355,7 @@ namespace SpaceEngineersVR.Player
             }
 
             if (controls.Dampeners.HasPressed)
-                 character.SwitchDamping();
+                character.SwitchDamping();
 
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
             character.MoveAndRotate(move, rotate, roll);
@@ -353,8 +363,191 @@ namespace SpaceEngineersVR.Player
 
         private void ControlCommonFunctions(IMyCharacter character)
         {
+            var controlledEntity = MySession.Static.ControlledEntity;
+
+            if (controls.Primary.HasPressed)
+            {
+                controlledEntity?.BeginShoot(MyShootActionEnum.PrimaryAction);
+            }
+            else if (controls.Primary.HasReleased)
+            {
+                controlledEntity?.EndShoot(MyShootActionEnum.PrimaryAction);
+            }
+
+            if (controls.Secondary.HasPressed)
+            {
+                controlledEntity?.BeginShoot(MyShootActionEnum.SecondaryAction);
+            }
+            else if (controls.Secondary.HasReleased)
+            {
+                controlledEntity?.EndShoot(MyShootActionEnum.SecondaryAction);
+            }
+
+            if (controls.Reload.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Unequip.HasPressed)
+            {
+                controlledEntity?.SwitchToWeapon(null);
+            }
+
+            if (controls.CutGrid.HasPressed)
+            {
+                new MyActionCutGrid().ExecuteAction();
+            }
+
+            if (controls.CopyGrid.HasPressed)
+            {
+                new MyActionCopyGrid().ExecuteAction();
+            }
+
+            if (controls.PasteGrid.HasPressed)
+            {
+                new MyActionPasteGrid().ExecuteAction();
+            }
+
+            if (controls.Interact.HasPressed)
+            {
+                controlledEntity?.Use();
+            }
+
+            if (controls.Helmet.HasPressed)
+            {
+                character.SwitchHelmet();
+            }
+
             if (controls.Jetpack.HasPressed)
+            {
                 character.SwitchThrusts();
+            }
+
+            if (controls.Broadcasting.HasPressed)
+            {
+                controlledEntity?.SwitchBroadcasting();
+            }
+
+            if (controls.Park.HasPressed)
+            {
+                controlledEntity?.SwitchHandbrake();
+            }
+
+            if (controls.Power.HasPressed)
+            {
+                new MyActionTogglePower().ExecuteAction();
+            }
+
+            if (controls.Lights.HasPressed)
+            {
+                character.SwitchLights();
+            }
+
+            if (controls.Respawn.HasPressed)
+            {
+                controlledEntity?.Die();
+            }
+
+            if (controls.ToggleSignals.HasPressed)
+            {
+                new MyActionToggleSignals().ExecuteAction();
+            }
+
+            if (controls.ToggleSymmetry.HasPressed)
+            {
+                new MyActionToggleSymmetry().ExecuteAction();
+            }
+
+            if (controls.SymmetrySetup.HasPressed)
+            {
+                new MyActionSymmetrySetup().ExecuteAction();
+            }
+
+            if (controls.PlacementMode.HasPressed)
+            {
+                MyClipboardComponent.Static.ChangeStationRotation();
+                MyCubeBuilder.Static.CycleCubePlacementMode();
+            }
+
+            if (controls.CubeSize.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Terminal.HasPressed)
+            {
+                character.ShowTerminal();
+            }
+
+            if (controls.Inventory.HasPressed)
+            {
+                character.ShowInventory();
+            }
+
+            if (controls.ColorSelector.HasPressed)
+            {
+                new MyActionColorTool().ExecuteAction();
+            }
+
+            if (controls.ColorPicker.HasPressed)
+            {
+                new MyActionColorPicker().ExecuteAction();
+            }
+
+            if (controls.BuildPlanner.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.ToolbarConfig.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.BlockSelector.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Contract.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Chat.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.ToggleView.HasPressed)
+            {
+                character.IsInFirstPersonView = !character.IsInFirstPersonView;
+            }
+
+            if (controls.Pause.HasPressed)
+            {
+                MySandboxGame.IsPaused = !MySandboxGame.IsPaused;
+            }
+
+            if (controls.VoiceChat.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.SignalMode.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.SpectatorMode.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Teleport.HasPressed)
+            {
+                // TODO: character.Teleport();
+            }
         }
 
         #endregion
