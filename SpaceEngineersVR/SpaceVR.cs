@@ -2,19 +2,14 @@
 using Sandbox;
 using Sandbox.Game;
 using Sandbox.Game.World;
-using SharpDX.Direct3D11;
-using SpaceEngineersVR.Patches;
 using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Utils;
-using System;
 using System.Drawing;
-using System.Text;
+using System.IO;
 using System.Windows.Forms;
 using Valve.VR;
 using VRage;
 using VRage.Plugins;
-using VRage.Utils;
-using VRageRender;
 
 namespace SpaceEngineersVR
 {
@@ -58,17 +53,18 @@ namespace SpaceEngineersVR
 
             log.Write("De-Keenifying enviroment");
             Form GameWindow = (Form)AccessTools.Field(MyVRage.Platform.Windows.GetType(), "m_form").GetValue(MyVRage.Platform.Windows);
-            GameWindow.Icon = new Icon(Util.GetAssetFolder() + "icon.ico");
+            var assetFolder = Util.GetAssetFolder();
+            GameWindow.Icon = new Icon( Path.Combine(assetFolder, "icon.ico"));
             GameWindow.Text = "SpaceEngineersVR";
             GameWindow.AccessibleName = "SpaceEngineersVR";
-            
-            MyPerGameSettings.GameIcon = Util.GetAssetFolder() + "icon.ico";
+
+            MyPerGameSettings.GameIcon = Path.Combine(assetFolder, "icon.ico");
             MyPerGameSettings.BasicGameInfo.GameName = "SpaceEngineersVR";
             MyPerGameSettings.BasicGameInfo.ApplicationName = "SpaceEngineersVR";
-            MyPerGameSettings.BasicGameInfo.SplashScreenImage = (Util.GetAssetFolder() + "logo.png");
+            MyPerGameSettings.BasicGameInfo.SplashScreenImage = Path.Combine(assetFolder, "logo.png");
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
-            log.Write("Creating VR enviroment");
+            log.Write("Creating VR environment");
             Harmony = new Harmony("SpaceEngineersVR");
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
@@ -85,7 +81,6 @@ namespace SpaceEngineersVR
             if (!IsValid || OpenVR.System == null)
                 return;
 
-            Headset.GameUpdate();
             // log.Write("Game update");
         }
 
