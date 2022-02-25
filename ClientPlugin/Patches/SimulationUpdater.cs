@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using VRage.Game;
 using VRage.Game.Components;
 #pragma warning disable CS0649
 
-namespace ClientPlugin.Patches
+namespace SpaceEngineersVR.Patches
 {
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-    internal class SimulationUpdater : MySessionComponentBase
+    class SimulationUpdater : MySessionComponentBase
     {
         public static Action UpdateBeforeSim;
         public static Action UpdateAfterSim;
@@ -43,5 +43,6 @@ namespace ClientPlugin.Patches
         {
             OnWorldUnload?.Invoke();
         }
+
     }
 }
