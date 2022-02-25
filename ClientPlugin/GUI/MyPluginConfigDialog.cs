@@ -2,12 +2,12 @@ using System;
 using System.Text;
 using Sandbox;
 using Sandbox.Graphics.GUI;
-using Shared.Plugin;
+using SpaceEnginnersVR.Plugin;
 using VRage;
 using VRage.Utils;
 using VRageMath;
 
-namespace ClientPlugin.GUI
+namespace SpaceEnginnersVR.GUI
 {
 
     public class MyPluginConfigDialog : MyGuiScreenBase

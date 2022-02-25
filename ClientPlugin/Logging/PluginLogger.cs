@@ -1,11 +1,11 @@
 #if !TORCH
-using Shared.Plugin;
+using SpaceEnginnersVR.Plugin;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using VRage.Utils;
 
-namespace Shared.Logging
+namespace SpaceEnginnersVR.Logging
 {
     public class PluginLogger : LogFormatter, IPluginLogger
     {

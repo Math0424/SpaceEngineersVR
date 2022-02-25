@@ -1,6 +1,6 @@
 ﻿using Valve.VR;
 
-namespace ClientPlugin.Player
+namespace SpaceEnginnersVR.Player
 {
     public class InputSource
     {

@@ -3,7 +3,7 @@ using SharpDX.Direct3D11;
 using System;
 using System.Reflection;
 
-namespace ClientPlugin.Wrappers
+namespace SpaceEnginnersVR.Wrappers
 {
     public class MyBackbuffer
     {

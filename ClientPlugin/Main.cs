@@ -1,31 +1,30 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using ClientPlugin.GUI;
-using ClientPlugin.Player;
-using ClientPlugin.Utill;
-using ClientPlugin.Wrappers;
+using SpaceEnginnersVR.GUI;
+using SpaceEnginnersVR.Player;
+using SpaceEnginnersVR.Wrappers;
 using HarmonyLib;
 using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
-using Shared.Config;
-using Shared.Logging;
-using Shared.Patches;
-using Shared.Plugin;
+using SpaceEnginnersVR.Config;
+using SpaceEnginnersVR.Logging;
+using SpaceEnginnersVR.Patches;
+using SpaceEnginnersVR.Plugin;
 using Valve.VR;
 using VRage;
 using VRage.FileSystem;
 using VRage.Plugins;
 using VRageMath;
 
-namespace ClientPlugin
+namespace SpaceEnginnersVR
 {
     // ReSharper disable once UnusedType.Global
-    public class Plugin : IPlugin, ICommonPlugin
+    public class Main : IPlugin, ICommonPlugin
     {
         public const string Name = "SpaceEngineersVR";
-        public static Plugin Instance { get; private set; }
+        public static Main Instance { get; private set; }
         
         public Harmony Harmony { get; private set; }
 

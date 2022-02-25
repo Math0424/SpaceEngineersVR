@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
-namespace Shared.Logging
+namespace SpaceEnginnersVR.Logging
 {
     public class LogFormatter
     {

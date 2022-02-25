@@ -1,12 +1,12 @@
-using ClientPlugin.Utill;
-using Shared.Config;
-using Shared.Logging;
+using SpaceEnginnersVR.Utill;
+using SpaceEnginnersVR.Config;
+using SpaceEnginnersVR.Logging;
 using System;
 using System.Drawing;
 using System.IO;
 
 
-namespace Shared.Plugin
+namespace SpaceEnginnersVR.Plugin
 {
     public static class Common
     {
@@ -16,7 +16,7 @@ namespace Shared.Plugin
 
         public static readonly string PublicName = "Space Engineers VR";
 
-        public static readonly Version Version = typeof(ClientPlugin.Plugin).Assembly.GetName().Version;
+        public static readonly Version Version = typeof(SpaceEnginnersVR.Main).Assembly.GetName().Version;
 
         public static readonly Icon Icon = new Icon(Path.Combine(Util.GetAssetFolder(), "icon.ico"));
         public static readonly string IconPngPath = Path.Combine(Util.GetAssetFolder(), "logo.png");

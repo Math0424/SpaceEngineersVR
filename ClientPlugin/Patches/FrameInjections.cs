@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 
-namespace ClientPlugin.Patches
+namespace SpaceEnginnersVR.Patches
 {
     public static class FrameInjections
     {
@@ -13,11 +13,11 @@ namespace ClientPlugin.Patches
         {
             Type t = AccessTools.TypeByName("VRageRender.MyRender11");
 
-            Plugin.Instance.Harmony.Patch(AccessTools.Method(t, "Present"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_Present)));
+            Main.Instance.Harmony.Patch(AccessTools.Method(t, "Present"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_Present)));
 
-            Plugin.Instance.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
+            Main.Instance.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
 
-            Plugin.Instance.Log.Info("Applied harmony game injections for renderer.");
+            Main.Instance.Log.Info("Applied harmony game injections for renderer.");
         }
 
         public static bool Prefix_DrawScene()

@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System.Reflection;
 
-namespace ClientPlugin.Patches
+namespace SpaceEnginnersVR.Patches
 {
     [HarmonyPatch]
     public static class PlayerAndCameraDisabler
@@ -13,7 +13,7 @@ namespace ClientPlugin.Patches
 
         public static bool Prefix()
         {
-            if (Plugin.Instance.Config.EnableKeyboardAndMouseControls)
+            if (Main.Instance.Config.EnableKeyboardAndMouseControls)
             {
                 return true;
             }

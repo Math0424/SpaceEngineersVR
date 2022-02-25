@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace ClientPlugin.Wrappers
+namespace SpaceEnginnersVR.Wrappers
 {
     public static class MyManagers
     {

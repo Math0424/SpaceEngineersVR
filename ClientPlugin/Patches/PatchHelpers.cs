@@ -1,9 +1,9 @@
 using System;
 using System.Reflection;
 using HarmonyLib;
-using Shared.Logging;
+using SpaceEnginnersVR.Logging;
 
-namespace Shared.Patches
+namespace SpaceEnginnersVR.Patches
 {
     // ReSharper disable once UnusedType.Global
     public static class PatchHelpers

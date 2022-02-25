@@ -6,7 +6,7 @@ using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
 
-namespace ClientPlugin.Wrappers
+namespace SpaceEnginnersVR.Wrappers
 {
     public static class MyRender11
     {

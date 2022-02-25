@@ -1,9 +1,9 @@
-﻿using ClientPlugin.Utill;
+﻿using SpaceEnginnersVR.Utill;
 using System.Runtime.CompilerServices;
 using Valve.VR;
 using VRageMath;
 
-namespace ClientPlugin.Player
+namespace SpaceEnginnersVR.Player
 {
     public class Pose
     {

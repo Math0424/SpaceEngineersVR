@@ -1,11 +1,14 @@
-﻿using ClientPlugin.Patches;
-using ClientPlugin.Utill;
-using ClientPlugin.Wrappers;
+﻿using SpaceEnginnersVR.Patches;
+using SpaceEnginnersVR.Utill;
+using SpaceEnginnersVR.Wrappers;
 using ParallelTasks;
 using Sandbox;
+using Sandbox.Game.Entities;
+using Sandbox.Game.Screens.Helpers.RadialMenuActions;
+using Sandbox.Game.SessionComponents.Clipboard;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
-using Shared.Plugin;
+using SpaceEnginnersVR.Plugin;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
@@ -22,7 +25,7 @@ using VRageRender.Messages;
 
 // See MyRadialMenuItemFactory for actions
 
-namespace ClientPlugin.Player
+namespace SpaceEnginnersVR.Player
 {
     internal class Headset
     {
@@ -67,7 +70,7 @@ namespace ClientPlugin.Player
                 vMax = 1
             };
 
-            Plugin.Instance.Log.Info($"Found headset with eye resolution of '{width}x{height}'");
+            Main.Instance.Log.Info($"Found headset with eye resolution of '{width}x{height}'");
         }
 
         #region DrawingLogic
@@ -106,11 +109,11 @@ namespace ClientPlugin.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePush();
-                    Plugin.Instance.Log.Info("Controller disconnected, pausing game.");
+                    Main.Instance.Log.Info("Controller disconnected, pausing game.");
                 }
                 else
                 {
-                    Plugin.Instance.Log.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                    Main.Instance.Log.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
                 }
 
                 IsControllersAlreadyDisconnected = true;
@@ -120,11 +123,11 @@ namespace ClientPlugin.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePop();
-                    Plugin.Instance.Log.Info("Controller reconnected, unpausing game.");
+                    Main.Instance.Log.Info("Controller reconnected, unpausing game.");
                 }
                 else
                 {
-                    Plugin.Instance.Log.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
+                    Main.Instance.Log.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
                 }
 
                 IsControllersAlreadyDisconnected = false;
@@ -138,11 +141,11 @@ namespace ClientPlugin.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePush();
-                    Plugin.Instance.Log.Info("Headset disconnected, pausing game.");
+                    Main.Instance.Log.Info("Headset disconnected, pausing game.");
                 }
                 else
                 {
-                    Plugin.Instance.Log.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                    Main.Instance.Log.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
                 }
 
                 IsHeadsetAlreadyDisconnected = true;
@@ -152,11 +155,11 @@ namespace ClientPlugin.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePop();
-                    Plugin.Instance.Log.Info("Headset reconnected, unpausing game.");
+                    Main.Instance.Log.Info("Headset reconnected, unpausing game.");
                 }
                 else
                 {
-                    Plugin.Instance.Log.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
+                    Main.Instance.Log.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
                 }
 
                 IsHeadsetAlreadyDisconnected = false;
@@ -222,7 +225,7 @@ namespace ClientPlugin.Player
                 if (modified)
                 {
                     var sign = ipdCorrection >= 0 ? '+' : '-';
-                    Plugin.Instance.Log.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
+                    Main.Instance.Log.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
                 }
             }
         }
@@ -282,8 +285,8 @@ namespace ClientPlugin.Player
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
             {
-                Plugin.Instance.Log.Warning("Dropping frames!");
-                Plugin.Instance.Log.IncreaseIndent();
+                Main.Instance.Log.Warning("Dropping frames!");
+                Main.Instance.Log.IncreaseIndent();
                 StringBuilder builder = new StringBuilder();
                 builder.AppendLine("FrameInterval: " + timings.m_flClientFrameIntervalMs);
                 builder.AppendLine("IdleTime     : " + timings.m_flCompositorIdleCpuMs);
@@ -291,15 +294,15 @@ namespace ClientPlugin.Player
                 builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                Plugin.Instance.Log.Warning(builder.ToString());
-                Plugin.Instance.Log.Warning("");
+                Main.Instance.Log.Warning(builder.ToString());
+                Main.Instance.Log.Warning("");
             }
 
             //Update positions
             if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
 
             {
-                Plugin.Instance.Log.Error("HMD pos invalid!");
+                Main.Instance.Log.Error("HMD pos invalid!");
                 return;
             }
 
@@ -667,7 +670,7 @@ namespace ClientPlugin.Player
             };
             // FIXME: Notification on overlay
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
-            Plugin.Instance.Log.Debug("Pop-up created with message: " + message);
+            Main.Instance.Log.Debug("Pop-up created with message: " + message);
 
             bitmap.UnlockBits(textureData);
         }
@@ -682,7 +685,7 @@ namespace ClientPlugin.Player
         {
             Parallel.Start(() =>
             {
-                Plugin.Instance.Log.Info($"Messagebox created with the message: {msg}");
+                Main.Instance.Log.Info($"Messagebox created with the message: {msg}");
                 DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
                 return result;
             });

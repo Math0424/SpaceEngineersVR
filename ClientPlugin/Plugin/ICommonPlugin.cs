@@ -1,7 +1,7 @@
-using Shared.Config;
-using Shared.Logging;
+using SpaceEnginnersVR.Config;
+using SpaceEnginnersVR.Logging;
 
-namespace Shared.Plugin
+namespace SpaceEnginnersVR.Plugin
 {
     public interface ICommonPlugin
     {

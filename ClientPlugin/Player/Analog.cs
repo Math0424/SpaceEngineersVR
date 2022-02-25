@@ -2,7 +2,7 @@
 using Valve.VR;
 using VRageMath;
 
-namespace ClientPlugin.Player
+namespace SpaceEnginnersVR.Player
 {
     public class Analog
     {

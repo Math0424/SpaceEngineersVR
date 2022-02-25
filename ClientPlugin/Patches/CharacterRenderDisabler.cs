@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace ClientPlugin.Patches
+namespace SpaceEnginnersVR.Patches
 {
     [HarmonyPatch]
     public static class CharacterRenderDisabler
@@ -15,7 +15,7 @@ namespace ClientPlugin.Patches
 
         public static bool Prefix()
         {
-            if (Plugin.Instance.Config.EnableCharacterRendering)
+            if (Main.Instance.Config.EnableCharacterRendering)
             {
                 return true;
             }

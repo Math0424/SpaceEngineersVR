@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.Logging
+namespace SpaceEnginnersVR.Logging
 {
     public interface IPluginLogger
     {

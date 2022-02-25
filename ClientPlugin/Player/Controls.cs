@@ -1,4 +1,4 @@
-﻿using ClientPlugin.Utill;
+﻿using SpaceEnginnersVR.Utill;
 using System.IO;
 using Valve.VR;
 
@@ -6,7 +6,7 @@ using Valve.VR;
 // https://github.com/ValveSoftware/openvr/wiki/SteamVR-Input
 // https://github.com/ValveSoftware/openvr/wiki/Action-manifest
 
-namespace ClientPlugin.Player
+namespace SpaceEnginnersVR.Player
 {
     public class Controls
     {

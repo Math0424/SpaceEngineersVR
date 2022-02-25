@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 #if !TORCH
 
-namespace Shared.Config
+namespace SpaceEnginnersVR.Config
 {
     public class PluginConfig: IPluginConfig
     {
