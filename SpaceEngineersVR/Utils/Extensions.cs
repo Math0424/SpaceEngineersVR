@@ -1,15 +1,9 @@
-﻿using SpaceEngineersVR.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Valve.VR;
+﻿using Valve.VR;
 using VRageMath;
 
-namespace SpaceEngineersVR
+namespace SpaceEnginnersVR.Utill
 {
-    static class Extensions
+    internal static class Extensions
     {
 
         public static Vector3 ToVector(this HmdVector3_t v)

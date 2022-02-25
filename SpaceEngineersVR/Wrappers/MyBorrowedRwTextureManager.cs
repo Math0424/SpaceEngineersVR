@@ -3,11 +3,11 @@ using SharpDX.DXGI;
 using System;
 using System.Reflection;
 
-namespace SpaceEngineersVR.Wrappers
+namespace SpaceEnginnersVR.Wrappers
 {
     public class MyBorrowedRwTextureManager
     {
-        object instance;
+        private readonly object instance;
 
         static MyBorrowedRwTextureManager()
         {
@@ -20,11 +20,15 @@ namespace SpaceEngineersVR.Wrappers
             this.instance = instance;
         }
 
-        private static readonly MethodInfo borrowRtv; 
+        private static readonly MethodInfo borrowRtv;
         public BorrowedRtvTexture BorrowRtv(string debugName, int width, int height, Format format, int samplesCount = 1, int samplesQuality = 0)
         {
-            var x = borrowRtv.Invoke(instance, new object[] { debugName, width, height, format, samplesCount, samplesQuality });
-            if (x == null) return null;
+            object x = borrowRtv.Invoke(instance, new object[] { debugName, width, height, format, samplesCount, samplesQuality });
+            if (x == null)
+            {
+                return null;
+            }
+
             return new BorrowedRtvTexture(x);
         }
     }

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using VRage.Game;
 using VRage.Game.Components;
 #pragma warning disable CS0649
 
-namespace SpaceEngineersVR.Patches
+namespace SpaceEnginnersVR.Patches
 {
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
     class SimulationUpdater : MySessionComponentBase
@@ -43,6 +43,5 @@ namespace SpaceEngineersVR.Patches
         {
             OnWorldUnload?.Invoke();
         }
-
     }
 }

@@ -1,7 +1,7 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Valve.VR;
 
-namespace SpaceEngineersVR.Player
+namespace SpaceEnginnersVR.Player
 {
     public class Button
     {
@@ -9,6 +9,7 @@ namespace SpaceEngineersVR.Player
 
         private InputDigitalActionData_t data;
         private readonly ulong handle;
+        private bool previous;
 
         public bool Active => data.bActive;
         public bool IsPressed => data.bState;

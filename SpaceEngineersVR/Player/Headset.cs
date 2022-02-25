@@ -1,18 +1,21 @@
-﻿using Sandbox.Game.World;
-using Sandbox.ModAPI;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using SpaceEngineersVR.Patches;
-using SpaceEngineersVR.Utils;
-using SpaceEngineersVR.Wrappers;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Text;
+﻿using SpaceEnginnersVR.Patches;
+using SpaceEnginnersVR.Utill;
+using SpaceEnginnersVR.Wrappers;
+using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Screens.Helpers.RadialMenuActions;
 using Sandbox.Game.SessionComponents.Clipboard;
+using Sandbox.Game.World;
+using Sandbox.ModAPI;
+using SpaceEnginnersVR.Plugin;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Windows.Forms;
 using Valve.VR;
 using VRage.Game.ModAPI;
 using VRage.Input;
@@ -22,13 +25,16 @@ using VRageRender.Messages;
 
 // See MyRadialMenuItemFactory for actions
 
-namespace SpaceEngineersVR.Player
+namespace SpaceEnginnersVR.Player
 {
-    class Headset
+    internal class Headset
     {
-        Logger log = new Logger();
-
         public MatrixD RealWorldPos;
+
+        public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
+        public bool IsHeadsetAlreadyDisconnected = false;
+        public bool IsControllersConnected => true; //(LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
+        public bool IsControllersAlreadyDisconnected = false;
 
         private readonly uint pnX;
         private readonly uint pnY;
@@ -64,13 +70,13 @@ namespace SpaceEngineersVR.Player
                 vMax = 1
             };
 
-            log.Write($"Found headset with eye resolution of '{width}x{height}'");
+            Main.Instance.Log.Info($"Found headset with eye resolution of '{width}x{height}'");
         }
 
         #region DrawingLogic
 
-        bool firstUpdate = true;
-        BorrowedRtvTexture texture;
+        private bool firstUpdate = true;
+        private BorrowedRtvTexture texture;
 
         private bool FrameUpdate()
         {
@@ -78,7 +84,7 @@ namespace SpaceEngineersVR.Player
 
             // log.Write("Frame update");
 
-            var cam = MySector.MainCamera;
+            VRage.Game.Utils.MyCamera cam = MySector.MainCamera;
             if (cam == null)
             {
                 firstUpdate = true;
@@ -88,17 +94,82 @@ namespace SpaceEngineersVR.Player
             if (firstUpdate)
             {
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
-                MyRender11.SetResolution(new Vector2I((int)width, (int)height));
+                MyRender11.Resolution = new Vector2I((int)width, (int)height);
                 MyRender11.CreateScreenResources();
                 firstUpdate = false;
                 return true;
             }
 
+
+            //UNTESTED
+            //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
+            if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
+            {
+                //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    Main.Instance.Log.Info("Controller disconnected, pausing game.");
+                }
+                else
+                {
+                    Main.Instance.Log.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
+                IsControllersAlreadyDisconnected = true;
+            }
+            else if (IsControllersConnected && IsControllersAlreadyDisconnected)
+            {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    Main.Instance.Log.Info("Controller reconnected, unpausing game.");
+                }
+                else
+                {
+                    Main.Instance.Log.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
+                }
+
+                IsControllersAlreadyDisconnected = false;
+            }
+
+            //UNTESTED
+            //Checks if the headset got disconnected, shows a message if the headset is disconnected.
+            if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
+            {
+                //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    Main.Instance.Log.Info("Headset disconnected, pausing game.");
+                }
+                else
+                {
+                    Main.Instance.Log.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
+                IsHeadsetAlreadyDisconnected = true;
+            }
+            else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
+            {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    Main.Instance.Log.Info("Headset reconnected, unpausing game.");
+                }
+                else
+                {
+                    Main.Instance.Log.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
+                }
+
+                IsHeadsetAlreadyDisconnected = false;
+            }
+
             // Eye position and orientation
             MatrixD orientation = Matrix.Invert(RealWorldPos).GetOrientation();
 
-            var rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
-            var leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
+            MatrixD rightEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix());
+            MatrixD leftEye = MatrixD.Multiply(orientation, OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix());
 
             ipd = (float)(rightEye.Translation - leftEye.Translation).Length();
 
@@ -114,6 +185,7 @@ namespace SpaceEngineersVR.Player
             // Store the original matrices to remove the flickering
             var originalWm = cam.WorldMatrix;
             var originalVm = cam.ViewMatrix;
+
 
             // Stereo rendering
             cam.WorldMatrix = rightEye;
@@ -153,7 +225,7 @@ namespace SpaceEngineersVR.Player
                 if (modified)
                 {
                     var sign = ipdCorrection >= 0 ? '+' : '-';
-                    log.Write($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
+                    Main.Instance.Log.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
                 }
             }
         }
@@ -164,7 +236,7 @@ namespace SpaceEngineersVR.Player
             MyRender11.DrawGameScene(texture, out _);
 
             Texture2D texture2D = texture.GetResource(); //(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
-            var input = new Texture_t
+            Texture_t input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
                 eType = ETextureType.DirectX,
@@ -175,7 +247,7 @@ namespace SpaceEngineersVR.Player
 
         private void UploadCameraViewMatrix(EVREye eye)
         {
-            var cam = MySector.MainCamera;
+            VRage.Game.Utils.MyCamera cam = MySector.MainCamera;
 
             //ViewMatrix is the inverse of WorldMatrix
             cam.ViewMatrix = Matrix.Invert(cam.WorldMatrix);
@@ -213,8 +285,8 @@ namespace SpaceEngineersVR.Player
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
             {
-                log.Write("Dropping frames!");
-                log.IncreaseIndent();
+                Main.Instance.Log.Warning("Dropping frames!");
+                Main.Instance.Log.IncreaseIndent();
                 StringBuilder builder = new StringBuilder();
                 builder.AppendLine("FrameInterval: " + timings.m_flClientFrameIntervalMs);
                 builder.AppendLine("IdleTime     : " + timings.m_flCompositorIdleCpuMs);
@@ -222,15 +294,15 @@ namespace SpaceEngineersVR.Player
                 builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                log.Write(builder.ToString());
-                log.DecreaseIndent();
-                log.Write("");
+                Main.Instance.Log.Warning(builder.ToString());
+                Main.Instance.Log.Warning("");
             }
 
             //Update positions
             if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
+
             {
-                log.Write("HMD pos invalid!");
+                Main.Instance.Log.Error("HMD pos invalid!");
                 return;
             }
 
@@ -369,7 +441,6 @@ namespace SpaceEngineersVR.Player
                 character.SwitchDamping();
 
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-
             if (move == Vector3.Zero && rotate == Vector2.Zero && roll == 0f)
                 MySession.Static.ControlledEntity?.MoveAndRotateStopped();
             else
@@ -571,8 +642,7 @@ namespace SpaceEngineersVR.Player
 
         public void CreatePopup(string message)
         {
-            var logoPath = Path.Combine(Util.GetAssetFolder(), "logo.png");
-            Bitmap img = new Bitmap(File.OpenRead(logoPath));
+            Bitmap img = new Bitmap(File.OpenRead(Common.IconPngPath));
             CreatePopup(EVRNotificationType.Transient, message, ref img);
         }
 
@@ -600,9 +670,26 @@ namespace SpaceEngineersVR.Player
             };
             // FIXME: Notification on overlay
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
-            log.Write("Pop-up created with message: " + message);
+            Main.Instance.Log.Debug("Pop-up created with message: " + message);
 
             bitmap.UnlockBits(textureData);
+        }
+
+        /// <summary>
+        /// Shows a messagebox async to prevent calling thread from being paused.
+        /// </summary>
+        /// <param name="msg">The message of the messagebox.</param>
+        /// <param name="caption">The caption of the messagebox.</param>
+        /// <returns>The button that the user clicked as System.Windows.Forms.DialogResult.</returns>
+        public DialogResult ShowMessageBoxAsync(string msg, string caption)
+        {
+            Parallel.Start(() =>
+            {
+                Main.Instance.Log.Info($"Messagebox created with the message: {msg}");
+                DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
+                return result;
+            });
+            return DialogResult.None;
         }
 
         #endregion

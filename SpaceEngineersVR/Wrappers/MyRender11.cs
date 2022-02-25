@@ -1,21 +1,20 @@
 ﻿using HarmonyLib;
 using SharpDX.DXGI;
-using SpaceEngineersVR.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
 
-namespace SpaceEngineersVR.Wrappers
+namespace SpaceEnginnersVR.Wrappers
 {
     public static class MyRender11
     {
-        static Logger log = new Logger();
+        public static Vector2I Resolution
+        {
+            get => (Vector2I)resolution.GetValue(null);
+            set => SetResolution(value);
+        }
 
         static MyRender11()
         {
@@ -57,14 +56,8 @@ namespace SpaceEngineersVR.Wrappers
         private static readonly FieldInfo settings;
         public static MyRenderSettings Settings
         {
-            get
-            {
-                return (MyRenderSettings)settings.GetValue(null);
-            }
-            set
-            {
-                settings.SetValue(null, value);
-            }
+            get => (MyRenderSettings)settings.GetValue(null);
+            set => settings.SetValue(null, value);
         }
 
         private static readonly MethodInfo resizeSwapChain;
@@ -86,7 +79,7 @@ namespace SpaceEngineersVR.Wrappers
         }
 
         private static readonly FieldInfo resolution;
-        public static void SetResolution(Vector2I vector)
+        private static void SetResolution(Vector2I vector)
         {
             resolution.SetValue(null, vector);
         }
@@ -113,22 +106,10 @@ namespace SpaceEngineersVR.Wrappers
         }
 
         private static readonly MethodInfo get_deviceInstance;
-        public static Device1 DeviceInstance
-        {
-            get
-            {
-                return (Device1)get_deviceInstance.Invoke(null, new object[0]);
-            }
-        }
+        public static Device1 DeviceInstance => (Device1)get_deviceInstance.Invoke(null, new object[0]);
 
         private static readonly FieldInfo m_rc;
-        public static MyRenderContext RC
-        {
-            get
-            {
-                return new MyRenderContext(m_rc.GetValue(null));
-            }
-        }
+        public static MyRenderContext RC => new MyRenderContext(m_rc.GetValue(null));
     }
 
     public static class MyImmediateRC

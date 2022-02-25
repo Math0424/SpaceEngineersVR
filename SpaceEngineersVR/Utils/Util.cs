@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -9,7 +9,7 @@ using VRageMath;
 using VRageRender;
 using Vector4 = VRageMath.Vector4;
 
-namespace SpaceEngineersVR
+namespace SpaceEnginnersVR.Utill
 {
     internal class Util
     {
@@ -42,8 +42,8 @@ namespace SpaceEngineersVR
         public static void DrawDebugMatrix(Vector3D position, MatrixD pose, string name)
         {
             DrawDebugLine(position, pose.Forward, 255, 000, 000);
-            DrawDebugLine(position, pose.Left   , 000, 255, 000);
-            DrawDebugLine(position, pose.Up     , 000, 000, 255);
+            DrawDebugLine(position, pose.Left, 000, 255, 000);
+            DrawDebugLine(position, pose.Up, 000, 000, 255);
             DrawDebugText(position, name);
         }
 
@@ -54,7 +54,7 @@ namespace SpaceEngineersVR
 
         public static void ExecuteInMain(Action action, bool sync)
         {
-            var synchronization = SynchronizationContext.Current;
+            SynchronizationContext synchronization = SynchronizationContext.Current;
             if (synchronization != null)
             {
                 if (sync)
@@ -67,7 +67,9 @@ namespace SpaceEngineersVR
                 }
             }
             else
+            {
                 Task.Factory.StartNew(action);
+            }
         }
 
         public static MatrixD MapViewToWorldMatrix(MatrixD view, MatrixD worldMatrix)

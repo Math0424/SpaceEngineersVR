@@ -2,13 +2,9 @@
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SpaceEngineersVR.Wrappers
+namespace SpaceEnginnersVR.Wrappers
 {
     public class MyRenderContext
     {
@@ -37,8 +33,8 @@ namespace SpaceEngineersVR.Wrappers
         private static readonly MethodInfo mapSubresource;
         public DataBox MapSubresource(Texture2D resource, int mipSlice, int arraySlice, MapMode mode, MapFlags flags, out DataStream stream)
         {
-            var args = new object[] { resource, mipSlice, arraySlice, mode, flags, null };
-            var result = (DataBox)mapSubresource.Invoke(instance, args);
+            object[] args = new object[] { resource, mipSlice, arraySlice, mode, flags, null };
+            DataBox result = (DataBox)mapSubresource.Invoke(instance, args);
             stream = (DataStream)args[5];
             return result;
         }
