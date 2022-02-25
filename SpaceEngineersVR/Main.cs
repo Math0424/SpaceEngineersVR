@@ -81,7 +81,6 @@ namespace SpaceEnginnersVR
             try
             {
                 if (!failed || OpenVR.System != null)
-
                 {
                     CustomUpdate();
                     Tick++;
