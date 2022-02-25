@@ -57,12 +57,6 @@ namespace SpaceEnginnersVR
 
             Common.SetPlugin(this);
 
-            if (!PatchHelpers.HarmonyPatchAll(Log, Harmony = new Harmony(Name)))
-            {
-                failed = true;
-                return;
-            }
-
             Log.Debug("Successfully loaded");
         }
 
@@ -165,6 +159,13 @@ namespace SpaceEnginnersVR
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
             Log.Info("Creating VR environment");
+            
+            if (!PatchHelpers.HarmonyPatchAll(Log, Harmony = new Harmony(Name)))
+            {
+                failed = true;
+                return;
+            }
+            
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
 
