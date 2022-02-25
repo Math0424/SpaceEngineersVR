@@ -1,4 +1,4 @@
-﻿using SpaceEnginnersVR.Player;
+using ClientPlugin.Player;
 using System;
 using System.IO;
 using System.Reflection;
@@ -8,8 +8,9 @@ using VRage.Game;
 using VRage.Utils;
 using VRageMath;
 using VRageRender;
+using Vector4 = VRageMath.Vector4;
 
-namespace SpaceEnginnersVR.Utill
+namespace ClientPlugin.Utill
 {
     internal class Util
     {
@@ -28,7 +29,6 @@ namespace SpaceEnginnersVR.Utill
         public static void DrawDebugLine(Vector3D pos, Vector3D dir, int r, int g, int b)
         {
             Vector4 color = new Vector4(r / 255f, g / 255f, b / 255f, 1);
-
             MySimpleObjectDraw.DrawLine(pos, pos + dir * 10, SQUARE, ref color, 0.01f);
         }
 
