@@ -1,4 +1,3 @@
-using ClientPlugin.Player;
 using System;
 using System.IO;
 using System.Reflection;
@@ -10,7 +9,7 @@ using VRageMath;
 using VRageRender;
 using Vector4 = VRageMath.Vector4;
 
-namespace ClientPlugin.Utill
+namespace SpaceEnginnersVR.Utill
 {
     internal class Util
     {
