@@ -1,6 +1,7 @@
 ﻿using System;
 using VRage.Game;
 using VRage.Game.Components;
+#pragma warning disable CS0649
 
 namespace ClientPlugin.Patches
 {
@@ -42,6 +43,5 @@ namespace ClientPlugin.Patches
         {
             OnWorldUnload?.Invoke();
         }
-
     }
 }

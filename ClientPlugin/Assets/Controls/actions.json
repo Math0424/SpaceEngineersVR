@@ -1,0 +1,427 @@
+{
+  "version": 1,
+  "minimum_required_version": 1,
+  "default_bindings": [
+    {
+      "controller_type": "generic",
+      "binding_url": "binding_generic.json"
+    },
+    {
+      "controller_type": "vive_controller",
+      "binding_url": "binding_vive_controller.json"
+    },
+    {
+      "controller_type": "vive_cosmos_controller",
+      "binding_url": "binding_vive_cosmos_controller.json"
+    },
+    {
+      "controller_type": "oculus_touch",
+      "binding_url": "binding_oculus_touch.json"
+    },
+    {
+      "controller_type": "holographic_controller",
+      "binding_url": "binding_holographic_controller.json"
+    },
+    {
+      "controller_type": "gamepad",
+      "binding_url": "binding_gamepad.json"
+    },
+    {
+      "controller_type": "knuckles",
+      "binding_url": "binding_knuckles.json"
+    },
+    {
+      "controller_type": "knuckles_ev1",
+      "binding_url": "binding_knuckles_ev1.json"
+    },
+    {
+      "controller_type": "hpmotioncontroller",
+      "binding_url": "binding_hpmotioncontroller.json"
+    }
+  ],
+  "actions": [
+    {
+      "name": "/actions/walking/in/Walk",
+      "requirement": "mandatory",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/walking/in/WalkForward",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/walking/in/WalkBackward",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/walking/in/WalkRotate",
+      "requirement": "mandatory",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/walking/in/JumpOrClimbUp",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/walking/in/CrouchOrClimbDown",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/flying/in/ThrustLRUD",
+      "requirement": "suggested",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/flying/in/ThrustLRFB",
+      "requirement": "suggested",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/flying/in/ThrustUp",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/flying/in/ThrustDown",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/flying/in/ThrustForward",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/flying/in/ThrustBackward",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/flying/in/ThrustRotate",
+      "requirement": "mandatory",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/flying/in/ThrustRoll",
+      "requirement": "suggested",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/flying/in/Dampeners",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Primary",
+      "requirement": "mandatory",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Secondary",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Reload",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Unequip",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/CutGrid",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/CopyGrid",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/PasteGrid",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Interact",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Helmet",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Jetpack",
+      "requirement": "mandatory",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Broadcasting",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Park",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Power",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Lights",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Respawn",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/ToggleSignals",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/ToggleSymmetry",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/SymmetrySetup",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/PlacementMode",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/CubeSize",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Terminal",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Inventory",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/out/ColorSelector",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/out/ColorPicker",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/BuildPlanner",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/ToolbarConfig",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/BlockSelector",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Contract",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Chat",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/ToggleView",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Pause",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/VoiceChat",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/SignalMode",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/SpectatorMode",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/Teleport",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/common/in/LeftHand",
+      "requirement": "suggested",
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/left"
+    },
+    {
+      "name": "/actions/common/in/RightHand",
+      "requirement": "suggested",
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/right"
+    },
+    {
+      "name": "/actions/feedback/out/Welding",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Drilling",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Grinding",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Shooting",
+      "requirement": "suggested",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Placing",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/Removing",
+      "requirement": "optional",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/PlacementFit",
+      "requirement": "optional",
+      "type": "vibration"
+    }
+  ],
+  "action_sets": [
+    {
+      "name": "/actions/walking",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/flying",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/common",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/feedback",
+      "usage": "leftright"
+    }
+  ],
+  "localization": [
+    {
+      "language_tag": "en_us",
+      "/actions/walking": "Walking",
+      "/actions/walking/in/Walk": "Walk",
+      "/actions/walking/in/WalkForward": "Forward",
+      "/actions/walking/in/WalkBackward": "Backward",
+      "/actions/walking/in/WalkRotate": "Rotate",
+      "/actions/walking/in/JumpOrClimbUp": "Jump or climb up",
+      "/actions/walking/in/CrouchOrClimbDown": "Crouch or climb down",
+      "/actions/flying": "Flying",
+      "/actions/flying/in/ThrustLRUD": "Left/right up/down",
+      "/actions/flying/in/ThrustLRFB": "Left/right forward/backward",
+      "/actions/flying/in/ThrustUp": "Up",
+      "/actions/flying/in/ThrustDown": "Down",
+      "/actions/flying/in/ThrustForward": "Forward",
+      "/actions/flying/in/ThrustBackward": "Backward",
+      "/actions/flying/in/ThrustRotate": "Rotate",
+      "/actions/flying/in/ThrustRoll": "Roll",
+      "/actions/flying/in/Dampeners": "Dampener",
+      "/actions/common": "Common",
+      "/actions/common/in/Primary": "Use primary",
+      "/actions/common/in/Secondary": "Use secondary",
+      "/actions/common/in/Reload": "Reload",
+      "/actions/common/in/Unequip": "Unequip",
+      "/actions/common/in/CutGrid": "Cut grid",
+      "/actions/common/in/CopyGrid": "Copy grid",
+      "/actions/common/in/PasteGrid": "Paste grid",
+      "/actions/common/in/Interact": "Interact",
+      "/actions/common/in/Helmet": "Helmet",
+      "/actions/common/in/Jetpack": "Jetpack",
+      "/actions/common/in/Broadcasting": "Broadcasting",
+      "/actions/common/in/Park": "Park",
+      "/actions/common/in/Power": "Power",
+      "/actions/common/in/Lights": "Light",
+      "/actions/common/in/Respawn": "Respawn",
+      "/actions/common/in/ToggleSignals": "Voxel hands",
+      "/actions/common/in/ToggleSymmetry": "Toggle symmetry",
+      "/actions/common/in/SymmetrySetup": "Symmetry setup",
+      "/actions/common/in/PlacementMode": "Placement mode",
+      "/actions/common/in/CubeSize": "Cube size",
+      "/actions/common/in/Terminal": "Terminal",
+      "/actions/common/in/Inventory": "Inventory",
+      "/actions/common/out/ColorSelector": "Color selector",
+      "/actions/common/out/ColorPicker": "Color picker",
+      "/actions/common/in/BuildPlanner": "Build planner",
+      "/actions/common/in/ToolbarConfig": "Toolbar config",
+      "/actions/common/in/BlockSelector": "Block selector",
+      "/actions/common/in/Contract": "Contract",
+      "/actions/common/in/Chat": "Chat",
+      "/actions/common/in/ToggleView": "Toggle 1st/3rd person",
+      "/actions/common/in/Pause": "Pause",
+      "/actions/common/in/VoiceChat": "Voice chat",
+      "/actions/common/in/SignalMode": "Signal mode",
+      "/actions/common/in/SpectatorMode": "Spectator mode",
+      "/actions/common/in/Teleport": "Teleport character",
+      "/actions/common/in/LeftHand": "Left (tablet) hand",
+      "/actions/common/in/RightHand": "Right (tool) hand",
+      "/actions/feedback": "Feedback",
+      "/actions/feedback/out/Welding": "Welding",
+      "/actions/feedback/out/Drilling": "Drilling",
+      "/actions/feedback/out/Grinding": "Grinding",
+      "/actions/feedback/out/Shooting": "Shooting",
+      "/actions/feedback/out/Placing": "Placing",
+      "/actions/feedback/out/Removing": "Removing",
+      "/actions/feedback/out/PlacementFit": "Placement fit"
+    }
+  ]
+}
