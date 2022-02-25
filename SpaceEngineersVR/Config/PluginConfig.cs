@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-#if !TORCH
-
 namespace SpaceEnginnersVR.Config
 {
     public class PluginConfig: IPluginConfig
@@ -45,5 +43,3 @@ namespace SpaceEnginnersVR.Config
         }
     }
 }
-
-#endif

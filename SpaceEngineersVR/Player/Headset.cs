@@ -22,6 +22,7 @@ using VRage.Input;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
+using SpaceEnginnersVR.Logging;
 
 // See MyRadialMenuItemFactory for actions
 
@@ -70,7 +71,7 @@ namespace SpaceEnginnersVR.Player
                 vMax = 1
             };
 
-            Main.Instance.Log.Info($"Found headset with eye resolution of '{width}x{height}'");
+            Logger.Info($"Found headset with eye resolution of '{width}x{height}'");
         }
 
         #region DrawingLogic
@@ -109,11 +110,11 @@ namespace SpaceEnginnersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePush();
-                    Main.Instance.Log.Info("Controller disconnected, pausing game.");
+                    Logger.Info("Controller disconnected, pausing game.");
                 }
                 else
                 {
-                    Main.Instance.Log.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                    Logger.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
                 }
 
                 IsControllersAlreadyDisconnected = true;
@@ -123,11 +124,11 @@ namespace SpaceEnginnersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePop();
-                    Main.Instance.Log.Info("Controller reconnected, unpausing game.");
+                    Logger.Info("Controller reconnected, unpausing game.");
                 }
                 else
                 {
-                    Main.Instance.Log.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
+                    Logger.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
                 }
 
                 IsControllersAlreadyDisconnected = false;
@@ -141,11 +142,11 @@ namespace SpaceEnginnersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePush();
-                    Main.Instance.Log.Info("Headset disconnected, pausing game.");
+                    Logger.Info("Headset disconnected, pausing game.");
                 }
                 else
                 {
-                    Main.Instance.Log.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                    Logger.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
                 }
 
                 IsHeadsetAlreadyDisconnected = true;
@@ -155,11 +156,11 @@ namespace SpaceEnginnersVR.Player
                 if (MySession.Static.IsPausable())
                 {
                     MySandboxGame.PausePop();
-                    Main.Instance.Log.Info("Headset reconnected, unpausing game.");
+                    Logger.Info("Headset reconnected, unpausing game.");
                 }
                 else
                 {
-                    Main.Instance.Log.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
+                    Logger.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
                 }
 
                 IsHeadsetAlreadyDisconnected = false;
@@ -225,7 +226,7 @@ namespace SpaceEnginnersVR.Player
                 if (modified)
                 {
                     var sign = ipdCorrection >= 0 ? '+' : '-';
-                    Main.Instance.Log.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
+                    Logger.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
                 }
             }
         }
@@ -285,8 +286,8 @@ namespace SpaceEnginnersVR.Player
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
             {
-                Main.Instance.Log.Warning("Dropping frames!");
-                Main.Instance.Log.IncreaseIndent();
+                Logger.Warning("Dropping frames!");
+                Logger.IncreaseIndent();
                 StringBuilder builder = new StringBuilder();
                 builder.AppendLine("FrameInterval: " + timings.m_flClientFrameIntervalMs);
                 builder.AppendLine("IdleTime     : " + timings.m_flCompositorIdleCpuMs);
@@ -294,15 +295,15 @@ namespace SpaceEnginnersVR.Player
                 builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                Main.Instance.Log.Warning(builder.ToString());
-                Main.Instance.Log.Warning("");
+                Logger.Warning(builder.ToString());
+                Logger.Warning("");
             }
 
             //Update positions
             if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
 
             {
-                Main.Instance.Log.Error("HMD pos invalid!");
+                Logger.Error("HMD pos invalid!");
                 return;
             }
 
@@ -670,7 +671,7 @@ namespace SpaceEnginnersVR.Player
             };
             // FIXME: Notification on overlay
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
-            Main.Instance.Log.Debug("Pop-up created with message: " + message);
+            Logger.Debug("Pop-up created with message: " + message);
 
             bitmap.UnlockBits(textureData);
         }
@@ -685,7 +686,7 @@ namespace SpaceEnginnersVR.Player
         {
             Parallel.Start(() =>
             {
-                Main.Instance.Log.Info($"Messagebox created with the message: {msg}");
+                Logger.Info($"Messagebox created with the message: {msg}");
                 DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
                 return result;
             });

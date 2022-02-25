@@ -535,12 +535,9 @@
     <Compile Include="Config\PersistentConfig.cs" />
     <Compile Include="Config\PluginConfig.cs" />
     <Compile Include="GUI\MyPluginConfigDialog.cs" />
-    <Compile Include="Logging\IPluginLogger.cs" />
-    <Compile Include="Logging\LogFormatter.cs" />
-    <Compile Include="Logging\PluginLogger.cs" />
+    <Compile Include="Logging\Logger.cs" />
     <Compile Include="Patches\CharacterRenderDisabler.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
-    <Compile Include="Patches\PatchHelpers.cs" />
     <Compile Include="Patches\PlayerAndCameraDisabler.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
     <Compile Include="Player\ActionSets.cs" />
@@ -553,7 +550,7 @@
     <Compile Include="Player\Pose.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Plugin\Common.cs" />
-    <Compile Include="Plugin\ICommonPlugin.cs" />
+    <Compile Include="Plugin\IVRPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Util.cs" />
@@ -579,7 +576,6 @@
     <Content Include="Assets\icon.ico" />
     <Content Include="Assets\logo.png" />
     <Content Include="deploy.bat" />
-    <Content Include="Kill-Space-Engineers.bat" />
     <Content Include="openvr_api.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -588,6 +584,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

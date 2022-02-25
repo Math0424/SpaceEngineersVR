@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Threading;
 using SpaceEnginnersVR.Logging;
+using VRage.Utils;
 
 namespace SpaceEnginnersVR.Config
 {
@@ -50,7 +51,7 @@ namespace SpaceEnginnersVR.Config
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) => SaveLater();
 
-        public static PersistentConfig<T> Load(IPluginLogger log, string path)
+        public static PersistentConfig<T> Load(string path)
         {
             try
             {
@@ -63,12 +64,12 @@ namespace SpaceEnginnersVR.Config
             }
             catch (Exception e)
             {
-                log.Error(e, "Failed to load configuration file: {0}", path);
+                Logger.Error(e, "Failed to load configuration file: {0}", path);
                 try
                 {
                     var timestamp = DateTime.Now.ToString("yyyyMMdd-hhmmss");
                     var corruptedPath = $"{path}.corrupted.{timestamp}.txt";
-                    log.Info("Moving corrupted configuration file: {0} => {1}", path, corruptedPath);
+                    Logger.Info("Moving corrupted configuration file: {0} => {1}", path, corruptedPath);
                     File.Move(path, corruptedPath);
                 }
                 catch (Exception)
@@ -77,7 +78,7 @@ namespace SpaceEnginnersVR.Config
                 }
             }
 
-            log.Info("Writing default configuration file: {0}", path);
+            MyLog.Default.WriteLine($"SpaceEngineersVR: Writing default configuration file: {path}");
             var config = new PersistentConfig<T>(path, new T());
             config.Save();
             return config;

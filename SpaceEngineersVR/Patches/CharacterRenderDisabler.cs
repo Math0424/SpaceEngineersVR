@@ -1,9 +1,12 @@
 ﻿using HarmonyLib;
+using SpaceEnginnersVR.Plugin;
 using System;
 using System.Reflection;
 
 namespace SpaceEnginnersVR.Patches
 {
+
+    //TODO: Remove this class
     [HarmonyPatch]
     public static class CharacterRenderDisabler
     {
@@ -15,7 +18,7 @@ namespace SpaceEnginnersVR.Patches
 
         public static bool Prefix()
         {
-            if (Main.Instance.Config.EnableCharacterRendering)
+            if (Common.Config.EnableCharacterRendering)
             {
                 return true;
             }
