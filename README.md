@@ -2,5 +2,5 @@
 
 A plugin to bring Space Engineers native VR support
 
-##How to install
+## How to install
 Coming Soon.
