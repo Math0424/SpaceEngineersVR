@@ -1,279 +1,279 @@
 {
-   "action_manifest_version" : 1,
-   "alias_info" : {},
-   "app_key" : "steam.app.244850",
-   "bindings" : {
-      "/actions/common" : {
-         "skeleton" : [
-            {
-               "output" : "/actions/common/in/lefthand",
-               "path" : "/user/hand/left/input/skeleton/left"
-            },
-            {
-               "output" : "/actions/common/in/righthand",
-               "path" : "/user/hand/right/input/skeleton/right"
+  "action_manifest_version": 1,
+  "alias_info": {},
+  "app_key": "steam.app.244850",
+  "bindings": {
+    "/actions/common": {
+      "skeleton": [
+        {
+          "output": "/actions/common/in/lefthand",
+          "path": "/user/hand/left/input/skeleton/left"
+        },
+        {
+          "output": "/actions/common/in/righthand",
+          "path": "/user/hand/right/input/skeleton/right"
+        }
+      ],
+      "sources": [
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/common/in/primary"
             }
-         ],
-         "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/common/in/primary"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/common/in/secondary"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/common/in/jetpack"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/x"
-            },
-            {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/right/input/skeleton/right"
-            },
-            {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/left/input/skeleton/left"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/common/in/interact"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/common/in/inventory"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/application_menu"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/common/in/terminal"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/application_menu"
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/common/in/secondary"
             }
-         ]
-      },
-      "/actions/feedback" : {
-         "chords" : [],
-         "haptics" : [
-            {
-               "output" : "none",
-               "path" : "/user/hand/right/output/haptic"
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/grip"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/common/in/jetpack"
             }
-         ],
-         "sources" : []
-      },
-      "/actions/flying" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/flying/in/thrustrotate"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/flying/in/thrustlrud"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/flying/in/thrustforward"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/left/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/flying/in/thrustbackward"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/flying/in/dampeners"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/y"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/flying/in/thrustroll"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/b"
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/x"
+        },
+        {
+          "inputs": {},
+          "mode": "none",
+          "path": "/user/hand/right/input/skeleton/right"
+        },
+        {
+          "inputs": {},
+          "mode": "none",
+          "path": "/user/hand/left/input/skeleton/left"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/common/in/interact"
             }
-         ]
-      },
-      "/actions/movement" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/movement/in/forward"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/left/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/movement/in/backward"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/movement/in/move"
-                  }
-               },
-               "mode" : "trackpad",
-               "path" : "/user/hand/left/input/emulated_trackpad"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/movement/in/vertical"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/x"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/movement/in/rotate"
-                  }
-               },
-               "mode" : "trackpad",
-               "path" : "/user/hand/right/input/emulated_trackpad"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/movement/in/roll"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/b"
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/a"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/common/in/inventory"
             }
-         ]
-      },
-      "/actions/tool" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/tool/in/primary"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/tool/in/secondary"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/grip"
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/application_menu"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/common/in/terminal"
             }
-         ]
-      },
-      "/actions/walking" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/walking/in/walk"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/walking/in/walkrotate"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/walking/in/jumporclimbup"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/walking/in/crouchorclimbdown"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/grip"
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/application_menu"
+        }
+      ]
+    },
+    "/actions/feedback": {
+      "chords": [],
+      "haptics": [
+        {
+          "output": "none",
+          "path": "/user/hand/right/output/haptic"
+        }
+      ],
+      "sources": []
+    },
+    "/actions/flying": {
+      "sources": [
+        {
+          "inputs": {
+            "position": {
+              "output": "/actions/flying/in/thrustrotate"
             }
-         ]
-      }
-   },
-   "category" : "steamvr_input",
-   "controller_type" : "hpmotioncontroller",
-   "description" : "",
-   "name" : "Saved SpaceEngineers configuration for HP Motion Controller",
-   "options" : {},
-   "simulated_actions" : []
+          },
+          "mode": "joystick",
+          "path": "/user/hand/right/input/joystick"
+        },
+        {
+          "inputs": {
+            "position": {
+              "output": "/actions/flying/in/thrustlrud"
+            }
+          },
+          "mode": "joystick",
+          "path": "/user/hand/left/input/joystick"
+        },
+        {
+          "inputs": {
+            "pull": {
+              "output": "/actions/flying/in/thrustforward"
+            }
+          },
+          "mode": "trigger",
+          "path": "/user/hand/left/input/trigger"
+        },
+        {
+          "inputs": {
+            "pull": {
+              "output": "/actions/flying/in/thrustbackward" 
+            }
+          },
+          "mode": "trigger",
+          "path": "/user/hand/left/input/grip"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/flying/in/dampeners"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/y"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/flying/in/thrustroll"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/b"
+        }
+      ]
+    },
+    "/actions/movement": {
+      "sources": [
+        {
+          "inputs": {
+            "pull": {
+              "output": "/actions/movement/in/forward"
+            }
+          },
+          "mode": "trigger",
+          "path": "/user/hand/left/input/trigger"
+        },
+        {
+          "inputs": {
+            "pull": {
+              "output": "/actions/movement/in/backward"
+            }
+          },
+          "mode": "trigger",
+          "path": "/user/hand/left/input/grip"
+        },
+        {
+          "inputs": {
+            "position": {
+              "output": "/actions/movement/in/move"
+            }
+          },
+          "mode": "trackpad",
+          "path": "/user/hand/left/input/emulated_trackpad"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/movement/in/vertical"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/x"
+        },
+        {
+          "inputs": {
+            "position": {
+              "output": "/actions/movement/in/rotate"
+            }
+          },
+          "mode": "trackpad",
+          "path": "/user/hand/right/input/emulated_trackpad"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/movement/in/roll"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/b"
+        }
+      ]
+    },
+    "/actions/tool": {
+      "sources": [
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/tool/in/primary"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/tool/in/secondary"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/grip"
+        }
+      ]
+    },
+    "/actions/walking": {
+      "sources": [
+        {
+          "inputs": {
+            "position": {
+              "output": "/actions/walking/in/walk"
+            }
+          },
+          "mode": "joystick",
+          "path": "/user/hand/left/input/joystick"
+        },
+        {
+          "inputs": {
+            "position": {
+              "output": "/actions/walking/in/walkrotate"
+            }
+          },
+          "mode": "joystick",
+          "path": "/user/hand/right/input/joystick"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/walking/in/jumporclimbup"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/walking/in/crouchorclimbdown"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/grip"
+        }
+      ]
+    }
+  },
+  "category": "steamvr_input",
+  "controller_type": "hpmotioncontroller",
+  "description": "",
+  "name": "Saved SpaceEngineers configuration for HP Motion Controller",
+  "options": {},
+  "simulated_actions": []
 }

@@ -71,6 +71,9 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c">
       <HintPath>..\Bin64\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="OVRSharp, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OVRSharp.1.2.0\lib\netstandard2.0\OVRSharp.dll</HintPath>
+    </Reference>
     <Reference Include="ProtoBuf.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\Bin64\ProtoBuf.Net.dll</HintPath>
     </Reference>
@@ -216,6 +219,9 @@
       <HintPath>..\Bin64\System.Diagnostics.Tracing.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.5.0.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\Bin64\System.Drawing.Primitives.dll</HintPath>
     </Reference>
@@ -312,8 +318,9 @@
     <Reference Include="System.Net.WebSockets.Client, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\Bin64\System.Net.WebSockets.Client.dll</HintPath>
     </Reference>
-    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\Bin64\System.Numerics.Vectors.dll</HintPath>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
     <Reference Include="System.ObjectModel, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\Bin64\System.ObjectModel.dll</HintPath>
@@ -529,11 +536,16 @@
     <Compile Include="Patches\FrameInjections.cs" />
     <Compile Include="Patches\PlayerAndCameraDisabler.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
-    <Compile Include="Player\Controller.cs" />
+    <Compile Include="Player\ActionSets.cs" />
+    <Compile Include="Player\Button.cs" />
+    <Compile Include="Player\Controls.cs" />
+    <Compile Include="Player\Hapic.cs" />
     <Compile Include="Player\Headset.cs" />
+    <Compile Include="Player\Analog.cs" />
+    <Compile Include="Player\ImputSource.cs" />
+    <Compile Include="Player\Pose.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SteamVR\openvr_api.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Util.cs" />
     <Compile Include="Wrappers\BorrowedRtvTexture.cs" />
@@ -544,10 +556,24 @@
     <Compile Include="Wrappers\MyRenderContext.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Controls\.vrmanifest" />
+    <Content Include="Assets\Controls\actions.json" />
+    <Content Include="Assets\Controls\binding_gamepad.json" />
+    <Content Include="Assets\Controls\binding_generic.json" />
+    <Content Include="Assets\Controls\binding_holographic_controller.json" />
+    <Content Include="Assets\Controls\binding_hpmotioncontroller.json" />
+    <Content Include="Assets\Controls\binding_knuckles.json" />
+    <Content Include="Assets\Controls\binding_knuckles_ev1.json" />
+    <Content Include="Assets\Controls\binding_oculus_touch.json" />
+    <Content Include="Assets\Controls\binding_vive_controller.json" />
+    <Content Include="Assets\Controls\binding_vive_cosmos_controller.json" />
     <Content Include="Assets\icon.ico" />
     <Content Include="Assets\logo.png" />
     <Content Include="deploy.bat" />
     <Content Include="Kill-Space-Engineers.bat" />
+    <Content Include="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="PluginHub.xml" />
   </ItemGroup>
   <ItemGroup>

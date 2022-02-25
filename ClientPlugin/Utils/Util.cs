@@ -42,15 +42,10 @@ namespace ClientPlugin.Utill
 
         public static void DrawDebugMatrix(Vector3D position, MatrixD pose, string name)
         {
-            DrawDebugLine(pos, mat.Forward, 255, 000, 000);
-            DrawDebugLine(pos, mat.Left, 000, 255, 000);
-            DrawDebugLine(pos, mat.Up, 000, 000, 255);
-            DrawDebugText(pos, name);
-        }
-
-        public static void DrawControllerDebug(Vector3D pos, Controller c)
-        {
-            DrawDebugMatrix(c.WorldPos, pos, "Controller_" + c.ControllerID);
+            DrawDebugLine(position, pose.Forward, 255, 000, 000);
+            DrawDebugLine(position, pose.Left, 000, 255, 000);
+            DrawDebugLine(position, pose.Up, 000, 000, 255);
+            DrawDebugText(position, name);
         }
 
         public static void DrawDebugText(Vector3D pos, string text)

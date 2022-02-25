@@ -87,7 +87,8 @@ namespace ClientPlugin
             EnsureInitialized();
             try
             {
-                if (!failed)
+                if (!failed || OpenVR.System != null)
+
                 {
                     CustomUpdate();
                     Tick++;
@@ -158,13 +159,13 @@ namespace ClientPlugin
             GameWindow.Text = Common.PublicName;
             GameWindow.AccessibleName = Common.PublicName;
 
-            MyPerGameSettings.GameIcon = Util.GetAssetFolder() + "icon.ico";
+            MyPerGameSettings.GameIcon = Common.IconIcoPath;
             MyPerGameSettings.BasicGameInfo.GameName = Common.PublicName;
             MyPerGameSettings.BasicGameInfo.ApplicationName = Common.PublicName;
-            MyPerGameSettings.BasicGameInfo.SplashScreenImage = (Util.GetAssetFolder() + "logo.png");
+            MyPerGameSettings.BasicGameInfo.SplashScreenImage = Common.IconPngPath;
             MyPerGameSettings.BasicGameInfo.GameAcronym = "SEVR";
 
-            Log.Info("Creating VR enviroment");
+            Log.Info("Creating VR environment");
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
 
@@ -178,7 +179,7 @@ namespace ClientPlugin
 
         private void CustomUpdate()
         {
-            Headset.GameUpdate();
+
         }
 
         // ReSharper disable once UnusedMember.Global

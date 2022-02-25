@@ -1,6 +1,6 @@
 {
-  "bindings": {},
-  "controller_type": "generic",
-  "description": "Space Engineers VR generic bindings",
-  "name": ""
-}
+    "bindings": {},
+    "controller_type": "generic",
+    "description": "Space Engineers VR bindings for the generic bindings",
+    "name": ""
+  }

@@ -5,6 +5,7 @@ using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
+using Shared.Plugin;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
@@ -19,25 +20,35 @@ using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
 
+// See MyRadialMenuItemFactory for actions
+
 namespace ClientPlugin.Player
 {
     internal class Headset
     {
         public MatrixD RealWorldPos;
-        public Controller RightHand = default;
-        public Controller LeftHand = default;
+
         public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
         public bool IsHeadsetAlreadyDisconnected = false;
-        public bool IsControllersConnected => (LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
+        public bool IsControllersConnected => true; //(LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
         public bool IsControllersAlreadyDisconnected = false;
-        private readonly uint pnX, pnY, Height, Width;
-        private VRTextureBounds_t TextureBounds;
-        private readonly TrackedDevicePose_t[] RenderPositions;
-        private readonly TrackedDevicePose_t[] GamePositions;
+
+        private readonly uint pnX;
+        private readonly uint pnY;
+        private readonly uint height;
+        private readonly uint width;
+
+        private VRTextureBounds_t textureBounds;
+        private readonly TrackedDevicePose_t[] renderPositions;
+        private readonly TrackedDevicePose_t[] gamePositions;
 
         private float ipd;
         private float ipdCorrection;
-        private readonly float ipdCorrectionStep = 5e-5f;
+        private const float IpdCorrectionStep = 5e-5f;
+
+        private bool enableNotifications = false;
+
+        private readonly Controls controls = new Controls();
 
         public Headset()
         {
@@ -45,24 +56,25 @@ namespace ClientPlugin.Player
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
             //MyRenderProxy.RenderThread.BeforeDraw += FrameUpdate;
 
-            OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Right, ref pnX, ref pnY, ref Width, ref Height);
+            OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Right, ref pnX, ref pnY, ref width, ref height);
 
-            RenderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-            GamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+            renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+            gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 
-            TextureBounds = new VRTextureBounds_t
+            textureBounds = new VRTextureBounds_t
             {
                 uMax = 1,
                 vMax = 1
             };
 
-            Plugin.Instance.Log.Info($"Found headset with eye resolution of '{Width}x{Height}'");
+            Plugin.Instance.Log.Info($"Found headset with eye resolution of '{width}x{height}'");
         }
 
         #region DrawingLogic
 
         private bool firstUpdate = true;
         private BorrowedRtvTexture texture;
+
         private bool FrameUpdate()
         {
             GetNewPositions();
@@ -79,7 +91,7 @@ namespace ClientPlugin.Player
             if (firstUpdate)
             {
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
-                MyRender11.Resolution = new Vector2I((int)Width, (int)Height);
+                MyRender11.Resolution = new Vector2I((int)width, (int)height);
                 MyRender11.CreateScreenResources();
                 firstUpdate = false;
                 return true;
@@ -163,13 +175,14 @@ namespace ClientPlugin.Player
 
             //MyRender11.FullDrawScene(false);
             texture?.Release();
-            texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)Width, (int)Height, Format.R8G8B8A8_UNorm_SRgb);
+            texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)width, (int)height, Format.R8G8B8A8_UNorm_SRgb);
 
             //FrameInjections.DisablePresent = true;
 
             // Store the original matrices to remove the flickering
-            MatrixD originalWM = cam.WorldMatrix;
-            MatrixD originalVM = cam.ViewMatrix;
+            var originalWm = cam.WorldMatrix;
+            var originalVm = cam.ViewMatrix;
+
 
             // Stereo rendering
             cam.WorldMatrix = rightEye;
@@ -178,33 +191,40 @@ namespace ClientPlugin.Player
             DrawEye(EVREye.Eye_Left);
 
             // Restore original matrices to remove the flickering
-            cam.WorldMatrix = originalWM;
-            cam.ViewMatrix = originalVM;
+            cam.WorldMatrix = originalWm;
+            cam.ViewMatrix = originalVm;
 
             //FrameInjections.DisablePresent = false;
 
-            IMyInput input = MyInput.Static;
+            UpdateIpdCorrection();
+
+            return false;
+        }
+
+        private void UpdateIpdCorrection()
+        {
+            var input = MyInput.Static;
             if (input.IsAnyAltKeyPressed() && input.IsAnyCtrlKeyPressed())
             {
-                float before = ipdCorrection;
-                if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.02)
+                var modified = false;
+                if (input.IsKeyPress(MyKeys.Add) && ipdCorrection < 0.1)
                 {
-                    ipdCorrection += ipdCorrectionStep;
+                    ipdCorrection += IpdCorrectionStep;
+                    modified = true;
                 }
 
-                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.02)
+                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.1)
                 {
-                    ipdCorrection -= ipdCorrectionStep;
+                    ipdCorrection -= IpdCorrectionStep;
+                    modified = true;
                 }
 
-                if (ipdCorrection != before)
+                if (modified)
                 {
-                    char sign = ipdCorrection >= 0 ? '+' : '-';
+                    var sign = ipdCorrection >= 0 ? '+' : '-';
                     Plugin.Instance.Log.Debug($"IPD: {ipd:0.0000}{sign}{Math.Abs(ipdCorrection):0.0000}");
                 }
             }
-
-            return false;
         }
 
         private void DrawEye(EVREye eye)
@@ -212,15 +232,14 @@ namespace ClientPlugin.Player
             UploadCameraViewMatrix(eye);
             MyRender11.DrawGameScene(texture, out _);
 
-            Texture2D texture2D = texture.GetResource();//(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
+            Texture2D texture2D = texture.GetResource(); //(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
             Texture_t input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
-                eType = EGraphicsAPIConvention.API_DirectX,
+                eType = ETextureType.DirectX,
                 handle = texture2D.NativePointer
             };
-            OpenVR.Compositor.Submit(eye, ref input, ref TextureBounds, EVRSubmitFlags.Submit_Default);
-
+            OpenVR.Compositor.Submit(eye, ref input, ref textureBounds, EVRSubmitFlags.Submit_Default);
         }
 
         private void UploadCameraViewMatrix(EVREye eye)
@@ -238,7 +257,7 @@ namespace ClientPlugin.Player
             msg.ProjectionMatrix = cam.ProjectionMatrix;
             msg.ProjectionFarMatrix = cam.ProjectionMatrixFar;
 
-            Matrix matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance, EGraphicsAPIConvention.API_DirectX).ToMatrix();
+            var matrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance).ToMatrix();
             float fov = MathHelper.Atan(1.0f / matrix.M22) * 2f;
 
             msg.FOV = fov;
@@ -258,7 +277,7 @@ namespace ClientPlugin.Player
 
         private void GetNewPositions()
         {
-            OpenVR.Compositor.WaitGetPoses(RenderPositions, GamePositions);
+            OpenVR.Compositor.WaitGetPoses(renderPositions, gamePositions);
             Compositor_FrameTiming timings = default;
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
@@ -272,160 +291,385 @@ namespace ClientPlugin.Player
                 builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                builder.AppendLine("FidelityLevel: " + timings.m_nFidelityLevel);
                 Plugin.Instance.Log.Warning(builder.ToString());
                 Plugin.Instance.Log.Warning("");
             }
 
             //Update positions
-            if (!RenderPositions[0].bPoseIsValid || !RenderPositions[0].bDeviceIsConnected)
+            if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
+
             {
                 Plugin.Instance.Log.Error("HMD pos invalid!");
                 return;
             }
 
-            RealWorldPos = RenderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
-
-            if (!RightHand.IsConnected || !LeftHand.IsConnected)
-            {
-                if (MySandboxGame.TotalTimeInTicks % 1000 == 0)
-                {
-                    Plugin.Instance.Log.Error("Unable to find controller(s)!");
-                }
-
-                for (uint i = 0; i < OpenVR.k_unMaxTrackedDeviceCount; i++)
-                {
-                    ETrackedDeviceClass x = OpenVR.System.GetTrackedDeviceClass(i);
-                    if (x == ETrackedDeviceClass.Controller)
-                    {
-                        ETrackedControllerRole role = OpenVR.System.GetControllerRoleForTrackedDeviceIndex(i);
-                        if (role == ETrackedControllerRole.LeftHand)
-                        {
-                            LeftHand.ControllerID = i;
-                        }
-                        if (role == ETrackedControllerRole.RightHand)
-                        {
-                            RightHand.ControllerID = i;
-                        }
-                    }
-                }
-            }
+            RealWorldPos = renderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
         }
+
         #endregion
 
-        #region GameLogic
-        public void GameUpdate()
-        {
-            RightHand.UpdateControllerPosition(RenderPositions[RightHand.ControllerID]);
-            LeftHand.UpdateControllerPosition(RenderPositions[LeftHand.ControllerID]);
-        }
+        #region Control logic
+
+        // TODO: Configurable rotation speed and step by step rotation instead of continuous
+        private const float RotationSpeed = 10f;
 
         private void UpdateBeforeSimulation()
         {
-            IMyCharacter character = MyAPIGateway.Session?.Player?.Character;
-            if (character != null)
-            {
-                CharacterMovement(character);
-            }
-            //TODO: movement
+            var character = MyAPIGateway.Session?.Player?.Character;
+            if (character == null)
+                return;
+
+            //((MyVRageInput)MyInput.Static).EnableInput(false);
+
+            if (character.EnabledThrusts || MySession.Static.ControlledEntity is IMyShipController)
+                ControlFlight(character);
+            else
+                ControlWalk(character);
+
+            ControlCommonFunctions(character);
+
+            // TODO: Wrist GUI
+
+            // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
         }
 
-        private void CharacterMovement(IMyCharacter character)
+        private void ControlWalk(IMyCharacter character)
         {
-            //((MyVRageInput)MyInput.Static).EnableInput(false);
-            Vector3 move = Vector3.Zero;
-            Vector2 rotate = Vector2.Zero;
+            controls.UpdateWalk();
 
-            if (!character.EnabledThrusts)
+            var move = Vector3.Zero;
+            var rotate = Vector2.Zero;
+
+            if (controls.Walk.Active)
             {
-                if (LeftHand.IsValid)
-                {
-                    Vector2 vec = LeftHand.GetAxis(Axis.Joystick);
-                    move.X = vec.X;
-                    move.Z = -vec.Y;
-                }
-
-                if (RightHand.IsValid)
-                {
-                    Vector2 vec = RightHand.GetAxis(Axis.Joystick);
-                    rotate.Y = vec.X * 10;
-                }
-
-                if (RightHand.IsNewButtonDown(Button.A))
-                {
-                    //character.Jump();
-                }
+                var v = controls.Walk.Position;
+                move.X += v.X;
+                move.Z -= v.Y;
             }
+
+            if (controls.WalkForward.Active)
+                move.Z -= controls.WalkForward.Position.X;
+
+            if (controls.WalkBackward.Active)
+                move.Z += controls.WalkForward.Position.X;
+
+            // TODO: Configurable rotation speed and step by step rotation instead of continuous
+            if (controls.WalkRotate.Active)
+            {
+                var v = controls.WalkRotate.Position;
+                rotate.Y = v.X * RotationSpeed;
+                rotate.X = -v.Y * RotationSpeed;
+            }
+
+            if (controls.JumpOrClimbUp.HasPressed)
+                character.Jump();
+
+            if (controls.CrouchOrClimbDown.HasPressed)
+                character.Crouch();
+
+            if (controls.JumpOrClimbUp.IsPressed)
+                move.Y = 1f;
+
+            if (controls.CrouchOrClimbDown.IsPressed)
+                move.Y = -1f;
+
+            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
+
+            if (move == Vector3.Zero && rotate == Vector2.Zero)
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
             else
+                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, 0f);
+        }
+
+        private void ControlFlight(IMyCharacter character)
+        {
+            var move = Vector3.Zero;
+            var rotate = Vector2.Zero;
+            var roll = 0f;
+
+            if (controls.ThrustLRUD.Active)
             {
-                if (RightHand.IsValid)
-                {
-                    if (RightHand.IsButtonDown(Button.B))
-                    {
-                        Vector3D v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
-                        v.Y *= -1;
-                        //move += v;
-                    }
-
-                    Vector2 vec = RightHand.GetAxis(Axis.Joystick);
-                    rotate.Y = vec.X * 10;
-                    rotate.X = -vec.Y * 10;
-
-                    //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Down, 0, 0, 255);
-                    //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, Vector3D.Normalize(Vector3D.Lerp(RightHand.WorldPos.Down, RightHand.WorldPos.Forward, .5)), 255, 0, 0);
-                    //Util.DrawDebugLine(character.GetHeadMatrix(true).Translation + character.GetHeadMatrix(true).Forward, RightHand.WorldPos.Forward, 0, 255, 0);
-                }
-                if (LeftHand.IsValid)
-                {
-                    if (LeftHand.IsButtonDown(Button.B))
-                    {
-                        Vector3D v = Vector3D.Normalize(Vector3D.Lerp(LeftHand.WorldPos.Up, LeftHand.WorldPos.Forward, .5)) * .5f;
-                        v.Y *= -1;
-                        //move += v;
-                    }
-
-                }
+                var v = controls.ThrustLRUD.Position;
+                move.X += v.X;
+                move.Y += v.Y;
             }
 
-            if (LeftHand.IsNewButtonDown(Button.A))
+            controls.UpdateFlight();
+
+            if (controls.ThrustLRUD.Active)
             {
-                //TODO: wrist GUI
+                var v = controls.ThrustLRUD.Position;
+                move.X += v.X;
+                move.Y += v.Y;
+            }
+
+            if (controls.ThrustLRFB.Active)
+            {
+                var v = controls.ThrustLRFB.Position;
+                move.X += v.X;
+                move.Z -= v.Y;
+            }
+
+            if (controls.ThrustUp.Active)
+                move.Y += controls.ThrustUp.Position.X;
+
+            if (controls.ThrustDown.Active)
+                move.Y -= controls.ThrustDown.Position.X;
+
+            if (controls.ThrustForward.Active)
+                move.Z -= controls.ThrustForward.Position.X;
+
+            if (controls.ThrustBackward.Active)
+                move.Z += controls.ThrustBackward.Position.X;
+
+            if (controls.ThrustRotate.Active)
+            {
+                var v = controls.ThrustRotate.Position;
+                rotate.Y = v.X * RotationSpeed;
+                rotate.X = -v.Y * RotationSpeed;
+            }
+
+            if (controls.ThrustRoll.Active)
+            {
+                roll = controls.ThrustRotate.Position.X * RotationSpeed;
+            }
+
+            if (controls.Dampeners.HasPressed)
+                character.SwitchDamping();
+
+            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
+            if (move == Vector3.Zero && rotate == Vector2.Zero && roll == 0f)
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
+            else
+                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
+        }
+
+        private void ControlCommonFunctions(IMyCharacter character)
+        {
+            var controlledEntity = MySession.Static.ControlledEntity;
+
+            if (controls.Primary.HasPressed)
+            {
+                controlledEntity?.BeginShoot(MyShootActionEnum.PrimaryAction);
+            }
+            else if (controls.Primary.HasReleased)
+            {
+                controlledEntity?.EndShoot(MyShootActionEnum.PrimaryAction);
+            }
+
+            if (controls.Secondary.HasPressed)
+            {
+                controlledEntity?.BeginShoot(MyShootActionEnum.SecondaryAction);
+            }
+            else if (controls.Secondary.HasReleased)
+            {
+                controlledEntity?.EndShoot(MyShootActionEnum.SecondaryAction);
+            }
+
+            if (controls.Reload.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Unequip.HasPressed)
+            {
+                controlledEntity?.SwitchToWeapon(null);
+            }
+
+            if (controls.CutGrid.HasPressed)
+            {
+                new MyActionCutGrid().ExecuteAction();
+            }
+
+            if (controls.CopyGrid.HasPressed)
+            {
+                new MyActionCopyGrid().ExecuteAction();
+            }
+
+            if (controls.PasteGrid.HasPressed)
+            {
+                new MyActionPasteGrid().ExecuteAction();
+            }
+
+            if (controls.Interact.HasPressed)
+            {
+                controlledEntity?.Use();
+            }
+
+            if (controls.Helmet.HasPressed)
+            {
+                character.SwitchHelmet();
+            }
+
+            if (controls.Jetpack.HasPressed)
+            {
                 character.SwitchThrusts();
             }
 
-            character.MoveAndRotate(move, rotate, 0f);
+            if (controls.Broadcasting.HasPressed)
+            {
+                controlledEntity?.SwitchBroadcasting();
+            }
+
+            if (controls.Park.HasPressed)
+            {
+                controlledEntity?.SwitchHandbrake();
+            }
+
+            if (controls.Power.HasPressed)
+            {
+                new MyActionTogglePower().ExecuteAction();
+            }
+
+            if (controls.Lights.HasPressed)
+            {
+                character.SwitchLights();
+            }
+
+            if (controls.Respawn.HasPressed)
+            {
+                controlledEntity?.Die();
+            }
+
+            if (controls.ToggleSignals.HasPressed)
+            {
+                new MyActionToggleSignals().ExecuteAction();
+            }
+
+            if (controls.ToggleSymmetry.HasPressed)
+            {
+                new MyActionToggleSymmetry().ExecuteAction();
+            }
+
+            if (controls.SymmetrySetup.HasPressed)
+            {
+                new MyActionSymmetrySetup().ExecuteAction();
+            }
+
+            if (controls.PlacementMode.HasPressed)
+            {
+                MyClipboardComponent.Static.ChangeStationRotation();
+                MyCubeBuilder.Static.CycleCubePlacementMode();
+            }
+
+            if (controls.CubeSize.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Terminal.HasPressed)
+            {
+                character.ShowTerminal();
+            }
+
+            if (controls.Inventory.HasPressed)
+            {
+                character.ShowInventory();
+            }
+
+            if (controls.ColorSelector.HasPressed)
+            {
+                new MyActionColorTool().ExecuteAction();
+            }
+
+            if (controls.ColorPicker.HasPressed)
+            {
+                new MyActionColorPicker().ExecuteAction();
+            }
+
+            if (controls.BuildPlanner.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.ToolbarConfig.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.BlockSelector.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Contract.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Chat.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.ToggleView.HasPressed)
+            {
+                character.IsInFirstPersonView = !character.IsInFirstPersonView;
+            }
+
+            if (controls.Pause.HasPressed)
+            {
+                MySandboxGame.IsPaused = !MySandboxGame.IsPaused;
+            }
+
+            if (controls.VoiceChat.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.SignalMode.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.SpectatorMode.HasPressed)
+            {
+                // TODO
+            }
+
+            if (controls.Teleport.HasPressed)
+            {
+                // TODO: character.Teleport();
+            }
         }
+
         #endregion
 
         #region Utils
+
         public void CreatePopup(string message)
         {
-            Bitmap img = new Bitmap(File.OpenRead(Util.GetAssetFolder() + "logo.png"));
+            Bitmap img = new Bitmap(File.OpenRead(Common.IconPngPath));
             CreatePopup(EVRNotificationType.Transient, message, ref img);
         }
 
         public void CreatePopup(EVRNotificationType type, string message, ref Bitmap bitmap)
         {
+            if (!enableNotifications)
+                return;
+
             ulong handle = 0;
             OpenVR.Overlay.CreateOverlay(Guid.NewGuid().ToString(), "SpaceEngineersVR", ref handle);
 
-            System.Drawing.Imaging.BitmapData TextureData =
-            bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb
-            );
-            NotificationBitmap_t image = new NotificationBitmap_t()
-            {
-                bytes = TextureData.Scan0,
-                width = TextureData.Width,
-                height = TextureData.Height,
-                depth = 4
-            };
-            //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
-            Plugin.Instance.Log.Info("Pop-up created with message: " + message);
+            System.Drawing.Imaging.BitmapData textureData =
+                bitmap.LockBits(
+                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb
+                );
 
-            bitmap.UnlockBits(TextureData);
+            var image = new NotificationBitmap_t()
+            {
+                m_pImageData = textureData.Scan0,
+                m_nWidth = textureData.Width,
+                m_nHeight = textureData.Height,
+                m_nBytesPerPixel = 4
+            };
+            // FIXME: Notification on overlay
+            //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
+            Plugin.Instance.Log.Debug("Pop-up created with message: " + message);
+
+            bitmap.UnlockBits(textureData);
         }
 
         /// <summary>
@@ -444,7 +688,7 @@ namespace ClientPlugin.Player
             });
             return DialogResult.None;
         }
-        #endregion
 
+        #endregion
     }
 }

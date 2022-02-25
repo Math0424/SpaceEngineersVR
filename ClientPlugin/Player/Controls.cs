@@ -1,3 +1,4 @@
+﻿using ClientPlugin.Utill;
 using System.IO;
 using Valve.VR;
 
@@ -5,7 +6,7 @@ using Valve.VR;
 // https://github.com/ValveSoftware/openvr/wiki/SteamVR-Input
 // https://github.com/ValveSoftware/openvr/wiki/Action-manifest
 
-namespace SpaceEngineersVR.Player
+namespace ClientPlugin.Player
 {
     public class Controls
     {
@@ -170,8 +171,6 @@ namespace SpaceEngineersVR.Player
         public void UpdateWalk()
         {
             WalkingSets.Update();
-
-            Walk.Update();
             WalkForward.Update();
             WalkBackward.Update();
             WalkRotate.Update();
