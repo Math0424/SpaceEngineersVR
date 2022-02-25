@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>B127E405-3C0F-48C3-9F8E-7437E8F4E106</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Config\IPluginConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Config\PersistentConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Config\PluginConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\IPluginLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\LogFormatter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\PluginLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Patches\PatchHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugin\Common.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugin\ICommonPlugin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\Edit-and-run-before-opening-solution.bat">
+      <Link>Edit-and-run-before-opening-solution.bat</Link>
+    </Content>
+  </ItemGroup>
+</Project>
