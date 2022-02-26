@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using VRage.Game;
 using VRage.Game.Components;
 
-namespace ClientPlugin.Player
+namespace ClientPlugin.Player.Components
 {
 
     [MySessionComponentDescriptor(MyUpdateOrder.Simulation | MyUpdateOrder.BeforeSimulation)]
-    internal class VRPlayerComponent : MyCharacterComponent
+    internal class VRHandsComponent : MyCharacterComponent
     {
 
         public override void Init(MyComponentDefinitionBase definition)
@@ -46,7 +46,7 @@ namespace ClientPlugin.Player
 
         }
 
-        public override string ComponentTypeDebugString => "VR Character Component";
+        public override string ComponentTypeDebugString => "VR Hands Component";
 
     }
 }

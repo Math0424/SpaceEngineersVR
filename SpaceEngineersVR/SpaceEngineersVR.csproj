@@ -536,7 +536,8 @@
     <Compile Include="Config\PluginConfig.cs" />
     <Compile Include="GUI\MyPluginConfigDialog.cs" />
     <Compile Include="Patches\ModelPatcher.cs" />
-    <Compile Include="Player\VRPlayerComponent.cs" />
+    <Compile Include="Player\Components\VRMovementComponent.cs" />
+    <Compile Include="Player\Components\VRHandsComponent.cs" />
     <Compile Include="Plugin\Logger.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
     <Compile Include="Patches\PlayerAndCameraDisabler.cs" />

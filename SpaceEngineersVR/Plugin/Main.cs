@@ -20,6 +20,7 @@ using System.Reflection;
 using ClientPlugin.Plugin;
 using Sandbox.ModAPI;
 using ClientPlugin.Player;
+using ClientPlugin.Player.Components;
 
 namespace SpaceEnginnersVR.Plugin
 {
@@ -151,9 +152,10 @@ namespace SpaceEnginnersVR.Plugin
         private void CustomUpdate()
         {
             if (MySession.Static?.LocalCharacter != null && 
-                !MySession.Static.LocalCharacter.Components.Contains(typeof(VRPlayerComponent)))
+                !MySession.Static.LocalCharacter.Components.Contains(typeof(VRMovementComponent)))
             {
-                MySession.Static.LocalCharacter.Components.Add(new VRPlayerComponent());
+                MySession.Static.LocalCharacter.Components.Add(new VRMovementComponent());
+                MySession.Static.LocalCharacter.Components.Add(new VRHandsComponent());
             }
         }
 
