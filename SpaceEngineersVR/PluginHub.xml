@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <PluginData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="GitHubPlugin">
-  <Id>TODO: github-user/project-name</Id>
-  <GroupId>TODO: github-user/project-name</GroupId>
-  <FriendlyName>TODO: PluginTemplate</FriendlyName>
-  <Author>TODO: Author Name</Author>
+  <Id>Math0424/SpaceEngineersVR</Id>
+  <GroupId>SpaceEnginnersVR</GroupId>
+  <FriendlyName>Space Enginners VR</FriendlyName>
+  <Author>Space Engineers VR Developers</Author>
   <Commit>TODO: Git commit hash</Commit>
   <SourceDirectories>
     <Directory>SpaceEnginnersVR</Directory>
   </SourceDirectories>
-  <Tooltip>TODO: Short description</Tooltip>
+  <Tooltip>A plugin to bring SpaceEngineers native VR support.</Tooltip>
   <Description>TODO: Long description, multiple lines.
 
 FriendlyName: How your plugin will show up in the Plugins list.

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace SpaceEnginnersVR.Config
 {
-    public class PluginConfig: IPluginConfig
+    public class PluginConfig : IPluginConfig
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -101,71 +101,6 @@ namespace SpaceEnginnersVR.Player
                 return true;
             }
 
-
-            //UNTESTED
-            //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
-            if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
-            {
-                //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePush();
-                    Logger.Info("Controller disconnected, pausing game.");
-                }
-                else
-                {
-                    Logger.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
-                }
-
-                IsControllersAlreadyDisconnected = true;
-            }
-            else if (IsControllersConnected && IsControllersAlreadyDisconnected)
-            {
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePop();
-                    Logger.Info("Controller reconnected, unpausing game.");
-                }
-                else
-                {
-                    Logger.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
-                }
-
-                IsControllersAlreadyDisconnected = false;
-            }
-
-            //UNTESTED
-            //Checks if the headset got disconnected, shows a message if the headset is disconnected.
-            if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
-            {
-                //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePush();
-                    Logger.Info("Headset disconnected, pausing game.");
-                }
-                else
-                {
-                    Logger.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
-                }
-
-                IsHeadsetAlreadyDisconnected = true;
-            }
-            else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
-            {
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePop();
-                    Logger.Info("Headset reconnected, unpausing game.");
-                }
-                else
-                {
-                    Logger.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
-                }
-
-                IsHeadsetAlreadyDisconnected = false;
-            }
-
             // Eye position and orientation
             MatrixD orientation = Matrix.Invert(RealWorldPos).GetOrientation();
 
@@ -319,9 +254,82 @@ namespace SpaceEnginnersVR.Player
 
         private void UpdateBeforeSimulation()
         {
+            //UNTESTED
+            //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
+            if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
+            {
+                //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    Logger.Info("Controller disconnected, pausing game.");
+                }
+                else
+                {
+                    Logger.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
+                IsControllersAlreadyDisconnected = true;
+            }
+            else if (IsControllersConnected && IsControllersAlreadyDisconnected)
+            {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    Logger.Info("Controller reconnected, unpausing game.");
+                }
+                else
+                {
+                    Logger.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
+                }
+
+                IsControllersAlreadyDisconnected = false;
+            }
+
+            //UNTESTED
+            //Checks if the headset got disconnected, shows a message if the headset is disconnected.
+            if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
+            {
+                //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    Logger.Info("Headset disconnected, pausing game.");
+                }
+                else
+                {
+                    Logger.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
+                IsHeadsetAlreadyDisconnected = true;
+            }
+            else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
+            {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    Logger.Info("Headset reconnected, unpausing game.");
+                }
+                else
+                {
+                    Logger.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
+                }
+
+                IsHeadsetAlreadyDisconnected = false;
+            }
+
             var character = MyAPIGateway.Session?.Player?.Character;
             if (character == null)
                 return;
+
+            if (character.Visible == true && !Common.Config.EnableCharacterRendering)
+            {
+                character.Visible = false;
+            }
+            else if (character.Visible == false && Common.Config.EnableCharacterRendering)
+            {
+                character.Visible = true;
+            }
 
             //((MyVRageInput)MyInput.Static).EnableInput(false);
 
