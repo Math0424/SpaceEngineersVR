@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace SpaceEnginnersVR.Config
+namespace SpaceEngineersVR.Config
 {
     public interface IPluginConfig: INotifyPropertyChanged
     {

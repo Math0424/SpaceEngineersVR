@@ -1,5 +1,5 @@
 ﻿using Sandbox.Game.Entities.Character.Components;
-using SpaceEnginnersVR.Player;
+using SpaceEngineersVR.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;

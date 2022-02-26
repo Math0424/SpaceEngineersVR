@@ -1,6 +1,6 @@
-﻿using SpaceEnginnersVR.Patches;
-using SpaceEnginnersVR.Util;
-using SpaceEnginnersVR.Wrappers;
+﻿using SpaceEngineersVR.Patches;
+using SpaceEngineersVR.Util;
+using SpaceEngineersVR.Wrappers;
 using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.Entities;
@@ -8,7 +8,7 @@ using Sandbox.Game.Screens.Helpers.RadialMenuActions;
 using Sandbox.Game.SessionComponents.Clipboard;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
-using SpaceEnginnersVR.Plugin;
+using SpaceEngineersVR.Plugin;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
@@ -22,11 +22,10 @@ using VRage.Input;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
-using SpaceEnginnersVR.Plugin;
 
 // See MyRadialMenuItemFactory for actions
 
-namespace SpaceEnginnersVR.Player
+namespace SpaceEngineersVR.Player
 {
     internal class Headset
     {

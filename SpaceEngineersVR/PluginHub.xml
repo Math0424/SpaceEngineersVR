@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <PluginData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="GitHubPlugin">
   <Id>Math0424/SpaceEngineersVR</Id>
-  <GroupId>SpaceEnginnersVR</GroupId>
+  <GroupId>SpaceEngineersVR</GroupId>
   <FriendlyName>Space Enginners VR</FriendlyName>
   <Author>Space Engineers VR Developers</Author>
   <Commit>TODO: Git commit hash</Commit>
   <SourceDirectories>
-    <Directory>SpaceEnginnersVR</Directory>
+    <Directory>SpaceEngineersVR</Directory>
   </SourceDirectories>
   <Tooltip>A plugin to bring SpaceEngineers native VR support.</Tooltip>
   <Description>TODO: Long description, multiple lines.

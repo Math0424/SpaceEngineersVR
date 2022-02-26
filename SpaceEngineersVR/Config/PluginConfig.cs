@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace SpaceEnginnersVR.Config
+namespace SpaceEngineersVR.Config
 {
     public class PluginConfig : IPluginConfig
     {

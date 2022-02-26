@@ -1,11 +1,11 @@
-using SpaceEnginnersVR.Util;
-using SpaceEnginnersVR.Config;
+using SpaceEngineersVR.Util;
+using SpaceEngineersVR.Config;
 using System;
 using System.Drawing;
 using System.IO;
 using ClientPlugin.Plugin;
 
-namespace SpaceEnginnersVR.Plugin
+namespace SpaceEngineersVR.Plugin
 {
     public static class Common
     {

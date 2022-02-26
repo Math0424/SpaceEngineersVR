@@ -3,7 +3,7 @@ using SharpDX.DXGI;
 using System;
 using System.Reflection;
 
-namespace SpaceEnginnersVR.Wrappers
+namespace SpaceEngineersVR.Wrappers
 {
     public class MyBorrowedRwTextureManager
     {

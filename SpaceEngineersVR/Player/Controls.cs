@@ -1,5 +1,5 @@
-﻿using SpaceEnginnersVR.Player.Controller;
-using SpaceEnginnersVR.Util;
+﻿using SpaceEngineersVR.Player.Controller;
+using SpaceEngineersVR.Util;
 using System.IO;
 using Valve.VR;
 
@@ -7,7 +7,7 @@ using Valve.VR;
 // https://github.com/ValveSoftware/openvr/wiki/SteamVR-Input
 // https://github.com/ValveSoftware/openvr/wiki/Action-manifest
 
-namespace SpaceEnginnersVR.Player
+namespace SpaceEngineersVR.Player
 {
 
     public class Controls

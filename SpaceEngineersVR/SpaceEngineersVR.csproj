@@ -7,7 +7,7 @@
     <ProjectGuid>{A061FC6C-713E-42CD-B413-151AC8A5074C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClientPlugin</RootNamespace>
+    <RootNamespace>SpaceEngineersVR</RootNamespace>
     <AssemblyName>SpaceEngineersVR</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

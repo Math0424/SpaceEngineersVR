@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Valve.VR;
 
-namespace SpaceEnginnersVR.Player.Controller
+namespace SpaceEngineersVR.Player.Controller
 {
     public class Button
     {
@@ -9,7 +9,6 @@ namespace SpaceEnginnersVR.Player.Controller
 
         private InputDigitalActionData_t data;
         private readonly ulong handle;
-        private bool previous;
 
         public bool Active => data.bActive;
         public bool IsPressed => data.bState;
