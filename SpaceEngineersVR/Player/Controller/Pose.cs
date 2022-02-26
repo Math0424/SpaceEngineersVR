@@ -22,6 +22,20 @@ namespace SpaceEnginnersVR.Player.Controller
         public Vector3 AngularVelocity => data.pose.vAngularVelocity.ToVector();
         public MatrixD AbsoluteTracking => data.pose.mDeviceToAbsoluteTracking.ToMatrix();
 
+        public Vector3 TenFrameVelocity
+        {
+            get
+            {
+                Vector3 result = Vector3.Zero;
+                for (int i = 0; i < 10; i++)
+                    result += rollingVelocity[i];
+                return (result / 10f);
+            }
+        }
+
+        private Vector3[] rollingVelocity = new Vector3[10];
+        private int update = 0;
+
         public Pose(string name)
         {
             OpenVR.Input.GetActionHandle(name, ref handle);
@@ -30,6 +44,7 @@ namespace SpaceEnginnersVR.Player.Controller
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Update()
         {
+            rollingVelocity[update++ % 10] = data.pose.vVelocity.ToVector();
             OpenVR.Input.GetPoseActionDataForNextFrame(handle, TrackingOrigin, ref data, InputPoseActionData_t_size, OpenVR.k_ulInvalidInputValueHandle);
         }
     }
