@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
-using SpaceEnginnersVR.Plugin;
+using SpaceEngineersVR.Plugin;
 using System.Reflection;
 
-namespace SpaceEnginnersVR.Patches
+namespace SpaceEngineersVR.Patches
 {
     [HarmonyPatch]
     public static class PlayerAndCameraDisabler

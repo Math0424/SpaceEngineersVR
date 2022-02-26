@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using VRage.Utils;
 
-namespace SpaceEnginnersVR.Plugin
+namespace SpaceEngineersVR.Plugin
 {
     public static class Logger
     {

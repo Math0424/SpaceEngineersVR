@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using SpaceEnginnersVR.Config;
+using SpaceEngineersVR.Config;
 
 namespace ClientPlugin.Plugin
 {

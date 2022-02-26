@@ -4,7 +4,7 @@ using SharpDX.Direct3D11;
 using System;
 using System.Reflection;
 
-namespace SpaceEnginnersVR.Wrappers
+namespace SpaceEngineersVR.Wrappers
 {
     public class MyRenderContext
     {

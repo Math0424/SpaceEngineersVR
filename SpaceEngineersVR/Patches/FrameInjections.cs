@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
-using SpaceEnginnersVR.Plugin;
-using SpaceEnginnersVR.Plugin;
+using SpaceEngineersVR.Plugin;
 using System;
 
-namespace SpaceEnginnersVR.Patches
+namespace SpaceEngineersVR.Patches
 {
     public static class FrameInjections
     {

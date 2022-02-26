@@ -3,7 +3,7 @@ using VRage.Game;
 using VRage.Game.Components;
 #pragma warning disable CS0649
 
-namespace SpaceEnginnersVR.Patches
+namespace SpaceEngineersVR.Patches
 {
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
     class SimulationUpdater : MySessionComponentBase

@@ -1,7 +1,7 @@
 ﻿using Sandbox.Game.Entities.Character.Components;
-using SpaceEnginnersVR.Player;
-using SpaceEnginnersVR.Plugin;
-using SpaceEnginnersVR.Util;
+using SpaceEngineersVR.Player;
+using SpaceEngineersVR.Plugin;
+using SpaceEngineersVR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;

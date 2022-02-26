@@ -1,15 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using SpaceEnginnersVR.GUI;
-using SpaceEnginnersVR.Player;
-using SpaceEnginnersVR.Wrappers;
+using SpaceEngineersVR.GUI;
+using SpaceEngineersVR.Player;
+using SpaceEngineersVR.Wrappers;
 using HarmonyLib;
 using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
-using SpaceEnginnersVR.Config;
-using SpaceEnginnersVR.Plugin;
+using SpaceEngineersVR.Config;
+using SpaceEngineersVR.Plugin;
 using Valve.VR;
 using VRage;
 using VRage.FileSystem;
@@ -22,7 +22,7 @@ using Sandbox.ModAPI;
 using ClientPlugin.Player;
 using ClientPlugin.Player.Components;
 
-namespace SpaceEnginnersVR.Plugin
+namespace SpaceEngineersVR.Plugin
 {
     // ReSharper disable once UnusedType.Global
     public class Main : IPlugin, IVRPlugin
