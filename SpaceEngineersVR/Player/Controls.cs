@@ -9,8 +9,11 @@ using Valve.VR;
 
 namespace SpaceEnginnersVR.Player
 {
+
     public class Controls
     {
+        public static Controls Static = new Controls();
+
         // Walking
         public readonly Analog Walk;
         public readonly Analog WalkForward;
