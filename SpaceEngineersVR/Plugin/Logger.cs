@@ -16,6 +16,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             myLog = new MyLog(true);
             myLog.InitWithDate(Common.Name, new StringBuilder(Common.Version.ToString()), 7);
+            myLog.LogFlag(LoggingOptions.ALL);
         }
 
         public static bool IsTraceEnabled => MyLog.Default.LogEnabled;
@@ -32,6 +33,7 @@ namespace SpaceEnginnersVR.Plugin
             if (!IsTraceEnabled)
                 return;
             myLog.Log(MyLogSeverity.Debug, Format(ex, message, data));
+            myLog.Flush();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -40,6 +42,7 @@ namespace SpaceEnginnersVR.Plugin
             if (!IsDebugEnabled)
                 return;
             myLog.Log(MyLogSeverity.Debug, Format(ex, message, data));
+            myLog.Flush();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -48,6 +51,7 @@ namespace SpaceEnginnersVR.Plugin
             if (!IsInfoEnabled)
                 return;
             myLog.Log(MyLogSeverity.Info, Format(ex, message, data));
+            myLog.Flush();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -56,6 +60,7 @@ namespace SpaceEnginnersVR.Plugin
             if (!IsWarningEnabled)
                 return;
             myLog.Log(MyLogSeverity.Warning, Format(ex, message, data));
+            myLog.Flush();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -64,6 +69,7 @@ namespace SpaceEnginnersVR.Plugin
             if (!IsErrorEnabled)
                 return;
             myLog.Log(MyLogSeverity.Error, Format(ex, message, data));
+            myLog.Flush();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -72,6 +78,7 @@ namespace SpaceEnginnersVR.Plugin
             if (!IsCriticalEnabled)
                 return;
             myLog.Log(MyLogSeverity.Critical, Format(ex, message, data));
+            myLog.Flush();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
