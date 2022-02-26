@@ -32,7 +32,6 @@ namespace SpaceEnginnersVR
         private PersistentConfig<PluginConfig> config;
         private static readonly string ConfigFileName = $"{Common.Name}.cfg";
 
-        private static readonly object InitializationMutex = new object();
         private static bool failed;
 
         private static Headset Headset;
@@ -45,27 +44,23 @@ namespace SpaceEnginnersVR
             var configPath = Path.Combine(MyFileSystem.UserDataPath, ConfigFileName);
             config = PersistentConfig<PluginConfig>.Load(configPath);
 
-            lock (InitializationMutex)
+            Common.SetPlugin(this);
+
+            try
             {
-                try
+                if (!Initialize())
                 {
-                    if (Initialize())
-                    {
-                        Common.SetPlugin(this);
-                    } 
-                    else
-                    {
-                        return;
-                    }
-                } 
-                catch (Exception ex)
-                {
-                    MyLog.Default.WriteLine("SpaceEngineersVR: Failed to start!");
-                    MyLog.Default.WriteLine(ex.Message);
-                    MyLog.Default.WriteLine(ex.StackTrace);
-                    return;
+                    failed = true;
                 }
             }
+            catch (Exception ex)
+            {
+                MyLog.Default.WriteLine("SpaceEngineersVR: Failed to start!");
+                MyLog.Default.WriteLine(ex.Message);
+                MyLog.Default.WriteLine(ex.StackTrace);
+                return;
+            }
+
             Logger.Debug("Successfully initialized.");
         }
 
@@ -103,14 +98,12 @@ namespace SpaceEnginnersVR
             if (!OpenVR.IsRuntimeInstalled())
             {
                 MyLog.Default.WriteLine("SpaceEngineersVR: OpenVR not found!");
-                failed = true;
                 return false;
             }
 
             if (!OpenVR.IsHmdPresent())
             {
                 MyLog.Default.WriteLine("SpaceEngineersVR: No VR headset found, please plug one in and reboot the game to play");
-                failed = true;
                 return false;
             }
 
@@ -122,7 +115,6 @@ namespace SpaceEnginnersVR
             if (error != EVRInitError.None)
             {
                 Logger.Critical("Failed to connect to SteamVR!");
-                failed = true;
                 return false;
             }
 

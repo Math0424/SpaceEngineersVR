@@ -183,6 +183,9 @@ namespace SpaceEnginnersVR.Logging
 
             sb.Append(Common.Name);
 
+            //Spacer
+            sb.Append(": ");
+
             sb.Append(data == null || data.Length == 0 ? message : string.Format(message, data));
 
             FormatException(sb, ex);
