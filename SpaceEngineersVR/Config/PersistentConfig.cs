@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using System.IO;
 using System.Threading;
-using SpaceEnginnersVR.Logging;
+using SpaceEnginnersVR.Plugin;
 using VRage.Utils;
 
 namespace SpaceEnginnersVR.Config

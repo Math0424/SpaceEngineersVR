@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using SpaceEnginnersVR.Logging;
+using SpaceEnginnersVR.Plugin;
 using SpaceEnginnersVR.Plugin;
 using System;
 

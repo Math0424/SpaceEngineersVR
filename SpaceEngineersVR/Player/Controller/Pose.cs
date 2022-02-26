@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Valve.VR;
 using VRageMath;
 
-namespace SpaceEnginnersVR.Player
+namespace SpaceEnginnersVR.Player.Controller
 {
     public class Pose
     {

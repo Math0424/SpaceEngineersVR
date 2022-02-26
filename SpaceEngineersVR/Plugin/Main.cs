@@ -9,8 +9,6 @@ using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SpaceEnginnersVR.Config;
-using SpaceEnginnersVR.Logging;
-using SpaceEnginnersVR.Patches;
 using SpaceEnginnersVR.Plugin;
 using Valve.VR;
 using VRage;
@@ -21,7 +19,7 @@ using VRage.Utils;
 using System.Reflection;
 using ClientPlugin.Plugin;
 
-namespace SpaceEnginnersVR
+namespace SpaceEnginnersVR.Plugin
 {
     // ReSharper disable once UnusedType.Global
     public class Main : IPlugin, IVRPlugin

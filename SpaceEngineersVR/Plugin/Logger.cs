@@ -1,11 +1,10 @@
-using SpaceEnginnersVR.Plugin;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using VRage.Utils;
 
-namespace SpaceEnginnersVR.Logging
+namespace SpaceEnginnersVR.Plugin
 {
     public static class Logger
     {

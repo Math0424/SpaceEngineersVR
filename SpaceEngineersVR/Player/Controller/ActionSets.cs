@@ -1,6 +1,6 @@
 ﻿using Valve.VR;
 
-namespace SpaceEnginnersVR.Player
+namespace SpaceEnginnersVR.Player.Controller
 {
     public class ActionSets
     {

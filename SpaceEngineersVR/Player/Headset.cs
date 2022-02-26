@@ -22,7 +22,7 @@ using VRage.Input;
 using VRageMath;
 using VRageRender;
 using VRageRender.Messages;
-using SpaceEnginnersVR.Logging;
+using SpaceEnginnersVR.Plugin;
 
 // See MyRadialMenuItemFactory for actions
 
