@@ -9,7 +9,6 @@ namespace SpaceEnginnersVR.Plugin
     public static class Logger
     {
         private static MyLog myLog;
-        private static readonly bool UseSeprateLog = false;
         private const int MaxExceptionDepth = 100;
         private static readonly ThreadLocal<StringBuilder> threadLocalStringBuilder = new ThreadLocal<StringBuilder>();
 
@@ -32,15 +31,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             if (!IsTraceEnabled)
                 return;
-
-            // Keen does not have a Trace log level, using Debug instead
-            if (UseSeprateLog)
-            {
-                myLog.Log(MyLogSeverity.Debug, Format(ex, message, data));
-                return;
-            }
-
-            MyLog.Default.Log(MyLogSeverity.Debug, Format(ex, message, data));
+            myLog.Log(MyLogSeverity.Debug, Format(ex, message, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -48,14 +39,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             if (!IsDebugEnabled)
                 return;
-
-            if (UseSeprateLog)
-            {
-                myLog.Log(MyLogSeverity.Debug, Format(ex, message, data));
-                return;
-            }
-
-            MyLog.Default.Log(MyLogSeverity.Debug, Format(ex, message, data));
+            myLog.Log(MyLogSeverity.Debug, Format(ex, message, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -63,14 +47,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             if (!IsInfoEnabled)
                 return;
-
-            if (UseSeprateLog)
-            {
-                myLog.Log(MyLogSeverity.Info, Format(ex, message, data));
-                return;
-            }
-
-            MyLog.Default.Log(MyLogSeverity.Info, Format(ex, message, data));
+            myLog.Log(MyLogSeverity.Info, Format(ex, message, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,14 +55,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             if (!IsWarningEnabled)
                 return;
-
-            if (UseSeprateLog)
-            {
-                myLog.Log(MyLogSeverity.Warning, Format(ex, message, data));
-                return;
-            }
-
-            MyLog.Default.Log(MyLogSeverity.Warning, Format(ex, message, data));
+            myLog.Log(MyLogSeverity.Warning, Format(ex, message, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,14 +63,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             if (!IsErrorEnabled)
                 return;
-
-            if (UseSeprateLog)
-            {
-                myLog.Log(MyLogSeverity.Error, Format(ex, message, data));
-                return;
-            }
-
-            MyLog.Default.Log(MyLogSeverity.Error, Format(ex, message, data));
+            myLog.Log(MyLogSeverity.Error, Format(ex, message, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -108,14 +71,7 @@ namespace SpaceEnginnersVR.Plugin
         {
             if (!IsCriticalEnabled)
                 return;
-
-            if (UseSeprateLog)
-            {
-                myLog.Log(MyLogSeverity.Critical, Format(ex, message, data));
-                return;
-            }
-
-            MyLog.Default.Log(MyLogSeverity.Critical, Format(ex, message, data));
+            myLog.Log(MyLogSeverity.Critical, Format(ex, message, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

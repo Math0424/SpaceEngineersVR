@@ -1,5 +1,7 @@
 ﻿using Sandbox.Game.Entities.Character.Components;
 using SpaceEnginnersVR.Player;
+using SpaceEnginnersVR.Plugin;
+using SpaceEnginnersVR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,6 @@ using VRage.Game.Components;
 namespace ClientPlugin.Player.Components
 {
 
-    [MySessionComponentDescriptor(MyUpdateOrder.Simulation | MyUpdateOrder.BeforeSimulation)]
     internal class VRHandsComponent : MyCharacterComponent
     {
 
@@ -25,8 +26,14 @@ namespace ClientPlugin.Player.Components
 
         public override void OnAddedToScene() => Init();
 
+        public override void OnAddedToContainer()
+        {
+            this.NeedsUpdateSimulation = true;
+        }
+
         private void Init()
         {
+            Logger.Debug("Initalizing VR hands");
             //TODO: use InternalChangeModelAndCharacter and swap models
             //Character.ChangeModelAndColor();
         }
@@ -38,12 +45,18 @@ namespace ClientPlugin.Player.Components
 
         public override void Simulate()
         {
+            var right = Controls.Static.RightHand;
+            var left = Controls.Static.LeftHand;
+               
+            if (right.Valid)
+            {
+                Util.DrawDebugMatrix(right.AbsoluteTracking.Translation, right.AbsoluteTracking, "RightHand");
+            }
 
-        }
-
-        public override void UpdateBeforeSimulation()
-        {
-
+            if (left.Valid)
+            {
+                Util.DrawDebugMatrix(left.AbsoluteTracking.Translation, left.AbsoluteTracking, "LeftHand");
+            }
         }
 
         public override string ComponentTypeDebugString => "VR Hands Component";

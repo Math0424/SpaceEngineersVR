@@ -11,7 +11,6 @@ using VRage.Game.Components;
 namespace ClientPlugin.Player.Components
 {
 
-    [MySessionComponentDescriptor(MyUpdateOrder.Simulation | MyUpdateOrder.BeforeSimulation)]
     internal class VRMovementComponent : MyCharacterComponent
     {
 
@@ -24,6 +23,11 @@ namespace ClientPlugin.Player.Components
         }
 
         public override void OnAddedToScene() => Init();
+
+        public override void OnAddedToContainer()
+        {
+            this.NeedsUpdateBeforeSimulation = true;
+        }
 
         private void Init()
         {
