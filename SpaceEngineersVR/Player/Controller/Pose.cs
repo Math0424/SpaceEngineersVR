@@ -1,4 +1,4 @@
-﻿using SpaceEnginnersVR.Utill;
+﻿using SpaceEnginnersVR.Util;
 using System.Runtime.CompilerServices;
 using Valve.VR;
 using VRageMath;

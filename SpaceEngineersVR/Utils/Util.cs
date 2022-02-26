@@ -9,7 +9,7 @@ using VRageMath;
 using VRageRender;
 using Vector4 = VRageMath.Vector4;
 
-namespace SpaceEnginnersVR.Utill
+namespace SpaceEnginnersVR.Util
 {
     internal class Util
     {

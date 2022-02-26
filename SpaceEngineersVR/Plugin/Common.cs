@@ -1,4 +1,4 @@
-using SpaceEnginnersVR.Utill;
+using SpaceEnginnersVR.Util;
 using SpaceEnginnersVR.Config;
 using System;
 using System.Drawing;
@@ -18,11 +18,11 @@ namespace SpaceEnginnersVR.Plugin
 
         public static readonly Version Version = typeof(Main).Assembly.GetName().Version;
 
-        public static readonly Icon Icon = new Icon(Path.Combine(Util.GetAssetFolder(), "icon.ico"));
-        public static readonly string IconPngPath = Path.Combine(Util.GetAssetFolder(), "logo.png");
-        public static readonly string IconIcoPath = Path.Combine(Util.GetAssetFolder(), "logo.ico");
+        public static readonly Icon Icon = new Icon(Path.Combine(Util.Util.GetAssetFolder(), "icon.ico"));
+        public static readonly string IconPngPath = Path.Combine(Util.Util.GetAssetFolder(), "logo.png");
+        public static readonly string IconIcoPath = Path.Combine(Util.Util.GetAssetFolder(), "logo.ico");
 
-        public static readonly string ActionJsonPath = Path.Combine(Path.Combine(Util.GetAssetFolder(), "Controller", "actions.json"));
+        public static readonly string ActionJsonPath = Path.Combine(Path.Combine(Util.Util.GetAssetFolder(), "Controller", "actions.json"));
         public static void SetPlugin(Main plugin)
         {
             Plugin = plugin;

@@ -1,7 +1,7 @@
 ﻿using Valve.VR;
 using VRageMath;
 
-namespace SpaceEnginnersVR.Utill
+namespace SpaceEnginnersVR.Util
 {
     internal static class Extensions
     {

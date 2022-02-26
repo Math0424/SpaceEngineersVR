@@ -1,5 +1,5 @@
 ﻿using SpaceEnginnersVR.Player.Controller;
-using SpaceEnginnersVR.Utill;
+using SpaceEnginnersVR.Util;
 using System.IO;
 using Valve.VR;
 
@@ -102,7 +102,7 @@ namespace SpaceEnginnersVR.Player
 
         public Controls()
         {
-            OpenVR.Input.SetActionManifestPath(Path.Combine(Util.GetAssetFolder(), "Controls", "actions.json"));
+            OpenVR.Input.SetActionManifestPath(Path.Combine(Util.Util.GetAssetFolder(), "Controls", "actions.json"));
 
             Walk = new Analog("/actions/walking/in/Walk");
             WalkForward = new Analog("/actions/walking/in/WalkForward");

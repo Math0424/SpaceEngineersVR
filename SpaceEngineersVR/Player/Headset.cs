@@ -1,5 +1,5 @@
 ﻿using SpaceEnginnersVR.Patches;
-using SpaceEnginnersVR.Utill;
+using SpaceEnginnersVR.Util;
 using SpaceEnginnersVR.Wrappers;
 using ParallelTasks;
 using Sandbox;
