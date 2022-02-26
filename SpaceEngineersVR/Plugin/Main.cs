@@ -18,6 +18,8 @@ using VRageMath;
 using VRage.Utils;
 using System.Reflection;
 using ClientPlugin.Plugin;
+using Sandbox.ModAPI;
+using ClientPlugin.Player;
 
 namespace SpaceEnginnersVR.Plugin
 {
@@ -148,7 +150,11 @@ namespace SpaceEnginnersVR.Plugin
 
         private void CustomUpdate()
         {
-
+            if (MySession.Static?.LocalCharacter != null && 
+                !MySession.Static.LocalCharacter.Components.Contains(typeof(VRPlayerComponent)))
+            {
+                MySession.Static.LocalCharacter.Components.Add(new VRPlayerComponent());
+            }
         }
 
         // ReSharper disable once UnusedMember.Global

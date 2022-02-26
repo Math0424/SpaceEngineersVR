@@ -52,8 +52,6 @@ namespace SpaceEnginnersVR.Player
 
         private bool enableNotifications = false;
 
-        private readonly Controls controls = new Controls();
-
         public Headset()
         {
             FrameInjections.DrawScene += FrameUpdate;
@@ -340,6 +338,7 @@ namespace SpaceEnginnersVR.Player
 
             ControlCommonFunctions(character);
 
+            // TODO: !move control logic to the VR character component!
             // TODO: Wrist GUI
 
             // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
@@ -347,6 +346,8 @@ namespace SpaceEnginnersVR.Player
 
         private void ControlWalk(IMyCharacter character)
         {
+            var controls = Controls.Static;
+
             controls.UpdateWalk();
 
             var move = Vector3.Zero;
@@ -395,6 +396,8 @@ namespace SpaceEnginnersVR.Player
 
         private void ControlFlight(IMyCharacter character)
         {
+            var controls = Controls.Static; 
+
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
             var roll = 0f;
@@ -458,6 +461,8 @@ namespace SpaceEnginnersVR.Player
 
         private void ControlCommonFunctions(IMyCharacter character)
         {
+            var controls = Controls.Static;
+
             var controlledEntity = MySession.Static.ControlledEntity;
 
             if (controls.Primary.HasPressed)

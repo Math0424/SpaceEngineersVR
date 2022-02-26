@@ -535,6 +535,7 @@
     <Compile Include="Config\PersistentConfig.cs" />
     <Compile Include="Config\PluginConfig.cs" />
     <Compile Include="GUI\MyPluginConfigDialog.cs" />
+    <Compile Include="Patches\ModelPatcher.cs" />
     <Compile Include="Player\VRPlayerComponent.cs" />
     <Compile Include="Plugin\Logger.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
