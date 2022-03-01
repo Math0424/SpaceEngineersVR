@@ -25,35 +25,31 @@ namespace SpaceEngineersVR
         public static Matrix ToMatrix(this HmdMatrix34_t hmd)
         {
             return new Matrix(
-                hmd.m0, hmd.m1, hmd.m2, 0,
-                hmd.m4, hmd.m5, hmd.m6, 0,
-                hmd.m8, hmd.m9, hmd.m10, 0,
-                hmd.m3, hmd.m7, hmd.m11, 1);
+                 hmd.m0,  hmd.m1,  hmd.m2,  0f,
+                 hmd.m4,  hmd.m5,  hmd.m6,  0f,
+                -hmd.m8, -hmd.m9, -hmd.m10, 0f,
+                -hmd.m3,  hmd.m7, -hmd.m11, 1f);
 
             //Matrix
             //11 12 13 right
             //21 22 23 up
-            //31 32 33 forward
-            //41 42 43 xyz
+            //31 32 33 backward
+            //41 42 43 translation
 
             //HmdMatrix34_t
-            //         x y z  xyz
-            //forward [0 1 2]  3
-            //up      [4 5 6]  7
-            //right   [8 9 10] 11
+            //0 1  2 left
+            //4 5  6 up
+            //8 9 10 forward
+            //3 7 11 translation
         }
 
         public static Matrix ToMatrix(this HmdMatrix44_t hmd)
         {
             return new Matrix(
-                hmd.m0, hmd.m1, hmd.m2, 0,
-                hmd.m4, hmd.m5, hmd.m6, 0,
-                hmd.m8, hmd.m9, hmd.m10, 0,
-                hmd.m3, hmd.m7, hmd.m11, 1);
+                 hmd.m0,  hmd.m1,  hmd.m2,  hmd.m12,
+                 hmd.m4,  hmd.m5,  hmd.m6,  hmd.m13,
+                -hmd.m8, -hmd.m9, -hmd.m10, hmd.m14,
+                -hmd.m3,  hmd.m7, -hmd.m11, hmd.m15);
         }
-
-
-
-
     }
 }
