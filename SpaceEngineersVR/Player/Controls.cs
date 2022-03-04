@@ -175,6 +175,8 @@ namespace SpaceEngineersVR.Player
         public void UpdateWalk()
         {
             WalkingSets.Update();
+
+            Walk.Update();
             WalkForward.Update();
             WalkBackward.Update();
             WalkRotate.Update();
