@@ -76,6 +76,7 @@ namespace SpaceEngineersVR.Player
 
         private bool firstUpdate = true;
         private BorrowedRtvTexture texture;
+        public static bool UsingControllerMovement;
 
         private bool FrameUpdate()
         {
@@ -150,7 +151,7 @@ namespace SpaceEngineersVR.Player
                     modified = true;
                 }
 
-                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.1)
+                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > -0.1)
                 {
                     ipdCorrection -= IpdCorrectionStep;
                     modified = true;
@@ -430,17 +431,17 @@ namespace SpaceEngineersVR.Player
             if (controls.ThrustRotate.Active)
             {
                 var v = controls.ThrustRotate.Position;
-                rotate.Y = v.X * RotationSpeed;
+
+                if (controls.ThrustRoll.IsPressed)
+                    roll = v.X * RotationSpeed;
+                else
+                    rotate.Y = v.X * RotationSpeed;
+
                 rotate.X = -v.Y * RotationSpeed;
             }
 
-            if (controls.ThrustRoll.Active)
-            {
-                roll = controls.ThrustRotate.Position.X * RotationSpeed;
-            }
-
-            if (controls.Dampeners.HasPressed)
-                character.SwitchDamping();
+            if (controls.Dampener.HasPressed)
+                MySession.Static.ControlledEntity?.SwitchDamping();
 
             ApplyMoveAndRotation(move, rotate, roll);
         }
@@ -450,10 +451,12 @@ namespace SpaceEngineersVR.Player
         {
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
 
-            if (move == Vector3.Zero && rotate == Vector2.Zero && roll == 0f)
-                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
-            else
+            UsingControllerMovement = move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f;
+
+            if (UsingControllerMovement)
                 MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
+            else
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

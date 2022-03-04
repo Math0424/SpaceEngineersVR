@@ -108,10 +108,10 @@
     {
       "name": "/actions/flying/in/ThrustRoll",
       "requirement": "suggested",
-      "type": "vector1"
+      "type": "boolean"
     },
     {
-      "name": "/actions/flying/in/Dampeners",
+      "name": "/actions/flying/in/Dampener",
       "requirement": "suggested",
       "type": "boolean"
     },
@@ -375,7 +375,7 @@
       "/actions/flying/in/ThrustBackward": "Backward",
       "/actions/flying/in/ThrustRotate": "Rotate",
       "/actions/flying/in/ThrustRoll": "Roll",
-      "/actions/flying/in/Dampeners": "Dampener",
+      "/actions/flying/in/Dampener": "Dampener",
       "/actions/common": "Common",
       "/actions/common/in/Primary": "Use primary",
       "/actions/common/in/Secondary": "Use secondary",

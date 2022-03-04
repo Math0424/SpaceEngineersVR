@@ -1,6 +1,5 @@
 ﻿using SpaceEngineersVR.Player.Controller;
-using SpaceEngineersVR.Util;
-using System.IO;
+using SpaceEngineersVR.Plugin;
 using Valve.VR;
 
 // See:
@@ -31,7 +30,7 @@ namespace SpaceEngineersVR.Player
         public readonly Analog ThrustBackward;
         public readonly Analog ThrustRotate;
         public readonly Button ThrustRoll;
-        public readonly Button Dampeners;
+        public readonly Button Dampener;
 
         // Tool
         public readonly Button Primary;
@@ -102,7 +101,7 @@ namespace SpaceEngineersVR.Player
 
         public Controls()
         {
-            OpenVR.Input.SetActionManifestPath(Path.Combine(Util.Util.GetAssetFolder(), "Controls", "actions.json"));
+            OpenVR.Input.SetActionManifestPath(Common.ActionJsonPath);
 
             Walk = new Analog("/actions/walking/in/Walk");
             WalkForward = new Analog("/actions/walking/in/WalkForward");
@@ -118,7 +117,7 @@ namespace SpaceEngineersVR.Player
             ThrustBackward = new Analog("/actions/flying/in/ThrustBackward");
             ThrustRotate = new Analog("/actions/flying/in/ThrustRotate");
             ThrustRoll = new Button("/actions/flying/in/ThrustRoll");
-            Dampeners = new Button("/actions/flying/in/Dampeners");
+            Dampener = new Button("/actions/flying/in/Dampener");
             Primary = new Button("/actions/common/in/Primary");
             Secondary = new Button("/actions/common/in/Secondary");
             Reload = new Button("/actions/common/in/Reload");
@@ -198,7 +197,7 @@ namespace SpaceEngineersVR.Player
             ThrustBackward.Update();
             ThrustRotate.Update();
             ThrustRoll.Update();
-            Dampeners.Update();
+            Dampener.Update();
 
             UpdateCommon();
         }

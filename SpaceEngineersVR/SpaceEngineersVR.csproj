@@ -540,7 +540,7 @@
     <Compile Include="Player\Components\VRHandsComponent.cs" />
     <Compile Include="Plugin\Logger.cs" />
     <Compile Include="Patches\FrameInjections.cs" />
-    <Compile Include="Patches\PlayerAndCameraDisabler.cs" />
+    <Compile Include="Patches\MyGuiScreenGamePlayPatch.cs" />
     <Compile Include="Patches\SimulationUpdater.cs" />
     <Compile Include="Player\Controller\ActionSets.cs" />
     <Compile Include="Player\Controller\Button.cs" />
