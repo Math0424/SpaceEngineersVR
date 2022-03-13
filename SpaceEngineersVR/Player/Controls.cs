@@ -1,4 +1,5 @@
-﻿using SpaceEngineersVR.Player.Controller;
+﻿using System.Diagnostics.CodeAnalysis;
+using SpaceEngineersVR.Player.Controller;
 using SpaceEngineersVR.Plugin;
 using Valve.VR;
 
@@ -9,6 +10,7 @@ using Valve.VR;
 namespace SpaceEngineersVR.Player
 {
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Controls
     {
         public static Controls Static = new Controls();
@@ -82,18 +84,8 @@ namespace SpaceEngineersVR.Player
         public readonly Pose RightHand;
 
         // Feedback
-        public readonly Haptic Welding;
-        public readonly Haptic Drilling;
-        public readonly Haptic Grinding;
-        public readonly Haptic Shooting;
-        public readonly Haptic Placing;
-        public readonly Haptic Removing;
-        public readonly Haptic PlacementFit;
-
-        // Input sources
-        private readonly InputSource HeadSource;
-        private readonly InputSource LeftHandSource;
-        private readonly InputSource RightHandSource;
+        public readonly Haptic LeftHaptic;
+        public readonly Haptic RightHaptic;
 
         // Action sets
         private readonly ActionSets WalkingSets;
@@ -153,19 +145,12 @@ namespace SpaceEngineersVR.Player
             SignalMode = new Button("/actions/common/in/SignalMode");
             SpectatorMode = new Button("/actions/common/in/SpectatorMode");
             Teleport = new Button("/actions/common/in/Teleport");
+
             LeftHand = new Pose("/actions/common/in/LeftHand");
             RightHand = new Pose("/actions/common/in/RightHand");
-            Welding = new Haptic("/actions/feedback/out/Welding");
-            Drilling = new Haptic("/actions/feedback/out/Drilling");
-            Grinding = new Haptic("/actions/feedback/out/Grinding");
-            Shooting = new Haptic("/actions/feedback/out/Shooting");
-            Placing = new Haptic("/actions/feedback/out/Placing");
-            Removing = new Haptic("/actions/feedback/out/Removing");
-            PlacementFit = new Haptic("/actions/feedback/out/PlacementFit");
 
-            HeadSource = new InputSource("/user/head");
-            LeftHandSource = new InputSource("/user/hand/left");
-            RightHandSource = new InputSource("/user/hand/right");
+            LeftHaptic = new Haptic("/actions/feedback/out/LeftHaptic");
+            RightHaptic = new Haptic("/actions/feedback/out/RightHaptic");
 
             WalkingSets = new ActionSets("/actions/walking", "/actions/common");
             FlyingSets = new ActionSets("/actions/flying", "/actions/common");
