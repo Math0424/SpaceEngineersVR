@@ -1,6 +1,6 @@
 {
   "bindings": {},
-  "controller_type": "generic",
-  "description": "Space Engineers VR Vive controller bindings",
-  "name": ""
+  "controller_type": "vive_controller",
+  "name": "Space Engineers VR Vive controller bindings",
+  "description": ""
 }

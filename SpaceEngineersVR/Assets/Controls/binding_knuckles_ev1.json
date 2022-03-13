@@ -1,6 +1,6 @@
 {
   "bindings": {},
-  "controller_type": "generic",
-  "description": "Space Engineers VR knuckles EV1 bindings",
-  "name": ""
+  "controller_type": "knuckles_ev1",
+  "name": "Space Engineers VR knuckles EV1 bindings",
+  "description": ""
 }

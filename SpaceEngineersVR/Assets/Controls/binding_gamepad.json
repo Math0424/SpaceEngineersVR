@@ -1,6 +1,6 @@
 {
   "bindings": {},
-  "controller_type": "generic",
-  "description": "Space Engineers VR gamepad bindings",
-  "name": ""
+  "controller_type": "gamepad",
+  "name": "Space Engineers VR gamepad bindings",
+  "description": ""
 }
