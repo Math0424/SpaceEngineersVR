@@ -1,6 +1,6 @@
-﻿using SpaceEngineersVR.Player.Controller;
-using SpaceEngineersVR.Util;
-using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using SpaceEngineersVR.Player.Controller;
+using SpaceEngineersVR.Plugin;
 using Valve.VR;
 
 // See:
@@ -10,6 +10,7 @@ using Valve.VR;
 namespace SpaceEngineersVR.Player
 {
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Controls
     {
         public static Controls Static = new Controls();
@@ -31,7 +32,7 @@ namespace SpaceEngineersVR.Player
         public readonly Analog ThrustBackward;
         public readonly Analog ThrustRotate;
         public readonly Button ThrustRoll;
-        public readonly Button Dampeners;
+        public readonly Button Dampener;
 
         // Tool
         public readonly Button Primary;
@@ -83,18 +84,8 @@ namespace SpaceEngineersVR.Player
         public readonly Pose RightHand;
 
         // Feedback
-        public readonly Haptic Welding;
-        public readonly Haptic Drilling;
-        public readonly Haptic Grinding;
-        public readonly Haptic Shooting;
-        public readonly Haptic Placing;
-        public readonly Haptic Removing;
-        public readonly Haptic PlacementFit;
-
-        // Input sources
-        private readonly InputSource HeadSource;
-        private readonly InputSource LeftHandSource;
-        private readonly InputSource RightHandSource;
+        public readonly Haptic LeftHaptic;
+        public readonly Haptic RightHaptic;
 
         // Action sets
         private readonly ActionSets WalkingSets;
@@ -102,7 +93,7 @@ namespace SpaceEngineersVR.Player
 
         public Controls()
         {
-            OpenVR.Input.SetActionManifestPath(Path.Combine(Util.Util.GetAssetFolder(), "Controls", "actions.json"));
+            OpenVR.Input.SetActionManifestPath(Common.ActionJsonPath);
 
             Walk = new Analog("/actions/walking/in/Walk");
             WalkForward = new Analog("/actions/walking/in/WalkForward");
@@ -118,7 +109,7 @@ namespace SpaceEngineersVR.Player
             ThrustBackward = new Analog("/actions/flying/in/ThrustBackward");
             ThrustRotate = new Analog("/actions/flying/in/ThrustRotate");
             ThrustRoll = new Button("/actions/flying/in/ThrustRoll");
-            Dampeners = new Button("/actions/flying/in/Dampeners");
+            Dampener = new Button("/actions/flying/in/Dampener");
             Primary = new Button("/actions/common/in/Primary");
             Secondary = new Button("/actions/common/in/Secondary");
             Reload = new Button("/actions/common/in/Reload");
@@ -154,19 +145,12 @@ namespace SpaceEngineersVR.Player
             SignalMode = new Button("/actions/common/in/SignalMode");
             SpectatorMode = new Button("/actions/common/in/SpectatorMode");
             Teleport = new Button("/actions/common/in/Teleport");
+
             LeftHand = new Pose("/actions/common/in/LeftHand");
             RightHand = new Pose("/actions/common/in/RightHand");
-            Welding = new Haptic("/actions/feedback/out/Welding");
-            Drilling = new Haptic("/actions/feedback/out/Drilling");
-            Grinding = new Haptic("/actions/feedback/out/Grinding");
-            Shooting = new Haptic("/actions/feedback/out/Shooting");
-            Placing = new Haptic("/actions/feedback/out/Placing");
-            Removing = new Haptic("/actions/feedback/out/Removing");
-            PlacementFit = new Haptic("/actions/feedback/out/PlacementFit");
 
-            HeadSource = new InputSource("/user/head");
-            LeftHandSource = new InputSource("/user/hand/left");
-            RightHandSource = new InputSource("/user/hand/right");
+            LeftHaptic = new Haptic("/actions/feedback/out/LeftHaptic");
+            RightHaptic = new Haptic("/actions/feedback/out/RightHaptic");
 
             WalkingSets = new ActionSets("/actions/walking", "/actions/common");
             FlyingSets = new ActionSets("/actions/flying", "/actions/common");
@@ -175,6 +159,8 @@ namespace SpaceEngineersVR.Player
         public void UpdateWalk()
         {
             WalkingSets.Update();
+
+            Walk.Update();
             WalkForward.Update();
             WalkBackward.Update();
             WalkRotate.Update();
@@ -196,7 +182,7 @@ namespace SpaceEngineersVR.Player
             ThrustBackward.Update();
             ThrustRotate.Update();
             ThrustRoll.Update();
-            Dampeners.Update();
+            Dampener.Update();
 
             UpdateCommon();
         }

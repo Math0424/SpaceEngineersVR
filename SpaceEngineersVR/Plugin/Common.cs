@@ -22,7 +22,7 @@ namespace SpaceEngineersVR.Plugin
         public static readonly string IconPngPath = Path.Combine(Util.Util.GetAssetFolder(), "logo.png");
         public static readonly string IconIcoPath = Path.Combine(Util.Util.GetAssetFolder(), "logo.ico");
 
-        public static readonly string ActionJsonPath = Path.Combine(Path.Combine(Util.Util.GetAssetFolder(), "Controller", "actions.json"));
+        public static readonly string ActionJsonPath = Path.Combine(Util.Util.GetAssetFolder(), "Controls", "actions.json");
         public static void SetPlugin(Main plugin)
         {
             Plugin = plugin;

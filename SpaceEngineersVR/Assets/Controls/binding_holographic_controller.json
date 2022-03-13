@@ -1,6 +1,6 @@
 {
   "bindings": {},
-  "controller_type": "generic",
-  "description": "Space Engineers VR holographic bindings",
-  "name": ""
+  "controller_type": "holographic_controller",
+  "name": "Space Engineers VR holographic bindings",
+  "description": ""
 }

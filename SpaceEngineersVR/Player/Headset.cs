@@ -14,6 +14,7 @@ using SharpDX.DXGI;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
@@ -75,6 +76,7 @@ namespace SpaceEngineersVR.Player
 
         private bool firstUpdate = true;
         private BorrowedRtvTexture texture;
+        public static bool UsingControllerMovement;
 
         private bool FrameUpdate()
         {
@@ -149,7 +151,7 @@ namespace SpaceEngineersVR.Player
                     modified = true;
                 }
 
-                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > 0.1)
+                if (input.IsKeyPress(MyKeys.Subtract) && ipdCorrection > -0.1)
                 {
                     ipdCorrection -= IpdCorrectionStep;
                     modified = true;
@@ -330,7 +332,7 @@ namespace SpaceEngineersVR.Player
 
             //((MyVRageInput)MyInput.Static).EnableInput(false);
 
-            if (character.EnabledThrusts || MySession.Static.ControlledEntity is IMyShipController)
+            if (character.EnabledThrusts || MySession.Static.ControlledEntity is MyShipController)
                 ControlFlight(character);
             else
                 ControlWalk(character);
@@ -343,6 +345,7 @@ namespace SpaceEngineersVR.Player
             // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ControlWalk(IMyCharacter character)
         {
             var controls = Controls.Static;
@@ -385,14 +388,10 @@ namespace SpaceEngineersVR.Player
             if (controls.CrouchOrClimbDown.IsPressed)
                 move.Y = -1f;
 
-            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-
-            if (move == Vector3.Zero && rotate == Vector2.Zero)
-                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
-            else
-                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, 0f);
+            ApplyMoveAndRotation(move, rotate, 0f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ControlFlight(IMyCharacter character)
         {
             var controls = Controls.Static; 
@@ -400,13 +399,6 @@ namespace SpaceEngineersVR.Player
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
             var roll = 0f;
-
-            if (controls.ThrustLRUD.Active)
-            {
-                var v = controls.ThrustLRUD.Position;
-                move.X += v.X;
-                move.Y += v.Y;
-            }
 
             controls.UpdateFlight();
 
@@ -439,25 +431,35 @@ namespace SpaceEngineersVR.Player
             if (controls.ThrustRotate.Active)
             {
                 var v = controls.ThrustRotate.Position;
-                rotate.Y = v.X * RotationSpeed;
+
+                if (controls.ThrustRoll.IsPressed)
+                    roll = v.X * RotationSpeed;
+                else
+                    rotate.Y = v.X * RotationSpeed;
+
                 rotate.X = -v.Y * RotationSpeed;
             }
 
-            if (controls.ThrustRoll.Active)
-            {
-                roll = controls.ThrustRotate.Position.X * RotationSpeed;
-            }
+            if (controls.Dampener.HasPressed)
+                MySession.Static.ControlledEntity?.SwitchDamping();
 
-            if (controls.Dampeners.HasPressed)
-                character.SwitchDamping();
-
-            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-            if (move == Vector3.Zero && rotate == Vector2.Zero && roll == 0f)
-                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
-            else
-                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
+            ApplyMoveAndRotation(move, rotate, roll);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ApplyMoveAndRotation(Vector3 move, Vector2 rotate, float roll)
+        {
+            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
+
+            UsingControllerMovement = move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f;
+
+            if (UsingControllerMovement)
+                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
+            else
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ControlCommonFunctions(IMyCharacter character)
         {
             var controls = Controls.Static;
