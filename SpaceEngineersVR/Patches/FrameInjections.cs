@@ -1,11 +1,10 @@
 ﻿using HarmonyLib;
-using SpaceEngineersVR.Utils;
+using SpaceEngineersVR.Plugin;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using VRageMath;
-using VRageRender;
 using VRageRender.Messages;
 
 namespace SpaceEngineersVR.Patches
@@ -15,16 +14,18 @@ namespace SpaceEngineersVR.Patches
 
         public static Func<bool> DrawScene;
         public static bool DisablePresent = false;
+        public static Func<double, double, double, double, MatrixD> GetPerspectiveMatrix;
+        public static Func<float, float, float, Matrix> GetPerspectiveMatrixRhInfiniteComplementary;
 
         static FrameInjections()
         {
             Type t = AccessTools.TypeByName("VRageRender.MyRender11");
 
-            SpaceVR.Harmony.Patch(AccessTools.Method(t, "Present"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_Present)));
+            Common.Plugin.Harmony.Patch(AccessTools.Method(t, "Present"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_Present)));
 
-            SpaceVR.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
+            Common.Plugin.Harmony.Patch(AccessTools.Method(t, "DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
 
-            SpaceVR.Harmony.Patch(AccessTools.Constructor(
+            Common.Plugin.Harmony.Patch(AccessTools.Constructor(
                 AccessTools.TypeByName("VRage.Ansel.MyAnselCamera"),
                 new Type[]
                 {
@@ -39,10 +40,10 @@ namespace SpaceEngineersVR.Patches
                     typeof(float),    //projectionOffset
                 }), transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_AnselCameraConstructor)));
 
-            SpaceVR.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:SetupCameraMatricesInternal"),
+            Common.Plugin.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:SetupCameraMatricesInternal"),
                 transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_SetupCameraMatrices)));
 
-            new Logger().Write("Applied harmony game injections");
+            Logger.Info("Applied harmony game injections for renderer.");
         }
 
         private static bool Prefix_DrawScene()
@@ -122,13 +123,11 @@ namespace SpaceEngineersVR.Patches
             return code;
         }
 
-        public static Func<double, double, double, double, MatrixD> GetPerspectiveMatrix;
         private static MatrixD GetPerspectiveFov(double fov, double aspectRatio, double nearPlane, double farPlane)
         {
             return GetPerspectiveMatrix(fov, aspectRatio, nearPlane, farPlane);
         }
 
-        public static Func<float, float, float, Matrix> GetPerspectiveMatrixRhInfiniteComplementary;
         private static Matrix GetPerspectiveFovRhInfiniteComplementary(float fov, float aspectRatio, float nearPlane)
         {
             return GetPerspectiveMatrixRhInfiniteComplementary(fov, aspectRatio, nearPlane);

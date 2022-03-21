@@ -108,10 +108,10 @@
     {
       "name": "/actions/flying/in/ThrustRoll",
       "requirement": "suggested",
-      "type": "vector1"
+      "type": "boolean"
     },
     {
-      "name": "/actions/flying/in/Dampeners",
+      "name": "/actions/flying/in/Dampener",
       "requirement": "suggested",
       "type": "boolean"
     },
@@ -303,37 +303,12 @@
       "skeleton": "/skeleton/hand/right"
     },
     {
-      "name": "/actions/feedback/out/Welding",
+      "name": "/actions/feedback/out/LeftHaptic",
       "requirement": "optional",
       "type": "vibration"
     },
     {
-      "name": "/actions/feedback/out/Drilling",
-      "requirement": "optional",
-      "type": "vibration"
-    },
-    {
-      "name": "/actions/feedback/out/Grinding",
-      "requirement": "optional",
-      "type": "vibration"
-    },
-    {
-      "name": "/actions/feedback/out/Shooting",
-      "requirement": "suggested",
-      "type": "vibration"
-    },
-    {
-      "name": "/actions/feedback/out/Placing",
-      "requirement": "optional",
-      "type": "vibration"
-    },
-    {
-      "name": "/actions/feedback/out/Removing",
-      "requirement": "optional",
-      "type": "vibration"
-    },
-    {
-      "name": "/actions/feedback/out/PlacementFit",
+      "name": "/actions/feedback/out/RightHaptic",
       "requirement": "optional",
       "type": "vibration"
     }
@@ -375,7 +350,7 @@
       "/actions/flying/in/ThrustBackward": "Backward",
       "/actions/flying/in/ThrustRotate": "Rotate",
       "/actions/flying/in/ThrustRoll": "Roll",
-      "/actions/flying/in/Dampeners": "Dampener",
+      "/actions/flying/in/Dampener": "Dampener",
       "/actions/common": "Common",
       "/actions/common/in/Primary": "Use primary",
       "/actions/common/in/Secondary": "Use secondary",
@@ -415,13 +390,8 @@
       "/actions/common/in/LeftHand": "Left (tablet) hand",
       "/actions/common/in/RightHand": "Right (tool) hand",
       "/actions/feedback": "Feedback",
-      "/actions/feedback/out/Welding": "Welding",
-      "/actions/feedback/out/Drilling": "Drilling",
-      "/actions/feedback/out/Grinding": "Grinding",
-      "/actions/feedback/out/Shooting": "Shooting",
-      "/actions/feedback/out/Placing": "Placing",
-      "/actions/feedback/out/Removing": "Removing",
-      "/actions/feedback/out/PlacementFit": "Placement fit"
+      "/actions/feedback/out/LeftHaptic": "Vibrate left",
+      "/actions/feedback/out/RightHaptic": "Vibrate right"
     }
   ]
 }

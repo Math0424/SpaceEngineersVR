@@ -1,14 +1,7 @@
 ﻿using HarmonyLib;
-using SharpDX;
 using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SpaceEngineersVR.Wrappers
 {

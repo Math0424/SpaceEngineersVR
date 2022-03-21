@@ -1,15 +1,9 @@
-﻿using SpaceEngineersVR.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Valve.VR;
+﻿using Valve.VR;
 using VRageMath;
 
-namespace SpaceEngineersVR
+namespace SpaceEngineersVR.Util
 {
-    static class Extensions
+    internal static class Extensions
     {
 
         public static Vector3 ToVector(this HmdVector3_t v)
@@ -23,6 +17,7 @@ namespace SpaceEngineersVR
         }
 
 
+        //Despite this being what the internet says, it appears to be incorrect..
         //Matrix
         //11 12 13 right
         //21 22 23 up

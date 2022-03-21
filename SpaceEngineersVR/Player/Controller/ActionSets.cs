@@ -1,6 +1,6 @@
-using Valve.VR;
+﻿using Valve.VR;
 
-namespace SpaceEngineersVR.Player
+namespace SpaceEngineersVR.Player.Controller
 {
     public class ActionSets
     {

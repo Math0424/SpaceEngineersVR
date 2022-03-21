@@ -1,8 +1,8 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Valve.VR;
 using VRageMath;
 
-namespace SpaceEngineersVR.Player
+namespace SpaceEngineersVR.Player.Controller
 {
     public class Analog
     {

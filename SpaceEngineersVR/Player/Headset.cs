@@ -1,18 +1,22 @@
-﻿using Sandbox.Game.World;
-using Sandbox.ModAPI;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using SpaceEngineersVR.Patches;
-using SpaceEngineersVR.Utils;
+﻿using SpaceEngineersVR.Patches;
+using SpaceEngineersVR.Util;
 using SpaceEngineersVR.Wrappers;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Text;
+using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Screens.Helpers.RadialMenuActions;
 using Sandbox.Game.SessionComponents.Clipboard;
+using Sandbox.Game.World;
+using Sandbox.ModAPI;
+using SpaceEngineersVR.Plugin;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows.Forms;
 using Valve.VR;
 using VRage.Game.ModAPI;
 using VRage.Input;
@@ -25,11 +29,14 @@ using VRage.Game.Utils;
 
 namespace SpaceEngineersVR.Player
 {
-    class Headset
+    internal class Headset
     {
-        Logger log = new Logger();
-
         public MatrixD headToRealWorld;
+
+        public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
+        public bool IsHeadsetAlreadyDisconnected = false;
+        public bool IsControllersConnected => true; //(LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
+        public bool IsControllersAlreadyDisconnected = false;
 
         private readonly uint pnX;
         private readonly uint pnY;
@@ -41,8 +48,6 @@ namespace SpaceEngineersVR.Player
         private readonly TrackedDevicePose_t[] gamePositions;
 
         private bool enableNotifications = false;
-
-        private readonly Controls controls = new Controls();
 
         private Vector3 offset = new Vector3(0f, -1.73f, 0f);
         private static EVREye currentlyRenderingEye;
@@ -66,13 +71,14 @@ namespace SpaceEngineersVR.Player
                 vMax = 1
             };
 
-            log.Write($"Found headset with eye resolution of '{width}x{height}'");
+            Logger.Info($"Found headset with eye resolution of '{width}x{height}'");
         }
 
         #region DrawingLogic
 
-        bool firstUpdate = true;
-        BorrowedRtvTexture texture;
+        private bool firstUpdate = true;
+        private BorrowedRtvTexture texture;
+        public static bool UsingControllerMovement;
 
         private bool FrameUpdate()
         {
@@ -80,7 +86,7 @@ namespace SpaceEngineersVR.Player
 
             // log.Write("Frame update");
 
-            var cam = MySector.MainCamera;
+            VRage.Game.Utils.MyCamera cam = MySector.MainCamera;
             if (cam == null)
             {
                 firstUpdate = true;
@@ -90,7 +96,7 @@ namespace SpaceEngineersVR.Player
             if (firstUpdate)
             {
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
-                MyRender11.SetResolution(new Vector2I((int)width, (int)height));
+                MyRender11.Resolution = new Vector2I((int)width, (int)height);
                 MyRender11.CreateScreenResources();
                 SetOffset();
                 firstUpdate = false;
@@ -152,8 +158,8 @@ namespace SpaceEngineersVR.Player
 
             if(MyInput.Static.IsKeyPress(MyKeys.Enter))
             {
-                log.Write($"HeadToReal:   {headToReal}");
-                log.Write($"HeadToReal-1: {Matrix.Invert(headToReal)}");
+                Logger.Info($"HeadToReal:   {headToReal}");
+                Logger.Info($"HeadToReal-1: {Matrix.Invert(headToReal)}");
             }
 
             cam.WorldMatrix =
@@ -168,7 +174,7 @@ namespace SpaceEngineersVR.Player
             MyRender11.DrawGameScene(texture, out _);
 
             Texture2D texture2D = texture.GetResource(); //(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
-            var input = new Texture_t
+            Texture_t input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
                 eType = ETextureType.DirectX,
@@ -258,8 +264,8 @@ namespace SpaceEngineersVR.Player
             OpenVR.Compositor.GetFrameTiming(ref timings, 0);
             if (timings.m_nNumDroppedFrames != 0)
             {
-                log.Write("Dropping frames!");
-                log.IncreaseIndent();
+                Logger.Warning("Dropping frames!");
+                Logger.IncreaseIndent();
                 StringBuilder builder = new StringBuilder();
                 builder.AppendLine("FrameInterval: " + timings.m_flClientFrameIntervalMs);
                 builder.AppendLine("IdleTime     : " + timings.m_flCompositorIdleCpuMs);
@@ -267,15 +273,15 @@ namespace SpaceEngineersVR.Player
                 builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
                 builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
                 builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                log.Write(builder.ToString());
-                log.DecreaseIndent();
-                log.Write("");
+                Logger.Warning(builder.ToString());
+                Logger.Warning("");
             }
 
             //Update positions
             if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
+
             {
-                log.Write("HMD pos invalid!");
+                Logger.Error("HMD pos invalid!");
                 return;
             }
 
@@ -291,26 +297,103 @@ namespace SpaceEngineersVR.Player
 
         private void UpdateBeforeSimulation()
         {
+            //UNTESTED
+            //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
+            if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
+            {
+                //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    Logger.Info("Controller disconnected, pausing game.");
+                }
+                else
+                {
+                    Logger.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
+                IsControllersAlreadyDisconnected = true;
+            }
+            else if (IsControllersConnected && IsControllersAlreadyDisconnected)
+            {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    Logger.Info("Controller reconnected, unpausing game.");
+                }
+                else
+                {
+                    Logger.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
+                }
+
+                IsControllersAlreadyDisconnected = false;
+            }
+
+            //UNTESTED
+            //Checks if the headset got disconnected, shows a message if the headset is disconnected.
+            if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
+            {
+                //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePush();
+                    Logger.Info("Headset disconnected, pausing game.");
+                }
+                else
+                {
+                    Logger.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
+                }
+
+                IsHeadsetAlreadyDisconnected = true;
+            }
+            else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
+            {
+                if (MySession.Static.IsPausable())
+                {
+                    MySandboxGame.PausePop();
+                    Logger.Info("Headset reconnected, unpausing game.");
+                }
+                else
+                {
+                    Logger.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
+                }
+
+                IsHeadsetAlreadyDisconnected = false;
+            }
+
             var character = MyAPIGateway.Session?.Player?.Character;
             if (character == null)
                 return;
 
+            if (character.Visible == true && !Common.Config.EnableCharacterRendering)
+            {
+                character.Visible = false;
+            }
+            else if (character.Visible == false && Common.Config.EnableCharacterRendering)
+            {
+                character.Visible = true;
+            }
+
             //((MyVRageInput)MyInput.Static).EnableInput(false);
 
-            if (character.EnabledThrusts || MySession.Static.ControlledEntity is IMyShipController)
+            if (character.EnabledThrusts || MySession.Static.ControlledEntity is MyShipController)
                 ControlFlight(character);
             else
                 ControlWalk(character);
 
             ControlCommonFunctions(character);
 
+            // TODO: !move control logic to the VR character component!
             // TODO: Wrist GUI
 
             // TODO: Configurable left handed mode (swap LeftHand with RightHand, also swap visuals and mirror the hand tools)
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ControlWalk(IMyCharacter character)
         {
+            var controls = Controls.Static;
+
             controls.UpdateWalk();
 
             var move = Vector3.Zero;
@@ -349,26 +432,17 @@ namespace SpaceEngineersVR.Player
             if (controls.CrouchOrClimbDown.IsPressed)
                 move.Y = -1f;
 
-            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-
-            if (move == Vector3.Zero && rotate == Vector2.Zero)
-                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
-            else
-                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, 0f);
+            ApplyMoveAndRotation(move, rotate, 0f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ControlFlight(IMyCharacter character)
         {
+            var controls = Controls.Static; 
+
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
             var roll = 0f;
-
-            if (controls.ThrustLRUD.Active)
-            {
-                var v = controls.ThrustLRUD.Position;
-                move.X += v.X;
-                move.Y += v.Y;
-            }
 
             controls.UpdateFlight();
 
@@ -401,28 +475,39 @@ namespace SpaceEngineersVR.Player
             if (controls.ThrustRotate.Active)
             {
                 var v = controls.ThrustRotate.Position;
-                rotate.Y = v.X * RotationSpeed;
+
+                if (controls.ThrustRoll.IsPressed)
+                    roll = v.X * RotationSpeed;
+                else
+                    rotate.Y = v.X * RotationSpeed;
+
                 rotate.X = -v.Y * RotationSpeed;
             }
 
-            if (controls.ThrustRoll.Active)
-            {
-                roll = controls.ThrustRotate.Position.X * RotationSpeed;
-            }
+            if (controls.Dampener.HasPressed)
+                MySession.Static.ControlledEntity?.SwitchDamping();
 
-            if (controls.Dampeners.HasPressed)
-                character.SwitchDamping();
-
-            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
-
-            if (move == Vector3.Zero && rotate == Vector2.Zero && roll == 0f)
-                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
-            else
-                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
+            ApplyMoveAndRotation(move, rotate, roll);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ApplyMoveAndRotation(Vector3 move, Vector2 rotate, float roll)
+        {
+            move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
+
+            UsingControllerMovement = move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f;
+
+            if (UsingControllerMovement)
+                MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
+            else
+                MySession.Static.ControlledEntity?.MoveAndRotateStopped();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ControlCommonFunctions(IMyCharacter character)
         {
+            var controls = Controls.Static;
+
             var controlledEntity = MySession.Static.ControlledEntity;
 
             if (controls.Primary.HasPressed)
@@ -616,8 +701,7 @@ namespace SpaceEngineersVR.Player
 
         public void CreatePopup(string message)
         {
-            var logoPath = Path.Combine(Util.GetAssetFolder(), "logo.png");
-            Bitmap img = new Bitmap(File.OpenRead(logoPath));
+            Bitmap img = new Bitmap(File.OpenRead(Common.IconPngPath));
             CreatePopup(EVRNotificationType.Transient, message, ref img);
         }
 
@@ -645,9 +729,26 @@ namespace SpaceEngineersVR.Player
             };
             // FIXME: Notification on overlay
             //OpenVR..CreateNotification(handle, 0, type, message, EVRNotificationStyle.Application, ref image, ref id);
-            log.Write("Pop-up created with message: " + message);
+            Logger.Debug("Pop-up created with message: " + message);
 
             bitmap.UnlockBits(textureData);
+        }
+
+        /// <summary>
+        /// Shows a messagebox async to prevent calling thread from being paused.
+        /// </summary>
+        /// <param name="msg">The message of the messagebox.</param>
+        /// <param name="caption">The caption of the messagebox.</param>
+        /// <returns>The button that the user clicked as System.Windows.Forms.DialogResult.</returns>
+        public DialogResult ShowMessageBoxAsync(string msg, string caption)
+        {
+            Parallel.Start(() =>
+            {
+                Logger.Info($"Messagebox created with the message: {msg}");
+                DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
+                return result;
+            });
+            return DialogResult.None;
         }
 
         #endregion

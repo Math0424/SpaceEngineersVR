@@ -13,12 +13,6 @@ namespace SpaceEngineersVR.Wrappers
         }
 
         private static readonly FieldInfo rwTexturesPool;
-        public static MyBorrowedRwTextureManager RwTexturesPool
-        {
-            get
-            {
-                return new MyBorrowedRwTextureManager(rwTexturesPool.GetValue(null));
-            }
-        }
+        public static MyBorrowedRwTextureManager RwTexturesPool => new MyBorrowedRwTextureManager(rwTexturesPool.GetValue(null));
     }
 }
