@@ -44,6 +44,9 @@ namespace SpaceEngineersVR.Player
 
         private readonly Controls controls = new Controls();
 
+        private Vector3 offset = new Vector3(0f, -1.73f, 0f);
+        private static EVREye currentlyRenderingEye;
+
         public Headset()
         {
             FrameInjections.DrawScene += FrameUpdate;
@@ -89,6 +92,7 @@ namespace SpaceEngineersVR.Player
                 //MyRender11.ResizeSwapChain((int)Width, (int)Height);
                 MyRender11.SetResolution(new Vector2I((int)width, (int)height));
                 MyRender11.CreateScreenResources();
+                SetOffset();
                 firstUpdate = false;
                 return true;
             }
@@ -103,12 +107,12 @@ namespace SpaceEngineersVR.Player
             var originalWm = cam.WorldMatrix;
             var originalVm = cam.ViewMatrix;
 
-            Matrix head = headToRealWorld; //Matrix.Invert(RealWorldPos).GetOrientation();
-            head.Translation += new Vector3(0f, -1.73f, 0f);
+            Matrix headToReal = headToRealWorld; //Matrix.Invert(RealWorldPos).GetOrientation();
+            headToReal.Translation += offset;
 
             // Stereo rendering
-            DrawEye(EVREye.Eye_Right, head, originalWm, cam);
-            DrawEye(EVREye.Eye_Left,  head, originalWm, cam);
+            DrawEye(EVREye.Eye_Right, headToReal, originalWm, cam);
+            DrawEye(EVREye.Eye_Left,  headToReal, originalWm, cam);
 
             // Restore original matrices to remove the flickering
             cam.WorldMatrix = originalWm;
@@ -116,26 +120,48 @@ namespace SpaceEngineersVR.Player
 
             //FrameInjections.DisablePresent = false;
 
+            if(MyInput.Static.IsKeyPress(MyKeys.Enter))
+                SetOffset();
+
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad2))
+                offset.Z += 0.1f;
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad8))
+                offset.Z -= 0.1f;
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad6))
+                offset.X += 0.1f;
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad4))
+                offset.X -= 0.1f;
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad7))
+                offset.Y += 0.1f;
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad1))
+                offset.Y -= 0.1f;
+            if(MyInput.Static.IsKeyPress(MyKeys.NumPad5))
+                offset = new Vector3(0);
+
             return false;
         }
 
+        private void SetOffset()
+        {
+            offset = -headToRealWorld.Translation;
+        }
 
-        private void DrawEye(EVREye eye, Matrix headToRealWorld, MatrixD worldMat, MyCamera cam)
+        private void DrawEye(EVREye eye, Matrix headToReal, MatrixD worldMat, MyCamera cam)
         {
             Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(eye).ToMatrix();
 
             if(MyInput.Static.IsKeyPress(MyKeys.Enter))
             {
-                log.Write($"EyeToHead:   {eyeToHead}");
-                log.Write($"EyeToHead-1: {Matrix.Invert(eyeToHead)}");
-                log.Write($"HeadToReal:   {headToRealWorld}");
-                log.Write($"HeadToReal-1: {Matrix.Invert(headToRealWorld)}");
+                log.Write($"HeadToReal:   {headToReal}");
+                log.Write($"HeadToReal-1: {Matrix.Invert(headToReal)}");
             }
 
             cam.WorldMatrix =
-                Matrix.Invert(eyeToHead) *
-                Matrix.Invert(headToRealWorld).GetOrientation() *
-                Matrix.CreateTranslation(Matrix.Invert(headToRealWorld).Translation) *
+                eyeToHead *
+                Matrix.Invert(headToReal.GetOrientation()) *
+                //worldMat.GetOrientation() *
+                Matrix.CreateTranslation(headToReal.Translation) *
+                //Matrix.CreateTranslation(worldMat.Translation) *
                 worldMat;
 
             UploadCameraViewMatrix(eye, eyeToHead, cam);
@@ -156,20 +182,34 @@ namespace SpaceEngineersVR.Player
             //ViewMatrix is the inverse of WorldMatrix
             cam.ViewMatrix = Matrix.Invert(cam.WorldMatrix);
 
+            //float left = 0f, right = 0f, top = 0f, bottom = 0f;
+            //OpenVR.System.GetProjectionRaw(currentlyRenderingEye, ref left, ref right, ref top, ref bottom);
+            //float fov = MathHelper.Atan(right) - MathHelper.Atan(left);
+
+            Matrix proj = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance).ToMatrix();
+            float fov = MathHelper.Atan(1f / proj.M22) * 2f;
+
+
             MyRenderMessageSetCameraViewMatrix msg = MyRenderProxy.MessagePool.Get<MyRenderMessageSetCameraViewMatrix>(MyRenderMessageEnum.SetCameraViewMatrix);
 
             msg.ViewMatrix = cam.ViewMatrix;
             msg.CameraPosition = cam.Position;
 
-            Matrix proj = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance).ToMatrix();
-            Matrix proj2 = eyeToHead * Matrix.Invert(proj);
-            msg.ProjectionMatrix = proj2;
+            //These matrixes are just used for culling. I can't figure out why using the matrixes from OpenVR aren't working
+            //TODO: Correct these, or override the render pipeline to do a single cull for both eyes
+            msg.ProjectionMatrix    = cam.ProjectionMatrix;
+            msg.ProjectionFarMatrix = cam.ProjectionMatrixFar;
 
-            Matrix projFar = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarFarPlaneDistance).ToMatrix();
-            Matrix projFar2 = eyeToHead * Matrix.Invert(projFar);
-            msg.ProjectionFarMatrix = projFar2;
+            //Other attempts:
+            //Very close, but culling is visible at bottom of view, and occasionally on far left of left view and far right of right view
+            //msg.ProjectionMatrix    = Matrix.CreatePerspectiveFieldOfView(fov, cam.AspectRatio, cam.NearPlaneDistance, cam.FarPlaneDistance);
+            //msg.ProjectionFarMatrix = Matrix.CreatePerspectiveFieldOfView(fov, cam.AspectRatio, cam.NearPlaneDistance, cam.FarFarPlaneDistance);
 
-            float fov = MathHelper.Atan(1f / proj.M22) * 2f;
+            //Lots wrong, seems to have too small width, and rotated inwards. probably due to weird matrix values to undistort canted displays
+            //maybe extract info from these to build a new projection matrix?
+            //msg.ProjectionMatrix    = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarPlaneDistance).ToMatrix();
+            //msg.ProjectionFarMatrix = OpenVR.System.GetProjectionMatrix(eye, cam.NearPlaneDistance, cam.FarFarPlaneDistance).ToMatrix();
+
 
             msg.FOV = fov;
             msg.FOVForSkybox = fov;
@@ -179,7 +219,7 @@ namespace SpaceEngineersVR.Player
 
             msg.UpdateTime = VRage.Library.Utils.MyTimeSpan.Zero;
             msg.LastMomentUpdateIndex = 0;
-            msg.ProjectionOffsetX = 0f;
+            msg.ProjectionOffsetX = 0f; //Patched to do nothing, previously the renderer would ignore the matrix's translation X,Y and use these instead for some reason
             msg.ProjectionOffsetY = 0f;
             msg.Smooth = false;
 
@@ -187,16 +227,12 @@ namespace SpaceEngineersVR.Player
             MyRender11.SetupCameraMatrices(msg);
         }
 
-        private static EVREye currentlyRenderingEye;
         private MatrixD GetPerspectiveMatrix(double fov, double aspectRatio, double nearPlane, double farPlane)
         {
-            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(currentlyRenderingEye).ToMatrix();
-            Matrix proj = OpenVR.System.GetProjectionMatrix(currentlyRenderingEye, (float)nearPlane, (float)farPlane).ToMatrix();
-            return eyeToHead * Matrix.Invert(proj);
+            return OpenVR.System.GetProjectionMatrix(currentlyRenderingEye, (float)nearPlane, (float)farPlane).ToMatrix();
         }
         private Matrix GetPerspectiveMatrixRhInfiniteComplementary(float fov, float aspectRatio, float nearPlane)
         {
-            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(currentlyRenderingEye).ToMatrix();
             float left = 0f, right = 0f, top = 0f, bottom = 0f;
             OpenVR.System.GetProjectionRaw(currentlyRenderingEye, ref left, ref right, ref top, ref bottom);
 
@@ -208,13 +244,11 @@ namespace SpaceEngineersVR.Player
             float sx = right + left;
             float sy = bottom + top;
 
-            Matrix result = new Matrix(
-                idy,     0f,      0f,         0f,
-                0f,      idx,     0f,         0f,
-                sx*idx,  sy*idy,  0f,         -1f,
-                0f,      0f,      -nearPlane, 0f);
-
-            return result * Matrix.Invert(eyeToHead);
+            return new Matrix(
+                idy,    0f,     0f,        0f,
+                0f,     idx,    0f,        0f,
+                sx*idx, sy*idy, 0f,        -1f,
+                0f,     0f,     nearPlane, 0f);
         }
 
         private void GetNewPositions()
