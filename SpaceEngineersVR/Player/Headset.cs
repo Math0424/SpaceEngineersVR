@@ -86,7 +86,7 @@ namespace SpaceEngineersVR.Player
 
             // log.Write("Frame update");
 
-            VRage.Game.Utils.MyCamera cam = MySector.MainCamera;
+            MyCamera cam = MySector.MainCamera;
             if (cam == null)
             {
                 firstUpdate = true;
@@ -158,13 +158,34 @@ namespace SpaceEngineersVR.Player
 
             if(MyInput.Static.IsKeyPress(MyKeys.Enter))
             {
+                Logger.Info($"\n");
+
                 Logger.Info($"HeadToReal:   {headToReal}");
+                Logger.Info($"            Left: {headToReal.Left}");
+                Logger.Info($"            Up: {headToReal.Up}");
+                Logger.Info($"            Forward: {headToReal.Forward}");
+
                 Logger.Info($"HeadToReal-1: {Matrix.Invert(headToReal)}");
+                Logger.Info($"              Left: {Matrix.Invert(headToReal).Left}");
+                Logger.Info($"              Up: {Matrix.Invert(headToReal).Up}");
+                Logger.Info($"              Forward: {Matrix.Invert(headToReal).Forward}");
+
+                Logger.Info($"EyeToHead: {eyeToHead}");
+                Logger.Info($"EyeToHead * HeadToReal: {eyeToHead * headToReal}");
+                Logger.Info($"EyeToHead * HeadToReal-1: {eyeToHead * Matrix.Invert(headToReal)}");
+
+                Logger.Info($"Head dot from forward: { Vector3.Dot(headToReal.Forward, Vector3.Forward) }");
+                Logger.Info($"Head-1 dot from forward: { Vector3.Dot(Matrix.Invert(headToReal).Forward, Vector3.Forward) }");
+
+                Logger.Info($"\n");
             }
 
             cam.WorldMatrix =
+                //headToReal.GetOrientation() *
                 eyeToHead *
                 Matrix.Invert(headToReal.GetOrientation()) *
+                //Matrix.Invert(headToReal.GetOrientation()) *
+                //Matrix.CreateTranslation(Vector3.Transform(eyeToHead.Translation, headToReal)) *
                 //worldMat.GetOrientation() *
                 Matrix.CreateTranslation(headToReal.Translation) *
                 //Matrix.CreateTranslation(worldMat.Translation) *

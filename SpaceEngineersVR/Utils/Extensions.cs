@@ -25,9 +25,9 @@ namespace SpaceEngineersVR.Util
         //41 42 43 translation
 
         //HmdMatrix34_t
-        //0 1  2 left
+        //0 1  2 right
         //4 5  6 up
-        //8 9 10 forward
+        //8 9 10 backward
         //3 7 11 translation
 
         public static Matrix ToMatrix(this HmdMatrix34_t hmd)
