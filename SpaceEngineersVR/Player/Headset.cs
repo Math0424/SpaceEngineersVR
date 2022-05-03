@@ -31,7 +31,7 @@ namespace SpaceEngineersVR.Player
 {
     internal class Headset
     {
-        public MatrixD headToRealWorld;
+        public MatrixD hmdAbsolute;
 
         public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
         public bool IsHeadsetAlreadyDisconnected = false;
@@ -56,7 +56,7 @@ namespace SpaceEngineersVR.Player
         {
             FrameInjections.DrawScene += FrameUpdate;
             FrameInjections.GetPerspectiveMatrix = GetPerspectiveMatrix;
-            FrameInjections.GetPerspectiveMatrixRhInfiniteComplementary = GetPerspectiveMatrixRhInfiniteComplementary;
+            FrameInjections.GetPerspectiveMatrixRhInfiniteComplementary = GetPerspectiveFovRhInfiniteComplementary;
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
             //MyRenderProxy.RenderThread.BeforeDraw += FrameUpdate;
 
@@ -113,12 +113,13 @@ namespace SpaceEngineersVR.Player
             var originalWm = cam.WorldMatrix;
             var originalVm = cam.ViewMatrix;
 
-            Matrix headToReal = headToRealWorld; //Matrix.Invert(RealWorldPos).GetOrientation();
-            headToReal.Translation += offset;
+            Matrix headToWorld = hmdAbsolute; //Matrix.Invert(RealWorldPos).GetOrientation();
+            headToWorld.Translation += offset;
+            headToWorld = Matrix.Invert(headToWorld.GetOrientation()) * Matrix.CreateTranslation(headToWorld.Translation) * originalWm;
 
             // Stereo rendering
-            DrawEye(EVREye.Eye_Right, headToReal, originalWm, cam);
-            DrawEye(EVREye.Eye_Left,  headToReal, originalWm, cam);
+            DrawEye(EVREye.Eye_Right, headToWorld, cam);
+            DrawEye(EVREye.Eye_Left,  headToWorld, cam);
 
             // Restore original matrices to remove the flickering
             cam.WorldMatrix = originalWm;
@@ -149,47 +150,14 @@ namespace SpaceEngineersVR.Player
 
         private void SetOffset()
         {
-            offset = -headToRealWorld.Translation;
+            offset = -hmdAbsolute.Translation;
         }
 
-        private void DrawEye(EVREye eye, Matrix headToReal, MatrixD worldMat, MyCamera cam)
+        private void DrawEye(EVREye eye, Matrix headToWorld, MyCamera cam)
         {
             Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(eye).ToMatrix();
 
-            if(MyInput.Static.IsKeyPress(MyKeys.Enter))
-            {
-                Logger.Info($"\n");
-
-                Logger.Info($"HeadToReal:   {headToReal}");
-                Logger.Info($"            Left: {headToReal.Left}");
-                Logger.Info($"            Up: {headToReal.Up}");
-                Logger.Info($"            Forward: {headToReal.Forward}");
-
-                Logger.Info($"HeadToReal-1: {Matrix.Invert(headToReal)}");
-                Logger.Info($"              Left: {Matrix.Invert(headToReal).Left}");
-                Logger.Info($"              Up: {Matrix.Invert(headToReal).Up}");
-                Logger.Info($"              Forward: {Matrix.Invert(headToReal).Forward}");
-
-                Logger.Info($"EyeToHead: {eyeToHead}");
-                Logger.Info($"EyeToHead * HeadToReal: {eyeToHead * headToReal}");
-                Logger.Info($"EyeToHead * HeadToReal-1: {eyeToHead * Matrix.Invert(headToReal)}");
-
-                Logger.Info($"Head dot from forward: { Vector3.Dot(headToReal.Forward, Vector3.Forward) }");
-                Logger.Info($"Head-1 dot from forward: { Vector3.Dot(Matrix.Invert(headToReal).Forward, Vector3.Forward) }");
-
-                Logger.Info($"\n");
-            }
-
-            cam.WorldMatrix =
-                //headToReal.GetOrientation() *
-                eyeToHead *
-                Matrix.Invert(headToReal.GetOrientation()) *
-                //Matrix.Invert(headToReal.GetOrientation()) *
-                //Matrix.CreateTranslation(Vector3.Transform(eyeToHead.Translation, headToReal)) *
-                //worldMat.GetOrientation() *
-                Matrix.CreateTranslation(headToReal.Translation) *
-                //Matrix.CreateTranslation(worldMat.Translation) *
-                worldMat;
+            cam.WorldMatrix = eyeToHead * headToWorld;
 
             UploadCameraViewMatrix(eye, eyeToHead, cam);
             MyRender11.DrawGameScene(texture, out _);
@@ -258,12 +226,12 @@ namespace SpaceEngineersVR.Player
         {
             return OpenVR.System.GetProjectionMatrix(currentlyRenderingEye, (float)nearPlane, (float)farPlane).ToMatrix();
         }
-        private Matrix GetPerspectiveMatrixRhInfiniteComplementary(float fov, float aspectRatio, float nearPlane)
+        private Matrix GetPerspectiveFovRhInfiniteComplementary(float fov, float aspectRatio, float nearPlane)
         {
             float left = 0f, right = 0f, top = 0f, bottom = 0f;
             OpenVR.System.GetProjectionRaw(currentlyRenderingEye, ref left, ref right, ref top, ref bottom);
 
-            //Adapted from decompilation of Matrix.CreatePerspectiveMatrixRhInfiniteComplementary, Matrix.CreatePerspectiveFieldOfView
+            //Adapted from decompilation of Matrix.CreatePerspectiveFovRhInfiniteComplementary, Matrix.CreatePerspectiveFieldOfView
             //and https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetProjectionRaw
 
             float idx = 1f / (right - left);
@@ -272,8 +240,8 @@ namespace SpaceEngineersVR.Player
             float sy = bottom + top;
 
             return new Matrix(
-                idy,    0f,     0f,        0f,
-                0f,     idx,    0f,        0f,
+                2*idx,  0f,     0f,        0f,
+                0f,     2*idy,  0f,        0f,
                 sx*idx, sy*idy, 0f,        -1f,
                 0f,     0f,     nearPlane, 0f);
         }
@@ -306,7 +274,7 @@ namespace SpaceEngineersVR.Player
                 return;
             }
 
-            headToRealWorld = renderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
+            hmdAbsolute = renderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
         }
 
         #endregion

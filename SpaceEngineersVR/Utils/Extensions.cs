@@ -17,7 +17,6 @@ namespace SpaceEngineersVR.Util
         }
 
 
-        //Despite this being what the internet says, it appears to be incorrect..
         //Matrix
         //11 12 13 right
         //21 22 23 up

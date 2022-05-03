@@ -38,7 +38,13 @@ namespace SpaceEngineersVR.Patches
                     typeof(Vector3D), //position
                     typeof(float),    //projectionOffsetX
                     typeof(float),    //projectionOffset
-                }), transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_AnselCameraConstructor)));
+                }), transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_ReplaceCreatePerspectiveFOV)));
+
+            /*
+            This seems to be used mainly to calculate the culling volume, and it really doesn't like the matrixes that my valve index gives
+            Common.Plugin.Harmony.Patch(AccessTools.Method("VRage.Game.Utils.MyCamera:UpdatePropertiesInternal"),
+                transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_ReplaceCreatePerspectiveFOV)));
+            */
 
             Common.Plugin.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:SetupCameraMatricesInternal"),
                 transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_SetupCameraMatrices)));
@@ -56,7 +62,7 @@ namespace SpaceEngineersVR.Patches
             return !DisablePresent;
         }
 
-        private static IEnumerable<CodeInstruction> Transpiler_AnselCameraConstructor(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> Transpiler_ReplaceCreatePerspectiveFOV(IEnumerable<CodeInstruction> instructions)
         {
             //Replace calls to MatrixD.CreatePerspectiveFieldOfView with calls to GetPerspectiveFov
 
