@@ -61,20 +61,21 @@ namespace SpaceEngineersVR.Plugin
                 MyLog.Default.WriteLine(ex.StackTrace);
                 return;
             }
-
-            Logger.Debug("Successfully initialized.");
         }
 
         public void Dispose()
         {
-            try
+            if (!failed)
             {
-                OpenVR.System?.AcknowledgeQuit_Exiting();
-                Logger.Info("Exiting OpenVR and closing threads");
-            }
-            catch (Exception ex)
-            {
-                Logger.Critical(ex, "Dispose failed");
+                try
+                {
+                    OpenVR.System?.AcknowledgeQuit_Exiting();
+                    Logger.Info("Exiting OpenVR and closing threads");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Critical(ex, "Dispose failed");
+                }
             }
         }
 
@@ -119,7 +120,7 @@ namespace SpaceEngineersVR.Plugin
                 return false;
             }
 
-            Logger.Info("De-Keenifying enviroment");
+            Logger.Info("Starting enviroment");
             Form GameWindow = (Form)AccessTools.Field(MyVRage.Platform.Windows.GetType(), "m_form").GetValue(MyVRage.Platform.Windows);
             GameWindow.Icon = Common.Icon;
             GameWindow.Text = Common.PublicName;
@@ -145,7 +146,7 @@ namespace SpaceEngineersVR.Plugin
 
             DesktopResolution = MyRender11.Resolution;
 
-            Logger.Info("Cleaning up...");
+            Logger.Info("Finalizing...");
             return true;
         }
 
