@@ -18,9 +18,6 @@ namespace SpaceEngineersVR.Patches
         public static Func<double, double, double, double, MatrixD> GetPerspectiveMatrix;
         public static Func<float, float, float, Matrix> GetPerspectiveMatrixRhInfiniteComplementary;
         
-        public static bool FirstEye;
-        private static MyRandom.State randomState;
-
         static FrameInjections()
         {
             Type t = AccessTools.TypeByName("VRageRender.MyRender11");
@@ -29,8 +26,6 @@ namespace SpaceEngineersVR.Patches
 
             Common.Plugin.Harmony.Patch(AccessTools.Method(t, "DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
 
-            Common.Plugin.Harmony.Patch(AccessTools.Method(AccessTools.TypeByName("VRageRender.MyCommon"), "UpdateFrameConstants"), new HarmonyMethod(typeof(FrameInjections), nameof(UpdateFrameConstantsPrefix)));
-            
             Common.Plugin.Harmony.Patch(AccessTools.Constructor(
                 AccessTools.TypeByName("VRage.Ansel.MyAnselCamera"),
                 new Type[]
@@ -68,22 +63,6 @@ namespace SpaceEngineersVR.Patches
             return !DisablePresent;
         }
 
-        private static bool UpdateFrameConstantsPrefix(ref MyRandom ___m_random)
-        {
-            if (FirstEye)
-            {
-                // Save the random state on rendering the first eye
-                ___m_random.GetState(out randomState);
-            }
-            else
-            {
-                // Force the same random state on the second eye
-                ___m_random.SetState(ref randomState);
-            }
-
-            return true;
-        }
-        
         private static IEnumerable<CodeInstruction> Transpiler_ReplaceCreatePerspectiveFOV(IEnumerable<CodeInstruction> instructions)
         {
             //Replace calls to MatrixD.CreatePerspectiveFieldOfView with calls to GetPerspectiveFov
