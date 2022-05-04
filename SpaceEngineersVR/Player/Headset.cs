@@ -118,7 +118,9 @@ namespace SpaceEngineersVR.Player
             headToWorld = Matrix.Invert(headToWorld.GetOrientation()) * Matrix.CreateTranslation(headToWorld.Translation) * originalWm;
 
             // Stereo rendering
+            FrameInjections.FirstEye = true;
             DrawEye(EVREye.Eye_Right, headToWorld, cam);
+            FrameInjections.FirstEye = false;
             DrawEye(EVREye.Eye_Left,  headToWorld, cam);
 
             // Restore original matrices to remove the flickering
@@ -354,11 +356,11 @@ namespace SpaceEngineersVR.Player
             if (character == null)
                 return;
 
-            if (character.Visible == true && !Common.Config.EnableCharacterRendering)
+            if (character.Visible && !Common.Config.EnableCharacterRendering)
             {
                 character.Visible = false;
             }
-            else if (character.Visible == false && Common.Config.EnableCharacterRendering)
+            else if (!character.Visible && Common.Config.EnableCharacterRendering)
             {
                 character.Visible = true;
             }
