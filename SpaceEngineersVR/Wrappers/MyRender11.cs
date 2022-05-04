@@ -30,16 +30,20 @@ namespace SpaceEngineersVR.Wrappers
             m_debugOverrides = AccessTools.Field(t, "m_debugOverrides");
             m_rc = AccessTools.Field(t, "m_rc");
             settings = AccessTools.Field(t, "Settings");
+            m_settings = AccessTools.Field(t, "m_settings");
 
             setupCameraMatricesDel = (Action<MyRenderMessageSetCameraViewMatrix>)Delegate.CreateDelegate(typeof(Action<MyRenderMessageSetCameraViewMatrix>), AccessTools.Method(t, "SetupCameraMatrices"));
             createScreenResourcesDel = (Action)Delegate.CreateDelegate(typeof(Action), AccessTools.Method(t, "CreateScreenResources"));
             fullDrawScene = (Action<bool>)Delegate.CreateDelegate(typeof(Action<bool>), AccessTools.Method(t, "FullDraw"));
 
+            processMessageQueueDel = (Action)Delegate.CreateDelegate(typeof(Action), AccessTools.Method(t, "ProcessMessageQueue"));
+            processUpdatesDel = (Action)Delegate.CreateDelegate(typeof(Action), AccessTools.Method(t, "ProcessUpdates"));
+            updateGameSceneDel = (Action)Delegate.CreateDelegate(typeof(Action), AccessTools.Method(t, "UpdateGameScene"));
+
             backbuffer = AccessTools.Field(t, "<Backbuffer>k__BackingField");
             resolution = AccessTools.Field(t, "m_resolution");
 
             drawGameScene = AccessTools.Method(t, "DrawGameScene");
-            processMessageQueue = AccessTools.Method(t, "ProcessMessageQueue", new Type[0]);
             resizeSwapChain = AccessTools.Method(t, "ResizeSwapchain");
 
             get_deviceInstance = AccessTools.Property(t, "DeviceInstance").GetGetMethod(true);
@@ -60,6 +64,14 @@ namespace SpaceEngineersVR.Wrappers
             set => settings.SetValue(null, value);
         }
 
+        private static readonly FieldInfo m_settings;
+        public static MyRenderDeviceSettings m_Settings
+        {
+            get => (MyRenderDeviceSettings)m_settings.GetValue(null);
+            set => settings.SetValue(null, value);
+        }
+
+
         private static readonly MethodInfo resizeSwapChain;
         public static void ResizeSwapChain(int width, int height)
         {
@@ -72,10 +84,28 @@ namespace SpaceEngineersVR.Wrappers
             setupCameraMatricesDel.Invoke(message);
         }
 
+        private static readonly Action processMessageQueueDel;
+        public static void ProcessMessageQueue()
+        {
+            processMessageQueueDel.Invoke();
+        }
+
+        private static readonly Action processUpdatesDel;
+        public static void ProcessUpdates()
+        {
+            processUpdatesDel.Invoke();
+        }
+
         private static readonly Action createScreenResourcesDel;
         public static void CreateScreenResources()
         {
             createScreenResourcesDel.Invoke();
+        }
+
+        private static readonly Action updateGameSceneDel;
+        public static void UpdateGameScene()
+        {
+            updateGameSceneDel.Invoke();
         }
 
         private static readonly FieldInfo resolution;
@@ -97,12 +127,6 @@ namespace SpaceEngineersVR.Wrappers
             object[] args = new object[] { renderTarget.Instance, null };
             drawGameScene.Invoke(null, args);
             debugAmbientOcclusion = args[1];
-        }
-
-        private static readonly MethodInfo processMessageQueue;
-        public static void ProcessMessageQueue()
-        {
-            processMessageQueue.Invoke(null, new object[0]);
         }
 
         private static readonly MethodInfo get_deviceInstance;
