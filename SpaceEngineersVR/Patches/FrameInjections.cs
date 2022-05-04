@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using VRageMath;
 using VRageRender.Messages;
+using VRage.Library.Utils;
 
 namespace SpaceEngineersVR.Patches
 {
@@ -16,6 +17,9 @@ namespace SpaceEngineersVR.Patches
         public static bool DisablePresent = false;
         public static Func<double, double, double, double, MatrixD> GetPerspectiveMatrix;
         public static Func<float, float, float, Matrix> GetPerspectiveMatrixRhInfiniteComplementary;
+        
+        public static bool FirstEye;
+        private static MyRandom.State randomState;
 
         static FrameInjections()
         {
@@ -25,6 +29,8 @@ namespace SpaceEngineersVR.Patches
 
             Common.Plugin.Harmony.Patch(AccessTools.Method(t, "DrawScene"), new HarmonyMethod(typeof(FrameInjections), nameof(Prefix_DrawScene)));
 
+            Common.Plugin.Harmony.Patch(AccessTools.Method(AccessTools.TypeByName("VRageRender.MyCommon"), "UpdateFrameConstants"), new HarmonyMethod(typeof(FrameInjections), nameof(UpdateFrameConstantsPrefix)));
+            
             Common.Plugin.Harmony.Patch(AccessTools.Constructor(
                 AccessTools.TypeByName("VRage.Ansel.MyAnselCamera"),
                 new Type[]
@@ -49,6 +55,11 @@ namespace SpaceEngineersVR.Patches
             Common.Plugin.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:SetupCameraMatricesInternal"),
                 transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_SetupCameraMatrices)));
 
+            Common.Plugin.Harmony.Patch(AccessTools.Method(typeof(Sandbox.Game.Gui.MyGuiScreenGamePlay), "Draw"),
+                transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_RemoveCallsToControlCameraAndUpdate)));
+            Common.Plugin.Harmony.Patch(AccessTools.Method(typeof(Sandbox.Game.Gui.MyGuiScreenLoadInventory), "DrawScene"),
+                transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_RemoveCallsToControlCameraAndUpdate)));
+
             Logger.Info("Applied harmony game injections for renderer.");
         }
 
@@ -62,6 +73,22 @@ namespace SpaceEngineersVR.Patches
             return !DisablePresent;
         }
 
+        private static bool UpdateFrameConstantsPrefix(ref MyRandom ___m_random)
+        {
+            if (FirstEye)
+            {
+                // Save the random state on rendering the first eye
+                ___m_random.GetState(out randomState);
+            }
+            else
+            {
+                // Force the same random state on the second eye
+                ___m_random.SetState(ref randomState);
+            }
+
+            return true;
+        }
+        
         private static IEnumerable<CodeInstruction> Transpiler_ReplaceCreatePerspectiveFOV(IEnumerable<CodeInstruction> instructions)
         {
             //Replace calls to MatrixD.CreatePerspectiveFieldOfView with calls to GetPerspectiveFov
@@ -122,9 +149,72 @@ namespace SpaceEngineersVR.Patches
                 ) {
                     //TODO: FIXME: Not moving lables/blocks that may have been added by other patches
                     code.RemoveRange(i, 4);
-                    i--;
+                    --i;
                 }
             }
+
+            return code;
+        }
+
+        private static IEnumerable<CodeInstruction> Transpiler_RemoveCallsToControlCameraAndUpdate(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> code = new List<CodeInstruction>(instructions);
+
+            MethodInfo getMySectorMainCamera = AccessTools.PropertyGetter(typeof(Sandbox.Game.World.MySector), "MainCamera");
+
+            {
+                MethodInfo getMySessionStatic = AccessTools.PropertyGetter(typeof(Sandbox.Game.World.MySession), "Static");
+                MethodInfo getMySessionCameraController = AccessTools.PropertyGetter(typeof(Sandbox.Game.World.MySession), "CameraController");
+                MethodInfo controlCamera = AccessTools.Method(typeof(VRage.Game.ModAPI.Interfaces.IMyCameraController), "ControlCamera");
+                for(int i = 0; i < code.Count - 3; ++i)
+                {
+                    if(
+                        code[i + 0].Calls(getMySessionStatic) &&
+                        code[i + 1].Calls(getMySessionCameraController) &&
+                        code[i + 2].Calls(getMySectorMainCamera) &&
+                        code[i + 3].Calls(controlCamera)
+                    ) {
+                        //TODO: FIXME: Not moving lables/blocks that may have been added by other patches
+                        code.RemoveRange(i, 4);
+                        --i;
+                    }
+                }
+            }
+
+            {
+                MethodInfo cameraUpdate = AccessTools.Method(typeof(VRage.Game.Utils.MyCamera), "Update");
+                for(int i = 0; i < code.Count - 2; ++i)
+                {
+                    if(
+                        code[i + 0].Calls(getMySectorMainCamera) &&
+                        code[i + 1].LoadsConstant() &&
+                        code[i + 2].Calls(cameraUpdate)
+                    ) {
+                        //TODO: FIXME: Not moving lables/blocks that may have been added by other patches
+                        code.RemoveRange(i, 3);
+                        --i;
+                    }
+                }
+            }
+
+            /*
+            Enabling this one seems to completely prevent the game from getting past the loading screen
+            Tried calling it from our rendering, didnt fix
+            {
+                MethodInfo uploadViewMatrixToRender = AccessTools.Method(typeof(VRage.Game.Utils.MyCamera), "UploadViewMatrixToRender");
+                for(int i = 0; i < code.Count - 1; ++i)
+                {
+                    if(
+                        code[i + 0].Calls(getMySectorMainCamera) &&
+                        code[i + 1].Calls(uploadViewMatrixToRender)
+                    ) {
+                        //TODO: FIXME: Not moving lables/blocks that may have been added by other patches
+                        code.RemoveRange(i, 2);
+                        --i;
+                    }
+                }
+            }
+            */
 
             return code;
         }
