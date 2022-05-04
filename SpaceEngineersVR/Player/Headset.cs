@@ -31,7 +31,7 @@ namespace SpaceEngineersVR.Player
 {
     internal class Headset
     {
-        public MatrixD hmdAbsolute;
+        public MatrixD hmdAbsolute = Matrix.Identity;
 
         public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
         public bool IsHeadsetAlreadyDisconnected = false;
@@ -102,6 +102,9 @@ namespace SpaceEngineersVR.Player
                 firstUpdate = false;
                 return true;
             }
+
+            MySession.Static.CameraController.ControlCamera(cam);
+            cam.Update(0f);
 
             //MyRender11.FullDrawScene(false);
             texture?.Release();
