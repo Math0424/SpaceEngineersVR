@@ -17,12 +17,22 @@ namespace SpaceEngineersVR.Wrappers
             copyResource = AccessTools.Method(t, "CopyResource", new Type[] { tIResource, typeof(Resource) });
             mapSubresource = AccessTools.Method(t, "MapSubresource", new Type[] { typeof(Texture2D), typeof(int), typeof(int), typeof(MapMode), typeof(MapFlags), typeof(DataStream).MakeByRefType() });
             unmapSubresource = AccessTools.Method(t, "UnmapSubresource", new Type[] { typeof(Resource), typeof(int) });
+
+            
         }
 
         public MyRenderContext(object instance)
         {
             this.instance = instance;
+
+            //cleanUpCommandListsDel = (Action)Delegate.CreateDelegate(typeof(Action), AccessTools.Method(instance.GetType(), "CleanUpCommandLists"));
         }
+
+        // private readonly Action cleanUpCommandListsDel;
+        // public void CleanUpCommandLists()
+        // {
+        //     cleanUpCommandListsDel.Invoke();
+        // }
 
         private static readonly MethodInfo copyResource;
         public void CopyResource(object source, Resource destination)
