@@ -47,6 +47,9 @@ namespace SpaceEngineersVR.Wrappers
             resizeSwapChain = AccessTools.Method(t, "ResizeSwapchain");
 
             get_deviceInstance = AccessTools.Property(t, "DeviceInstance").GetGetMethod(true);
+
+            environment = AccessTools.Field(t, "Environment");
+            environment_matrices = AccessTools.Field("VRageRender.MyEnvironment:Matrices");
         }
 
         //TODO; make delegate
@@ -134,6 +137,10 @@ namespace SpaceEngineersVR.Wrappers
 
         private static readonly FieldInfo m_rc;
         public static MyRenderContext RC => new MyRenderContext(m_rc.GetValue(null));
+
+        private static readonly FieldInfo environment;
+        private static readonly FieldInfo environment_matrices;
+        public static MyEnvironmentMatrices Environment_Matrices => new MyEnvironmentMatrices(environment_matrices.GetValue(environment.GetValue(null)));
     }
 
     public static class MyImmediateRC
