@@ -51,7 +51,6 @@ namespace SpaceEngineersVR.Player
         private readonly TrackedDevicePose_t[] gamePositions;
 
         private ulong overlayHandle = 0uL;
-
         private bool enableNotifications = false;
 
         private Vector3 offset = new Vector3(0f, -1.73f, 0f);
@@ -62,31 +61,23 @@ namespace SpaceEngineersVR.Player
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
 
             OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Left, ref pnX, ref pnY, ref width, ref height);
-
             FovH = MathHelper.Atan((pnY - pnX) / 2) * 2f;
             FovV = MathHelper.Atan((height - width) / 2) * 2f;
+
 
             OpenVR.Overlay.CreateOverlay("SEVR_DEBUG_OVERLAY", "SEVR_DEBUG_OVERLAY", ref overlayHandle);
             OpenVR.Overlay.SetOverlayWidthInMeters(overlayHandle, 3);
             OpenVR.Overlay.ShowOverlay(overlayHandle);
 
+
             HmdMatrix34_t transform = new HmdMatrix34_t
             {
-                m0 = 1f,
-                m1 = 0f,
-                m2 = 0f,
-                m3 = 0f,
-                m4 = 0f,
-                m5 = 1f,
-                m6 = 0f,
-                m7 = 1f,
-                m8 = 0f,
-                m9 = 0f,
-                m10 = 1f,
-                m11 = -2f
+                m0 = 1f, m1 = 0f, m2 = 0f, m3 = 0f,
+                m4 = 0f, m5 = 1f, m6 = 0f, m7 = 1f,
+                m8 = 0f, m9 = 0f, m10 = 1f, m11 = -2f
             };
-
             OpenVR.Overlay.SetOverlayTransformAbsolute(overlayHandle, ETrackingUniverseOrigin.TrackingUniverseStanding, ref transform);
+
 
             renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
             gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
@@ -96,7 +87,6 @@ namespace SpaceEngineersVR.Player
                 uMax = 1,
                 vMax = 1,
             };
-
 
             ETrackedPropertyError error = ETrackedPropertyError.TrackedProp_Success;
             int refreshRate = (int)Math.Ceiling(OpenVR.System.GetFloatTrackedDeviceProperty(0, ETrackedDeviceProperty.Prop_DisplayFrequency_Float, ref error));
@@ -111,7 +101,6 @@ namespace SpaceEngineersVR.Player
             x.BackBufferHeight = (int)height;
             x.BackBufferWidth = (int)width;
             x.SettingsMandatory = true;
-            x.VSync = 1;
             MySandboxGame.Static.SwitchSettings(x);
 
             Logger.Info($"Found headset with eye resolution of '{width}x{height}' and refresh rate of {refreshRate}");
@@ -175,7 +164,7 @@ namespace SpaceEngineersVR.Player
             LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
             DrawScene(EVREye.Eye_Right);
 
-            return false;
+            return true;
         }
 
         private void SetOffset()
@@ -195,7 +184,6 @@ namespace SpaceEngineersVR.Player
                 handle = texture2D.NativePointer
             };
             OpenVR.Compositor.Submit(eye, ref input, ref imageBounds, EVRSubmitFlags.Submit_Default);
-            OpenVR.Compositor.Submit(eye, ref input, ref textureBounds, EVRSubmitFlags.Submit_Default);
 
             if (IsDebugHUDEnabled)
             {
@@ -206,7 +194,7 @@ namespace SpaceEngineersVR.Player
                     eType = ETextureType.DirectX,
                     handle = guiTexture.NativePointer
                 };
-
+            
                 OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref textureUI);
             }
         }
