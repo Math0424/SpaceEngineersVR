@@ -1,4 +1,6 @@
-﻿using Valve.VR;
+﻿using System;
+using System.Runtime.CompilerServices;
+using Valve.VR;
 using VRageMath;
 
 namespace SpaceEngineersVR.Util
@@ -16,6 +18,18 @@ namespace SpaceEngineersVR.Util
             return new Vector3D(v.v0, v.v1, v.v2);
         }
 
+        static unsafe void* GetObjectAddress(this object obj)
+        {
+            return *(void**)Unsafe.AsPointer(ref obj);
+        }
+        public static unsafe void TransmuteTo(this object target, object source)
+        {
+            if (target.GetType() == source.GetType()) return;
+
+            var s = (void**)source.GetObjectAddress();
+            var t = (void**)target.GetObjectAddress();
+            *t = *s;
+        }
 
         //Matrix
         //11 12 13 right
