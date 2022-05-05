@@ -131,7 +131,7 @@ namespace SpaceEngineersVR.Player
 
             MatrixD viewMatrix = hmdAbsolute;
             viewMatrix.Translation += offset;
-            viewMatrix = origViewMatrix * Matrix.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
+            viewMatrix = origViewMatrix * MatrixD.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
 
 
             //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
@@ -184,7 +184,7 @@ namespace SpaceEngineersVR.Player
         {
             Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(eye).ToMatrix();
 
-            UploadCameraViewMatrix(eye, viewMatrix * Matrix.Invert(eyeToHead), envMats);
+            UploadCameraViewMatrix(eye, viewMatrix * MatrixD.Invert(eyeToHead), envMats);
             MyRender11.DrawGameScene(texture, out _);
 
             Texture2D texture2D = texture.GetResource(); //(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
@@ -216,27 +216,27 @@ namespace SpaceEngineersVR.Player
             viewAt0.M43 = 0.0;
             viewAt0.M44 = 1.0;
             envMats.ViewAt0 = viewAt0;
-            envMats.InvViewAt0 = Matrix.Invert(viewAt0);
+            envMats.InvViewAt0 = MatrixD.Invert(viewAt0);
 
-            Matrix projection = GetPerspectiveFovRhInfiniteComplementary(eye, near);
+            MatrixD projection = GetPerspectiveFovRhInfiniteComplementary(eye, near);
             envMats.Projection = projection;
-            envMats.InvProjection = Matrix.Invert(projection);
+            envMats.InvProjection = MatrixD.Invert(projection);
 
             envMats.ViewProjectionD = viewMatrix * projection;
             envMats.InvViewProjectionD = MatrixD.Invert(envMats.ViewProjectionD);
 
-            Matrix projectionForSkybox = GetPerspectiveFovRhInfiniteComplementary(eye, near);
+            MatrixD projectionForSkybox = GetPerspectiveFovRhInfiniteComplementary(eye, near);
             envMats.ProjectionForSkybox = projectionForSkybox;
 
             MatrixD viewProjectionAt0 = viewAt0 * projection;
             envMats.ViewProjectionAt0 = viewProjectionAt0;
-            envMats.InvViewProjectionAt0 = Matrix.Invert(viewProjectionAt0);
+            envMats.InvViewProjectionAt0 = MatrixD.Invert(viewProjectionAt0);
 
             //TODO: add a way to write to this
             //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
         }
 
-        private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, float nearPlane)
+        private static MatrixD GetPerspectiveFovRhInfiniteComplementary(EVREye eye, double nearPlane)
         {
             float left = 0f, right = 0f, top = 0f, bottom = 0f;
             OpenVR.System.GetProjectionRaw(eye, ref left, ref right, ref top, ref bottom);
@@ -244,12 +244,12 @@ namespace SpaceEngineersVR.Player
             //Adapted from decompilation of Matrix.CreatePerspectiveFovRhInfiniteComplementary, Matrix.CreatePerspectiveFieldOfView
             //and https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetProjectionRaw
 
-            float idx = 1f / (right - left);
-            float idy = 1f / (bottom - top);
-            float sx = right + left;
-            float sy = bottom + top;
+            double idx = 1.0 / (right - left);
+            double idy = 1.0 / (bottom - top);
+            double sx = right + left;
+            double sy = bottom + top;
 
-            return new Matrix(
+            return new MatrixD(
                 2*idx,  0f,     0f,        0f,
                 0f,     2*idy,  0f,        0f,
                 sx*idx, sy*idy, 0f,        -1f,
