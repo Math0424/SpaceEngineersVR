@@ -51,13 +51,10 @@ namespace SpaceEngineersVR.Player
         private bool enableNotifications = false;
 
         private Vector3 offset = new Vector3(0f, -1.73f, 0f);
-        private static EVREye currentlyRenderingEye;
 
         public Headset()
         {
             FrameInjections.DrawScene += FrameUpdate;
-            FrameInjections.GetPerspectiveMatrix = GetPerspectiveMatrix;
-            FrameInjections.GetPerspectiveMatrixRhInfiniteComplementary = GetPerspectiveFovRhInfiniteComplementary;
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
             //MyRenderProxy.RenderThread.BeforeDraw += FrameUpdate;
 
@@ -113,25 +110,17 @@ namespace SpaceEngineersVR.Player
             envMats.FovH = fovH;
             envMats.FovV = fovV;
 
+            //These seem to be unused
             //envMats.OriginalProjection = projectionMatrix;
             //envMats.OriginalProjectionFar = projectionFarMatrix;
 
+            //Leave as whatever keen set them to
             //envMats.NearClipping = message.NearPlane;
             //envMats.FarClipping = message.FarPlane;
             //envMats.LargeDistanceFarClipping = message.FarPlane * 500f;
 
-
-            BoundingFrustumD viewFrustum = envMats.ViewFrustumClippedD;
-            MyUtils.Init(ref viewFrustum);
-            viewFrustum.Matrix = origViewMatrix * envMats.OriginalProjection;
-            envMats.ViewFrustumClippedD = viewFrustum;
-
-            BoundingFrustumD viewFrustumFar = envMats.ViewFrustumClippedFarD;
-            MyUtils.Init(ref viewFrustumFar);
-            viewFrustumFar.Matrix = origViewMatrix * envMats.OriginalProjectionFar;
-            envMats.ViewFrustumClippedFarD = viewFrustumFar;
-
-            envMats.LastUpdateWasSmooth = false;
+            //No idea what this does, probably best to leave it alone
+            //envMats.LastUpdateWasSmooth = false;
 
 
             //MyRender11.FullDrawScene(false);
@@ -144,11 +133,24 @@ namespace SpaceEngineersVR.Player
             viewMatrix.Translation += offset;
             viewMatrix = origViewMatrix * Matrix.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
 
+
+            //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
+            //theres a thread on unity forums with the math involved, will have to do some searching to find it again.
+            //I think someone posted a link to it in the discord
+            BoundingFrustumD viewFrustum = envMats.ViewFrustumClippedD;
+            MyUtils.Init(ref viewFrustum);
+            viewFrustum.Matrix = viewMatrix * envMats.OriginalProjection;
+            envMats.ViewFrustumClippedD = viewFrustum;
+
+            BoundingFrustumD viewFrustumFar = envMats.ViewFrustumClippedFarD;
+            MyUtils.Init(ref viewFrustumFar);
+            viewFrustumFar.Matrix = viewMatrix * envMats.OriginalProjectionFar;
+            envMats.ViewFrustumClippedFarD = viewFrustumFar;
+
+
             // Stereo rendering
             DrawEye(EVREye.Eye_Right, viewMatrix, envMats);
             DrawEye(EVREye.Eye_Left,  viewMatrix, envMats);
-
-            //envMats.ViewD = origViewMatrix;
 
             //FrameInjections.DisablePresent = false;
 
@@ -205,42 +207,33 @@ namespace SpaceEngineersVR.Player
             envMats.ViewD = viewMatrix;
             envMats.InvViewD = MatrixD.Invert(viewMatrix);
 
-            MatrixD matrix = viewMatrix;
-            matrix.M14 = 0.0;
-            matrix.M24 = 0.0;
-            matrix.M34 = 0.0;
-            matrix.M41 = 0.0;
-            matrix.M42 = 0.0;
-            matrix.M43 = 0.0;
-            matrix.M44 = 1.0;
-            envMats.ViewAt0 = matrix;
-            envMats.InvViewAt0 = Matrix.Invert(matrix);
+            MatrixD viewAt0 = viewMatrix;
+            viewAt0.M14 = 0.0;
+            viewAt0.M24 = 0.0;
+            viewAt0.M34 = 0.0;
+            viewAt0.M41 = 0.0;
+            viewAt0.M42 = 0.0;
+            viewAt0.M43 = 0.0;
+            viewAt0.M44 = 1.0;
+            envMats.ViewAt0 = viewAt0;
+            envMats.InvViewAt0 = Matrix.Invert(viewAt0);
 
-            Matrix matrix2 = GetPerspectiveFovRhInfiniteComplementary(eye, near);
-            envMats.Projection = matrix2;
-            envMats.InvProjection = Matrix.Invert(matrix2);
+            Matrix projection = GetPerspectiveFovRhInfiniteComplementary(eye, near);
+            envMats.Projection = projection;
+            envMats.InvProjection = Matrix.Invert(projection);
 
-            envMats.ViewProjectionD = viewMatrix * matrix2;
+            envMats.ViewProjectionD = viewMatrix * projection;
             envMats.InvViewProjectionD = MatrixD.Invert(envMats.ViewProjectionD);
 
             Matrix projectionForSkybox = GetPerspectiveFovRhInfiniteComplementary(eye, near);
             envMats.ProjectionForSkybox = projectionForSkybox;
 
-            MatrixD matrixD = matrix * matrix2;
-            envMats.ViewProjectionAt0 = matrixD;
-            envMats.InvViewProjectionAt0 = Matrix.Invert(matrixD);
+            MatrixD viewProjectionAt0 = viewAt0 * projection;
+            envMats.ViewProjectionAt0 = viewProjectionAt0;
+            envMats.InvViewProjectionAt0 = Matrix.Invert(viewProjectionAt0);
 
-            //TODO:
+            //TODO: add a way to write to this
             //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
-        }
-
-        private MatrixD GetPerspectiveMatrix(double fov, double aspectRatio, double nearPlane, double farPlane)
-        {
-            return OpenVR.System.GetProjectionMatrix(currentlyRenderingEye, (float)nearPlane, (float)farPlane).ToMatrix();
-        }
-        private Matrix GetPerspectiveFovRhInfiniteComplementary(float fov, float aspectRatio, float nearPlane)
-        {
-            return GetPerspectiveFovRhInfiniteComplementary(currentlyRenderingEye, nearPlane);
         }
 
         private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, float nearPlane)
