@@ -556,9 +556,9 @@
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Util.cs" />
     <Compile Include="Wrappers\BorrowedRtvTexture.cs" />
+    <Compile Include="Wrappers\EnvironmentMatrices.cs" />
     <Compile Include="Wrappers\MyBackbuffer.cs" />
     <Compile Include="Wrappers\MyBorrowedRwTextureManager.cs" />
-    <Compile Include="Wrappers\MyEnvironmentMatrices.cs" />
     <Compile Include="Wrappers\MyManagers.cs" />
     <Compile Include="Wrappers\MyRender11.cs" />
     <Compile Include="Wrappers\MyRenderContext.cs" />
