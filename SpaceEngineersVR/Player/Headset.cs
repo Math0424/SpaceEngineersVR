@@ -218,19 +218,19 @@ namespace SpaceEngineersVR.Player
             viewAt0.M43 = 0.0;
             viewAt0.M44 = 1.0;
             envMats.ViewAt0 = viewAt0;
-            envMats.InvViewAt0 = Matrix.Invert(viewAt0);
+            envMats.InvViewAt0 = MatrixD.Invert(viewAt0);
 
-            Matrix projection = GetPerspectiveFovRhInfiniteComplementary(eye, envMats.NearClipping);
+            MatrixD projection = GetPerspectiveFovRhInfiniteComplementary(eye, envMats.NearClipping);
             envMats.Projection = projection;
             envMats.ProjectionForSkybox = projection;
-            envMats.InvProjection = Matrix.Invert(projection);
+            envMats.InvProjection = MatrixD.Invert(projection);
 
             envMats.ViewProjectionD = viewMatrix * projection;
             envMats.InvViewProjectionD = MatrixD.Invert(envMats.ViewProjectionD);
 
             MatrixD viewProjectionAt0 = viewAt0 * projection;
             envMats.ViewProjectionAt0 = viewProjectionAt0;
-            envMats.InvViewProjectionAt0 = Matrix.Invert(viewProjectionAt0);
+            envMats.InvViewProjectionAt0 = MatrixD.Invert(viewProjectionAt0);
 
             //TODO: add a way to write to this
             //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
@@ -249,7 +249,7 @@ namespace SpaceEngineersVR.Player
             float sx = right + left;
             float sy = bottom + top;
 
-            return new Matrix(
+            return new MatrixD(
                 2*idx,  0f,     0f,        0f,
                 0f,     2*idy,  0f,        0f,
                 sx*idx, sy*idy, 0f,        -1f,
@@ -278,7 +278,6 @@ namespace SpaceEngineersVR.Player
 
             //Update positions
             if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
-
             {
                 Logger.Error("HMD pos invalid!");
                 return;
