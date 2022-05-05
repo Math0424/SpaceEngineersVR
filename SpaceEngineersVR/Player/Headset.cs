@@ -25,6 +25,12 @@ using VRageRender;
 using VRageRender.Messages;
 using VRage.Game.Utils;
 using VRage.Utils;
+using Sandbox.Game;
+using VRageRender.ExternalApp;
+using VRage.Library.Utils;
+using Sandbox.Engine.Platform.VideoMode;
+using HarmonyLib;
+using VRage;
 
 // See MyRadialMenuItemFactory for actions
 
@@ -44,7 +50,7 @@ namespace SpaceEngineersVR.Player
         private readonly uint height;
         private readonly uint width;
 
-        private VRTextureBounds_t textureBounds;
+        private VRTextureBounds_t imageBounds;
         private readonly TrackedDevicePose_t[] renderPositions;
         private readonly TrackedDevicePose_t[] gamePositions;
 
@@ -56,18 +62,24 @@ namespace SpaceEngineersVR.Player
         {
             FrameInjections.DrawScene += FrameUpdate;
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
-            //MyRenderProxy.RenderThread.BeforeDraw += FrameUpdate;
 
             OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Right, ref pnX, ref pnY, ref width, ref height);
 
             renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
             gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 
-            textureBounds = new VRTextureBounds_t
+            imageBounds = new VRTextureBounds_t
             {
                 uMax = 1,
-                vMax = 1
+                vMax = 1,
             };
+
+            MyRenderDeviceSettings x = MyRender11.m_Settings;
+            x.RefreshRate = 80;
+            x.BackBufferHeight = (int)height;
+            x.BackBufferWidth = (int)width;
+            x.SettingsMandatory = true;
+            MySandboxGame.Static.SwitchSettings(x);
 
             Logger.Info($"Found headset with eye resolution of '{width}x{height}'");
         }
@@ -82,8 +94,6 @@ namespace SpaceEngineersVR.Player
         {
             GetNewPositions();
 
-            // log.Write("Frame update");
-
             if (MySector.MainCamera == null)
             {
                 firstUpdate = true;
@@ -92,51 +102,22 @@ namespace SpaceEngineersVR.Player
 
             if (firstUpdate)
             {
-                //MyRender11.ResizeSwapChain((int)Width, (int)Height);
-                MyRender11.Resolution = new Vector2I((int)width, (int)height);
-                MyRender11.CreateScreenResources();
                 SetOffset();
                 firstUpdate = false;
                 return true;
             }
 
-            MyEnvironmentMatrices envMats = MyRender11.Environment_Matrices;
-            MatrixD origViewMatrix = envMats.ViewD;
-
-            float left = 0f, right = 0f, top = 0f, bottom = 0f;
-            OpenVR.System.GetProjectionRaw(EVREye.Eye_Left, ref left, ref right, ref top, ref bottom);
-            float fovH = MathHelper.Atan((right - left) / 2) * 2f;
-            float fovV = MathHelper.Atan((bottom - top) / 2) * 2f;
-            envMats.FovH = fovH;
-            envMats.FovV = fovV;
-
-            //These seem to be unused
-            //envMats.OriginalProjection = projectionMatrix;
-            //envMats.OriginalProjectionFar = projectionFarMatrix;
-
-            //Leave as whatever keen set them to
-            //envMats.NearClipping = message.NearPlane;
-            //envMats.FarClipping = message.FarPlane;
-            //envMats.LargeDistanceFarClipping = message.FarPlane * 500f;
-
-            //No idea what this does, probably best to leave it alone
-            //envMats.LastUpdateWasSmooth = false;
-
-
-            //MyRender11.FullDrawScene(false);
             texture?.Release();
             texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)width, (int)height, Format.R8G8B8A8_UNorm_SRgb);
 
-            //FrameInjections.DisablePresent = true;
 
+            EnvironmentMatrices envMats = MyRender11.Environment_Matrices;
+            MatrixD origViewMatrix = envMats.ViewD;
             MatrixD viewMatrix = hmdAbsolute;
             viewMatrix.Translation += offset;
             viewMatrix = origViewMatrix * Matrix.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
 
 
-            //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
-            //theres a thread on unity forums with the math involved, will have to do some searching to find it again.
-            //I think someone posted a link to it in the discord
             BoundingFrustumD viewFrustum = envMats.ViewFrustumClippedD;
             MyUtils.Init(ref viewFrustum);
             viewFrustum.Matrix = viewMatrix * envMats.OriginalProjection;
@@ -147,30 +128,25 @@ namespace SpaceEngineersVR.Player
             viewFrustumFar.Matrix = viewMatrix * envMats.OriginalProjectionFar;
             envMats.ViewFrustumClippedFarD = viewFrustumFar;
 
+            //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
+            //theres a thread on unity forums with the math involved, will have to do some searching to find it again.
+            //I think someone posted a link to it in the discord
 
-            // Stereo rendering
-            DrawEye(EVREye.Eye_Right, viewMatrix, envMats);
-            DrawEye(EVREye.Eye_Left,  viewMatrix, envMats);
 
-            //FrameInjections.DisablePresent = false;
+            float left = 0f, right = 0f, top = 0f, bottom = 0f;
+            OpenVR.System.GetProjectionRaw(EVREye.Eye_Left, ref left, ref right, ref top, ref bottom);
+            envMats.FovH = MathHelper.Atan((right - left) / 2) * 2f;
+            envMats.FovV = MathHelper.Atan((bottom - top) / 2) * 2f;
 
-            if(MyInput.Static.IsKeyPress(MyKeys.Enter))
-                SetOffset();
 
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad2))
-                offset.Z += 0.1f;
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad8))
-                offset.Z -= 0.1f;
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad6))
-                offset.X += 0.1f;
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad4))
-                offset.X -= 0.1f;
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad7))
-                offset.Y += 0.1f;
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad1))
-                offset.Y -= 0.1f;
-            if(MyInput.Static.IsKeyPress(MyKeys.NumPad5))
-                offset = new Vector3(0);
+            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
+            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            DrawScene(EVREye.Eye_Left);
+
+            eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
+            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            DrawScene(EVREye.Eye_Right);
+
 
             return true;
         }
@@ -180,27 +156,24 @@ namespace SpaceEngineersVR.Player
             offset = -hmdAbsolute.Translation;
         }
 
-        private void DrawEye(EVREye eye, MatrixD viewMatrix, MyEnvironmentMatrices envMats)
+        private void DrawScene(EVREye eye)
         {
-            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(eye).ToMatrix();
-
-            UploadCameraViewMatrix(eye, viewMatrix * Matrix.Invert(eyeToHead), envMats);
             MyRender11.DrawGameScene(texture, out _);
 
-            Texture2D texture2D = texture.GetResource(); //(Texture2D) MyRender11.GetBackbuffer().GetResource(); //= texture.GetResource();
+            Texture2D texture2D = texture.GetResource();
             Texture_t input = new Texture_t
             {
                 eColorSpace = EColorSpace.Auto,
                 eType = ETextureType.DirectX,
                 handle = texture2D.NativePointer
             };
-            OpenVR.Compositor.Submit(eye, ref input, ref textureBounds, EVRSubmitFlags.Submit_Default);
+            OpenVR.Compositor.Submit(eye, ref input, ref imageBounds, EVRSubmitFlags.Submit_Default);
         }
 
-        private void UploadCameraViewMatrix(EVREye eye, MatrixD viewMatrix, MyEnvironmentMatrices envMats)
+        private void LoadEnviromentMatrices(EVREye eye, MatrixD viewMatrix, ref EnvironmentMatrices envMats)
         {
+
             MatrixD worldMat = MatrixD.Invert(viewMatrix);
-            float near = envMats.NearClipping;
             Vector3D cameraPosition = worldMat.Translation;
 
             envMats.CameraPosition = cameraPosition;
@@ -218,22 +191,18 @@ namespace SpaceEngineersVR.Player
             envMats.ViewAt0 = viewAt0;
             envMats.InvViewAt0 = Matrix.Invert(viewAt0);
 
-            Matrix projection = GetPerspectiveFovRhInfiniteComplementary(eye, near);
+            Matrix projection = GetPerspectiveFovRhInfiniteComplementary(eye, envMats.NearClipping);
             envMats.Projection = projection;
+            envMats.ProjectionForSkybox = projection;
             envMats.InvProjection = Matrix.Invert(projection);
 
             envMats.ViewProjectionD = viewMatrix * projection;
             envMats.InvViewProjectionD = MatrixD.Invert(envMats.ViewProjectionD);
 
-            Matrix projectionForSkybox = GetPerspectiveFovRhInfiniteComplementary(eye, near);
-            envMats.ProjectionForSkybox = projectionForSkybox;
-
             MatrixD viewProjectionAt0 = viewAt0 * projection;
             envMats.ViewProjectionAt0 = viewProjectionAt0;
             envMats.InvViewProjectionAt0 = Matrix.Invert(viewProjectionAt0);
 
-            //TODO: add a way to write to this
-            //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
         }
 
         private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, float nearPlane)
