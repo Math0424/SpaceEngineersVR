@@ -50,11 +50,6 @@ namespace SpaceEngineersVR.Patches
             Common.Plugin.Harmony.Patch(AccessTools.Method("VRageRender.MyRender11:SetupCameraMatricesInternal"),
                 transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_SetupCameraMatrices)));
 
-            Common.Plugin.Harmony.Patch(AccessTools.Method(typeof(Sandbox.Game.Gui.MyGuiScreenGamePlay), "Draw"),
-                transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_RemoveCallsToControlCameraAndUpdate)));
-            Common.Plugin.Harmony.Patch(AccessTools.Method(typeof(Sandbox.Game.Gui.MyGuiScreenLoadInventory), "DrawScene"),
-                transpiler: new HarmonyMethod(typeof(FrameInjections), nameof(Transpiler_RemoveCallsToControlCameraAndUpdate)));
-
             Logger.Info("Applied harmony game injections for renderer.");
         }
 
