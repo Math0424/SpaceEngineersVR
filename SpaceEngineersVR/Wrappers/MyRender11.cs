@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using SharpDX.DXGI;
+using SpaceEngineersVR.Util;
 using System;
 using System.Reflection;
 using VRageMath;
@@ -19,13 +20,6 @@ namespace SpaceEngineersVR.Wrappers
         static MyRender11()
         {
             Type t = AccessTools.TypeByName("VRageRender.MyRender11");
-
-            /*log.Write("Fields:");
-            foreach (var s in AccessTools.GetFieldNames(t))
-                log.Write(s);         
-            log.Write("Methods:");
-            foreach (var s in AccessTools.GetMethodNames(t))
-                log.Write(s);*/
 
             m_debugOverrides = AccessTools.Field(t, "m_debugOverrides");
             m_rc = AccessTools.Field(t, "m_rc");
@@ -140,7 +134,15 @@ namespace SpaceEngineersVR.Wrappers
 
         private static readonly FieldInfo environment;
         private static readonly FieldInfo environment_matrices;
-        public static MyEnvironmentMatrices Environment_Matrices => new MyEnvironmentMatrices(environment_matrices.GetValue(environment.GetValue(null)));
+        public static EnvironmentMatrices Environment_Matrices
+        {
+            get
+            {
+                object obj = environment_matrices.GetValue(environment.GetValue(null));
+                obj.TransmuteTo(new EnvironmentMatrices());
+                return (EnvironmentMatrices)obj;
+            }
+        }
     }
 
     public static class MyImmediateRC
