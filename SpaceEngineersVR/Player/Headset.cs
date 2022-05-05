@@ -36,6 +36,8 @@ namespace SpaceEngineersVR.Player
         public bool IsControllersConnected => true; //(LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
         public bool IsControllersAlreadyDisconnected = false;
 
+        public bool IsDebugHUDEnabled = true;
+
         private readonly uint pnX;
         private readonly uint pnY;
         private readonly uint height;
@@ -47,6 +49,8 @@ namespace SpaceEngineersVR.Player
         private VRTextureBounds_t imageBounds;
         private readonly TrackedDevicePose_t[] renderPositions;
         private readonly TrackedDevicePose_t[] gamePositions;
+
+        private ulong overlayHandle = 0uL;
 
         private bool enableNotifications = false;
 
@@ -61,6 +65,28 @@ namespace SpaceEngineersVR.Player
 
             FovH = MathHelper.Atan((pnY - pnX) / 2) * 2f;
             FovV = MathHelper.Atan((height - width) / 2) * 2f;
+
+            OpenVR.Overlay.CreateOverlay("SEVR_DEBUG_OVERLAY", "SEVR_DEBUG_OVERLAY", ref overlayHandle);
+            OpenVR.Overlay.SetOverlayWidthInMeters(overlayHandle, 3);
+            OpenVR.Overlay.ShowOverlay(overlayHandle);
+
+            HmdMatrix34_t transform = new HmdMatrix34_t
+            {
+                m0 = 1f,
+                m1 = 0f,
+                m2 = 0f,
+                m3 = 0f,
+                m4 = 0f,
+                m5 = 1f,
+                m6 = 0f,
+                m7 = 1f,
+                m8 = 0f,
+                m9 = 0f,
+                m10 = 1f,
+                m11 = -2f
+            };
+
+            OpenVR.Overlay.SetOverlayTransformAbsolute(overlayHandle, ETrackingUniverseOrigin.TrackingUniverseStanding, ref transform);
 
             renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
             gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
@@ -149,7 +175,7 @@ namespace SpaceEngineersVR.Player
             LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
             DrawScene(EVREye.Eye_Right);
 
-            return true;
+            return false;
         }
 
         private void SetOffset()
@@ -169,6 +195,20 @@ namespace SpaceEngineersVR.Player
                 handle = texture2D.NativePointer
             };
             OpenVR.Compositor.Submit(eye, ref input, ref imageBounds, EVRSubmitFlags.Submit_Default);
+            OpenVR.Compositor.Submit(eye, ref input, ref textureBounds, EVRSubmitFlags.Submit_Default);
+
+            if (IsDebugHUDEnabled)
+            {
+                Texture2D guiTexture = (Texture2D)MyRender11.GetBackbuffer().GetResource();
+                Texture_t textureUI = new Texture_t
+                {
+                    eColorSpace = EColorSpace.Auto,
+                    eType = ETextureType.DirectX,
+                    handle = guiTexture.NativePointer
+                };
+
+                OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref textureUI);
+            }
         }
 
         private void LoadEnviromentMatrices(EVREye eye, MatrixD viewMatrix, ref EnvironmentMatrices envMats)
