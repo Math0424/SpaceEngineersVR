@@ -19,18 +19,9 @@ using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
 using VRage.Game.ModAPI;
-using VRage.Input;
 using VRageMath;
 using VRageRender;
-using VRageRender.Messages;
-using VRage.Game.Utils;
 using VRage.Utils;
-using Sandbox.Game;
-using VRageRender.ExternalApp;
-using VRage.Library.Utils;
-using Sandbox.Engine.Platform.VideoMode;
-using HarmonyLib;
-using VRage;
 
 // See MyRadialMenuItemFactory for actions
 
@@ -50,6 +41,9 @@ namespace SpaceEngineersVR.Player
         private readonly uint height;
         private readonly uint width;
 
+        private readonly float FovH;
+        private readonly float FovV;
+
         private VRTextureBounds_t imageBounds;
         private readonly TrackedDevicePose_t[] renderPositions;
         private readonly TrackedDevicePose_t[] gamePositions;
@@ -63,7 +57,10 @@ namespace SpaceEngineersVR.Player
             FrameInjections.DrawScene += FrameUpdate;
             SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
 
-            OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Right, ref pnX, ref pnY, ref width, ref height);
+            OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Left, ref pnX, ref pnY, ref width, ref height);
+
+            FovH = MathHelper.Atan((pnY - pnX) / 2) * 2f;
+            FovV = MathHelper.Atan((height - width) / 2) * 2f;
 
             renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
             gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
@@ -74,14 +71,24 @@ namespace SpaceEngineersVR.Player
                 vMax = 1,
             };
 
+
+            ETrackedPropertyError error = ETrackedPropertyError.TrackedProp_Success;
+            int refreshRate = (int)Math.Ceiling(OpenVR.System.GetFloatTrackedDeviceProperty(0, ETrackedDeviceProperty.Prop_DisplayFrequency_Float, ref error));
+            if (error != ETrackedPropertyError.TrackedProp_Success)
+            {
+                Logger.Critical("Failed to get HMD refresh rate! defaulting to 80");
+                refreshRate = 80;
+            }
+
             MyRenderDeviceSettings x = MyRender11.m_Settings;
-            x.RefreshRate = 80;
+            x.RefreshRate = refreshRate;
             x.BackBufferHeight = (int)height;
             x.BackBufferWidth = (int)width;
             x.SettingsMandatory = true;
+            x.VSync = 1;
             MySandboxGame.Static.SwitchSettings(x);
 
-            Logger.Info($"Found headset with eye resolution of '{width}x{height}'");
+            Logger.Info($"Found headset with eye resolution of '{width}x{height}' and refresh rate of {refreshRate}");
         }
 
         #region DrawingLogic
@@ -112,10 +119,9 @@ namespace SpaceEngineersVR.Player
 
 
             EnvironmentMatrices envMats = MyRender11.Environment_Matrices;
-            MatrixD origViewMatrix = envMats.ViewD;
             MatrixD viewMatrix = hmdAbsolute;
             viewMatrix.Translation += offset;
-            viewMatrix = origViewMatrix * Matrix.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
+            viewMatrix = envMats.ViewD * Matrix.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
 
 
             BoundingFrustumD viewFrustum = envMats.ViewFrustumClippedD;
@@ -132,12 +138,8 @@ namespace SpaceEngineersVR.Player
             //theres a thread on unity forums with the math involved, will have to do some searching to find it again.
             //I think someone posted a link to it in the discord
 
-
-            float left = 0f, right = 0f, top = 0f, bottom = 0f;
-            OpenVR.System.GetProjectionRaw(EVREye.Eye_Left, ref left, ref right, ref top, ref bottom);
-            envMats.FovH = MathHelper.Atan((right - left) / 2) * 2f;
-            envMats.FovV = MathHelper.Atan((bottom - top) / 2) * 2f;
-
+            envMats.FovH = FovH;
+            envMats.FovV = FovV;
 
             Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
@@ -146,7 +148,6 @@ namespace SpaceEngineersVR.Player
             eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
             DrawScene(EVREye.Eye_Right);
-
 
             return true;
         }
@@ -203,6 +204,8 @@ namespace SpaceEngineersVR.Player
             envMats.ViewProjectionAt0 = viewProjectionAt0;
             envMats.InvViewProjectionAt0 = Matrix.Invert(viewProjectionAt0);
 
+            //TODO: add a way to write to this
+            //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
         }
 
         private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, float nearPlane)
