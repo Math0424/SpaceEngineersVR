@@ -35,7 +35,7 @@ namespace SpaceEngineersVR.Plugin
 
         private static bool failed;
 
-        private static Headset Headset;
+        public static Headset Headset { get; private set; }
         private Vector2I DesktopResolution;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
