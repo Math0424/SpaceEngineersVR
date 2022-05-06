@@ -41,19 +41,14 @@
   ],
   "actions": [
     {
-      "name": "/actions/walking/in/Walk",
+      "name": "/actions/walking/in/WalkLatitudinal",
       "requirement": "mandatory",
       "type": "vector2"
     },
     {
-      "name": "/actions/walking/in/WalkForward",
-      "requirement": "suggested",
-      "type": "vector1"
-    },
-    {
-      "name": "/actions/walking/in/WalkBackward",
-      "requirement": "suggested",
-      "type": "vector1"
+      "name": "/actions/walking/in/WalkLongitudinal",
+      "requirement": "mandatory",
+      "type": "vector2"
     },
     {
       "name": "/actions/walking/in/WalkRotate",

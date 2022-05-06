@@ -143,44 +143,53 @@
          ]
       },
       "/actions/walking" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/walking/in/jumporclimbup"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/trigger"
+        "sources": [
+          {
+            "inputs": {
+              "click": {
+                "output": "/actions/walking/in/jumporclimbup"
+              }
             },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/walking/in/crouchorclimbdown"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/grip"
+            "mode": "button",
+            "path": "/user/hand/left/input/trigger"
+          },
+          {
+            "inputs": {
+              "click": {
+                "output": "/actions/walking/in/crouchorclimbdown"
+              }
             },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/walking/in/walk"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/joystick"
+            "mode": "button",
+            "path": "/user/hand/left/input/grip"
+          },
+          {
+            "inputs": {
+              "position": {
+                "output": "/actions/walking/in/WalkLatitudinal"
+              }
             },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/walking/in/walkrotate"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/joystick"
-            }
-         ]
+            "mode": "joystick",
+            "path": "/user/hand/left/input/joystick"
+          },
+          {
+            "inputs": {
+              "position": {
+                "output": "/actions/walking/in/WalkLongitudinal"
+              }
+            },
+            "mode": "joystick",
+            "path": "/user/hand/left/input/joystick"
+          },
+          {
+            "inputs": {
+              "position": {
+                "output": "/actions/walking/in/walkrotate"
+              }
+            },
+            "mode": "joystick",
+            "path": "/user/hand/right/input/joystick"
+          }
+        ]
       }
    },
    "category" : "steamvr_input",

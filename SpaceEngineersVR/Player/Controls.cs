@@ -96,13 +96,10 @@ namespace SpaceEngineersVR.Player
         {
             OpenVR.Input.SetActionManifestPath(Common.ActionJsonPath);
 
-            //worry about changing all the paths once we finalize this.
-            //its far too early to be having all of this 'setup'
-
-            //Walk = new Analog("/actions/walking/in/Walk");
-            //WalkForward = new Analog("/actions/walking/in/WalkForward");
-            //WalkBackward = new Analog("/actions/walking/in/WalkBackward");
+            WalkLongitudinal = new Analog("/actions/walking/in/WalkLongitudinal");
+            WalkLatitudinal = new Analog("/actions/walking/in/WalkLatitudinal");
             WalkRotate = new Analog("/actions/walking/in/WalkRotate");
+
             JumpOrClimbUp = new Button("/actions/walking/in/JumpOrClimbUp");
             CrouchOrClimbDown = new Button("/actions/walking/in/CrouchOrClimbDown");
             ThrustLRUD = new Analog("/actions/flying/in/ThrustLRUD");

@@ -28,7 +28,7 @@ namespace ClientPlugin.Player.Components
         }
 
         private RotationType rotationType = RotationType.Continuous;
-        private MovementType movementType = MovementType.Hand;
+        private MovementType movementType = MovementType.Head;
 
 
         private Vector2 previousRotation = Vector2.Zero;
@@ -160,17 +160,16 @@ namespace ClientPlugin.Player.Components
 
 
             move.X += controls.WalkLatitudinal.Position.X;
-            move.Z -= controls.WalkLongitudinal.Position.X;
+            move.Z -= controls.WalkLongitudinal.Position.Y;
 
-            Matrix matrix = (movementType == MovementType.Head) ? Character.PositionComp.LocalMatrixRef : Controls.Static.RightHand.AbsoluteTracking;
-            Vector3.Transform(ref move, ref matrix, out move);
+            //Matrix matrix = (movementType == MovementType.Head) ? Character.PositionComp.LocalMatrixRef : Controls.Static.RightHand.AbsoluteTracking;
+            //Vector3.Transform(ref move, ref matrix, out move);
 
 
             // TODO: Configurable rotation speed and step by step rotation instead of continuous
             if (controls.WalkRotate.Active)
             {
                 var v = controls.WalkRotate.Position;
-
 
                 rotate.Y = v.X * RotationSpeed;
                 rotate.X = -v.Y * RotationSpeed;
