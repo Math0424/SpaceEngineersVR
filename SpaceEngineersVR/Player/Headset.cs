@@ -12,7 +12,6 @@ using SpaceEngineersVR.Plugin;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
-using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;

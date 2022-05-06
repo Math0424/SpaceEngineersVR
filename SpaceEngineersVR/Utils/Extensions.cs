@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ClientPlugin.Player.Components;
+using Sandbox.Game.Entities.Character;
+using System;
 using System.Runtime.CompilerServices;
 using Valve.VR;
 using VRageMath;
@@ -29,6 +31,15 @@ namespace SpaceEngineersVR.Util
             var s = (void**)source.GetObjectAddress();
             var t = (void**)target.GetObjectAddress();
             *t = *s;
+        }
+
+        public static VRMovementComponent VRMovement(this MyCharacter c)
+        {
+            return c.Components.Get<VRMovementComponent>();
+        }
+        public static VRHandsComponent VRHands(this MyCharacter c)
+        {
+            return c.Components.Get<VRHandsComponent>();
         }
 
         //Matrix
