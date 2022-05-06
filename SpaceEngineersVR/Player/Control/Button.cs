@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Valve.VR;
 
-namespace SpaceEngineersVR.Player.Controller
+namespace SpaceEngineersVR.Player.Control
 {
     public class Button
     {

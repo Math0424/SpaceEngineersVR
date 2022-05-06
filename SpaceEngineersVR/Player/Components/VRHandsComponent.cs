@@ -3,6 +3,7 @@ using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Plugin;
 using SpaceEngineersVR.Util;
 using VRage.Game;
+using VRageMath;
 
 namespace ClientPlugin.Player.Components
 {
@@ -39,18 +40,32 @@ namespace ClientPlugin.Player.Components
 
         public override void Simulate()
         {
-            var right = Controls.Static.RightHand;
-            var left = Controls.Static.LeftHand;
+            /*
+            var right = DeviceManager.RightHand;
+            var left = DeviceManager.LeftHand;
 
-            if (right.Valid)
+            if (right.isTracked)
             {
-                Util.DrawDebugMatrix(right.AbsoluteTracking.Translation, right.AbsoluteTracking, "RightHand");
+                Util.DrawDebugMatrix(right.transformCalibrated.Translation, right.transformCalibrated, "RightHand");
+                SetBoneTransform(right, "SE_RigRPalm");
             }
 
-            if (left.Valid)
+            if (left.isTracked)
             {
-                Util.DrawDebugMatrix(left.AbsoluteTracking.Translation, left.AbsoluteTracking, "LeftHand");
+                Util.DrawDebugMatrix(left.transformCalibrated.Translation, left.transformCalibrated, "LeftHand");
+                SetBoneTransform(left, "SE_RigLPalm");
             }
+
+
+            void SetBoneTransform(Controller hand, string boneName)
+            {
+                Matrix mat = hand.transformCalibrated;
+                Vector3 position = mat.Translation;
+                Quaternion rotation = Quaternion.CreateFromRotationMatrix(mat);
+
+                Character.AnimationController.FindBone(boneName, out _)?.SetCompleteTransform(ref position, ref rotation);
+            }
+            */
         }
 
         public override string ComponentTypeDebugString => "VR Hands Component";

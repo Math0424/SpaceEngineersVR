@@ -33,7 +33,7 @@ namespace ClientPlugin.Player.Components
         private Vector2 previousRotation = Vector2.Zero;
         private Vector2I hasSnapped = Vector2I.Zero;
 
-        public static bool UsingControllerMovement;        
+        public static bool UsingControllerMovement;
 
         // TODO: Configurable rotation speed
         public float RotationSpeed = 10;
