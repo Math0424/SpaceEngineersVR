@@ -22,6 +22,10 @@ using VRage.Game.ModAPI;
 using VRageMath;
 using VRageRender;
 using VRage.Utils;
+using Sandbox.Graphics.GUI;
+using Sandbox.Graphics;
+using Sandbox.Game.Gui;
+using Sandbox.Game;
 
 // See MyRadialMenuItemFactory for actions
 
@@ -185,7 +189,7 @@ namespace SpaceEngineersVR.Player
             };
             OpenVR.Compositor.Submit(eye, ref input, ref imageBounds, EVRSubmitFlags.Submit_Default);
 
-            if (IsDebugHUDEnabled)
+            if (IsDebugHUDEnabled && IsAnyDialogOpen())
             {
                 Texture2D guiTexture = (Texture2D)MyRender11.GetBackbuffer().GetResource();
                 Texture_t textureUI = new Texture_t
@@ -196,6 +200,11 @@ namespace SpaceEngineersVR.Player
                 };
             
                 OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref textureUI);
+                OpenVR.Overlay.ShowOverlay(overlayHandle);
+            }
+            else
+            {
+                OpenVR.Overlay.HideOverlay(overlayHandle);
             }
         }
 
@@ -748,6 +757,22 @@ namespace SpaceEngineersVR.Player
                 return result;
             });
             return DialogResult.None;
+        }
+
+        /// <summary>
+        /// Returns true if any other screen other than MyGuiScreenGamePlay or MyGuiScreenHudSpace is opened.
+        /// </summary>
+        /// <returns>A boolean value.</returns>
+        private bool IsAnyDialogOpen()
+        {
+            foreach (MyGuiScreenBase screen in MyScreenManager.Screens)
+            {
+                if (screen is not MyGuiScreenGamePlay && screen is not MyGuiScreenHudSpace)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #endregion
