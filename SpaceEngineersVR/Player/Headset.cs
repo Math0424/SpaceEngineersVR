@@ -1,29 +1,21 @@
-﻿using SpaceEngineersVR.Patches;
-using SpaceEngineersVR.Util;
-using SpaceEngineersVR.Wrappers;
-using ParallelTasks;
+﻿using ParallelTasks;
 using Sandbox;
-using Sandbox.Game.Entities;
-using Sandbox.Game.Screens.Helpers.RadialMenuActions;
-using Sandbox.Game.SessionComponents.Clipboard;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
-using SpaceEngineersVR.Plugin;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using SpaceEngineersVR.Patches;
+using SpaceEngineersVR.Plugin;
+using SpaceEngineersVR.Util;
+using SpaceEngineersVR.Wrappers;
 using System;
-using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
-using VRage.Game.ModAPI;
+using VRage.Input;
+using VRage.Utils;
 using VRageMath;
 using VRageRender;
-using VRage.Utils;
-using EmptyKeys.UserInterface.Controls;
-using EmptyKeys.UserInterface;
-using VRage.Input;
 
 // See MyRadialMenuItemFactory for actions
 
@@ -201,7 +193,7 @@ namespace SpaceEngineersVR.Player
                     eType = ETextureType.DirectX,
                     handle = guiTexture.NativePointer
                 };
-            
+
                 OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref textureUI);
             }
         }
@@ -257,10 +249,10 @@ namespace SpaceEngineersVR.Player
             double sy = bottom + top;
 
             return new MatrixD(
-                2*idx,  0f,     0f,        0f,
-                0f,     2*idy,  0f,        0f,
-                sx*idx, sy*idy, 0f,        -1f,
-                0f,     0f,     nearPlane, 0f);
+                2 * idx, 0f, 0f, 0f,
+                0f, 2 * idy, 0f, 0f,
+                sx * idx, sy * idy, 0f, -1f,
+                0f, 0f, nearPlane, 0f);
         }
 
         private void GetNewPositions()

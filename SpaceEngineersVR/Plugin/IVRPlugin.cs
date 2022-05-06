@@ -6,8 +6,14 @@ namespace ClientPlugin.Plugin
     public interface IVRPlugin
     {
 
-        Harmony Harmony { get; }
-        IPluginConfig Config { get; }
+        Harmony Harmony
+        {
+            get;
+        }
+        IPluginConfig Config
+        {
+            get;
+        }
 
     }
 }

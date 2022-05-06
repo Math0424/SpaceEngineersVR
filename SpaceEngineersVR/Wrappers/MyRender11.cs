@@ -48,7 +48,10 @@ namespace SpaceEngineersVR.Wrappers
 
         //TODO; make delegate
         private static readonly FieldInfo backbuffer;
-        public static MyBackbuffer GetBackbuffer() { return new MyBackbuffer(backbuffer.GetValue(null)); }
+        public static MyBackbuffer GetBackbuffer()
+        {
+            return new MyBackbuffer(backbuffer.GetValue(null));
+        }
 
 
         private static readonly FieldInfo m_debugOverrides;

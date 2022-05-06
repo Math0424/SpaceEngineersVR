@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using SpaceEngineersVR.Player.Controller;
+﻿using SpaceEngineersVR.Player.Controller;
 using SpaceEngineersVR.Plugin;
+using System.Diagnostics.CodeAnalysis;
 using Valve.VR;
 
 // See:
@@ -16,10 +16,11 @@ namespace SpaceEngineersVR.Player
         public static Controls Static = new Controls();
 
         // Walking
-        public readonly Analog Walk;
-        public readonly Analog WalkForward;
-        public readonly Analog WalkBackward;
+        public readonly Analog WalkLongitudinal;
+        public readonly Analog WalkLatitudinal;
+
         public readonly Analog WalkRotate;
+
         public readonly Button JumpOrClimbUp;
         public readonly Button CrouchOrClimbDown;
 
@@ -95,9 +96,12 @@ namespace SpaceEngineersVR.Player
         {
             OpenVR.Input.SetActionManifestPath(Common.ActionJsonPath);
 
-            Walk = new Analog("/actions/walking/in/Walk");
-            WalkForward = new Analog("/actions/walking/in/WalkForward");
-            WalkBackward = new Analog("/actions/walking/in/WalkBackward");
+            //worry about changing all the paths once we finalize this.
+            //its far too early to be having all of this 'setup'
+
+            //Walk = new Analog("/actions/walking/in/Walk");
+            //WalkForward = new Analog("/actions/walking/in/WalkForward");
+            //WalkBackward = new Analog("/actions/walking/in/WalkBackward");
             WalkRotate = new Analog("/actions/walking/in/WalkRotate");
             JumpOrClimbUp = new Button("/actions/walking/in/JumpOrClimbUp");
             CrouchOrClimbDown = new Button("/actions/walking/in/CrouchOrClimbDown");
@@ -160,9 +164,8 @@ namespace SpaceEngineersVR.Player
         {
             WalkingSets.Update();
 
-            Walk.Update();
-            WalkForward.Update();
-            WalkBackward.Update();
+            WalkLongitudinal.Update();
+            WalkLatitudinal.Update();
             WalkRotate.Update();
             JumpOrClimbUp.Update();
             CrouchOrClimbDown.Update();
