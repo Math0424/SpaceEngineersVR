@@ -81,6 +81,7 @@ namespace ClientPlugin.Player.Components
             {
                 ControlShip();
             }
+
             else if (((IMyCharacter)Character).EnabledThrusts)
             {
                 ControlFlight();
