@@ -1,5 +1,4 @@
-﻿using EmptyKeys.UserInterface;
-using EmptyKeys.UserInterface.Controls;
+﻿using ClientPlugin.Player.Components;
 using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.World;
@@ -158,14 +157,17 @@ namespace SpaceEngineersVR.Player
 
             MatrixD eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            VRGUIManager.Draw(viewMatrix);
             DrawScene(EVREye.Eye_Left);
 
             eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            VRGUIManager.Draw(viewMatrix);
             DrawScene(EVREye.Eye_Right);
 
             if (MyInput.Static.IsKeyPress(MyKeys.NumPad5))
                 offset = new Vector3(0);
+
 
             return true;
         }
@@ -298,6 +300,7 @@ namespace SpaceEngineersVR.Player
 
         #region Control logic
 
+        //TODO: move this elsewhere
         private void UpdateBeforeSimulation()
         {
             //UNTESTED
