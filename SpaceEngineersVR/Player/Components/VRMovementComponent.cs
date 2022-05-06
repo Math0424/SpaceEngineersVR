@@ -1,20 +1,12 @@
 ﻿using Sandbox;
 using Sandbox.Game.Entities;
-using Sandbox.Game.Entities.Character;
 using Sandbox.Game.Entities.Character.Components;
 using Sandbox.Game.Screens.Helpers.RadialMenuActions;
 using Sandbox.Game.SessionComponents.Clipboard;
 using Sandbox.Game.World;
 using SpaceEngineersVR.Player;
-using SpaceEngineersVR.Plugin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using VRage.Game;
-using VRage.Game.Components;
 using VRage.Game.ModAPI;
 using VRageMath;
 
@@ -35,14 +27,15 @@ namespace ClientPlugin.Player.Components
             Hand
         }
 
-        public Matrix cameraMatrix = Matrix.Identity;
-        public Matrix rotationOffset = Matrix.Identity;
+        private RotationType rotationType = RotationType.Continuous;
+        private MovementType movementType = MovementType.Hand;
 
-        public RotationType rotationType = RotationType.Continuous;
-        public MovementType movementType = MovementType.Hand;
 
-        public bool ControllerMovement;
-        // TODO: Configurable rotation speed and step by step rotation instead of continuous
+        private Vector2 previousRotation = Vector2.Zero;
+        private Vector2I hasSnapped = Vector2I.Zero;
+
+
+        // TODO: Configurable rotation speed
         public float RotationSpeed = 10;
 
 
@@ -79,11 +72,16 @@ namespace ClientPlugin.Player.Components
 
         public override void UpdateBeforeSimulation()
         {
+            if (((IMyCharacter)Character).IsDead)
+            {
+                return;
+            }
+
             if (MySession.Static.ControlledEntity is MyShipController)
             {
                 ControlShip();
             }
-            else if(((IMyCharacter)Character).EnabledThrusts)
+            else if (((IMyCharacter)Character).EnabledThrusts)
             {
                 ControlFlight();
             }
@@ -99,37 +97,81 @@ namespace ClientPlugin.Player.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void ControlShip()
         {
-            //tmp
-            ControlFlight();
+            var controls = Controls.Static;
+
+            var move = Vector3.Zero;
+            var rotate = Vector2.Zero;
+            var roll = 0f;
+
+            controls.UpdateFlight();
+
+            if (controls.ThrustLRUD.Active)
+            {
+                var v = controls.ThrustLRUD.Position;
+                move.X += v.X;
+                move.Y += v.Y;
+            }
+
+            if (controls.ThrustLRFB.Active)
+            {
+                var v = controls.ThrustLRFB.Position;
+                move.X += v.X;
+                move.Z -= v.Y;
+            }
+
+            if (controls.ThrustUp.Active)
+                move.Y += controls.ThrustUp.Position.X;
+
+            if (controls.ThrustDown.Active)
+                move.Y -= controls.ThrustDown.Position.X;
+
+            if (controls.ThrustForward.Active)
+                move.Z -= controls.ThrustForward.Position.X;
+
+            if (controls.ThrustBackward.Active)
+                move.Z += controls.ThrustBackward.Position.X;
+
+            if (controls.ThrustRotate.Active)
+            {
+                var v = controls.ThrustRotate.Position;
+
+                if (controls.ThrustRoll.IsPressed)
+                    roll = v.X * RotationSpeed;
+                else
+                    rotate.Y = v.X * RotationSpeed;
+
+                rotate.X = -v.Y * RotationSpeed;
+            }
+
+            if (controls.Dampener.HasPressed)
+                MySession.Static.ControlledEntity?.SwitchDamping();
+
+            ApplyMoveAndRotation(move, rotate, roll);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void ControlWalk()
         {
             var controls = Controls.Static;
-
             controls.UpdateWalk();
 
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
 
-            if (controls.Walk.Active)
-            {
-                var v = controls.Walk.Position;
-                move.X += v.X;
-                move.Z -= v.Y;
-            }
 
-            if (controls.WalkForward.Active)
-                move.Z -= controls.WalkForward.Position.X;
+            move.X += controls.WalkLatitudinal.Position.X;
+            move.Z -= controls.WalkLongitudinal.Position.X;
 
-            if (controls.WalkBackward.Active)
-                move.Z += controls.WalkForward.Position.X;
+            Matrix matrix = (movementType == MovementType.Head) ? Character.PositionComp.LocalMatrixRef : Controls.Static.RightHand.AbsoluteTracking;
+            Vector3.Transform(ref move, ref matrix, out move);
+
 
             // TODO: Configurable rotation speed and step by step rotation instead of continuous
             if (controls.WalkRotate.Active)
             {
                 var v = controls.WalkRotate.Position;
+
+
                 rotate.Y = v.X * RotationSpeed;
                 rotate.X = -v.Y * RotationSpeed;
             }
@@ -207,11 +249,11 @@ namespace ClientPlugin.Player.Components
 
         void OrientateCharacterToHMD()
         {
-            Matrix absoluteRotation = Main.Headset.hmdAbsolute;
-            absoluteRotation *= rotationOffset;
-
-            Matrix characterRotation = Character.WorldMatrix;
-            characterRotation.Translation = Vector3.Zero;
+            //Matrix absoluteRotation = Main.Headset.hmdAbsolute;
+            //absoluteRotation *= rotationOffset;
+            //
+            //Matrix characterRotation = Character.WorldMatrix;
+            //characterRotation.Translation = Vector3.Zero;
 
 
             //Character.MoveAndRotate();
@@ -222,9 +264,8 @@ namespace ClientPlugin.Player.Components
         {
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
 
-            ControllerMovement = move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f;
 
-            if (ControllerMovement)
+            if (move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f)
                 MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
             else
                 MySession.Static.ControlledEntity?.MoveAndRotateStopped();
