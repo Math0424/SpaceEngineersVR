@@ -18,7 +18,7 @@ namespace SpaceEngineersVR.Wrappers
             mapSubresource = AccessTools.Method(t, "MapSubresource", new Type[] { typeof(Texture2D), typeof(int), typeof(int), typeof(MapMode), typeof(MapFlags), typeof(DataStream).MakeByRefType() });
             unmapSubresource = AccessTools.Method(t, "UnmapSubresource", new Type[] { typeof(Resource), typeof(int) });
 
-            
+
         }
 
         public MyRenderContext(object instance)

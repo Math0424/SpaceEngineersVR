@@ -1,9 +1,9 @@
+using SpaceEngineersVR.Plugin;
 using System;
 using System.ComponentModel;
-using System.Xml.Serialization;
 using System.IO;
 using System.Threading;
-using SpaceEngineersVR.Plugin;
+using System.Xml.Serialization;
 using VRage.Utils;
 
 namespace SpaceEngineersVR.Config
@@ -18,7 +18,10 @@ namespace SpaceEngineersVR.Config
         private Timer saveConfigTimer;
         private const int SaveDelay = 500;
 
-        private string Path { get; }
+        private string Path
+        {
+            get;
+        }
 
         public T Data
         {

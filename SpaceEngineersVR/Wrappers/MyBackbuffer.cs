@@ -7,7 +7,10 @@ namespace SpaceEngineersVR.Wrappers
 {
     public class MyBackbuffer
     {
-        public object Instance { get; }
+        public object Instance
+        {
+            get;
+        }
 
         static MyBackbuffer()
         {

@@ -1,41 +1,44 @@
-﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using SpaceEngineersVR.GUI;
-using SpaceEngineersVR.Player;
-using SpaceEngineersVR.Wrappers;
+﻿using ClientPlugin.Player.Components;
+using ClientPlugin.Plugin;
 using HarmonyLib;
 using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SpaceEngineersVR.Config;
-using SpaceEngineersVR.Plugin;
+using SpaceEngineersVR.GUI;
+using SpaceEngineersVR.Player;
+using SpaceEngineersVR.Wrappers;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
 using Valve.VR;
 using VRage;
 using VRage.FileSystem;
 using VRage.Plugins;
-using VRageMath;
 using VRage.Utils;
-using System.Reflection;
-using ClientPlugin.Plugin;
-using Sandbox.ModAPI;
-using ClientPlugin.Player;
-using ClientPlugin.Player.Components;
+using VRageMath;
 
 namespace SpaceEngineersVR.Plugin
 {
     // ReSharper disable once UnusedType.Global
     public class Main : IPlugin, IVRPlugin
     {
-        public Harmony Harmony { get; private set; }
+        public Harmony Harmony
+        {
+            get; private set;
+        }
         public IPluginConfig Config => config?.Data;
-        
+
         private PersistentConfig<PluginConfig> config;
         private static readonly string ConfigFileName = $"{Common.Name}.cfg";
 
         private static bool failed;
 
-        public static Headset Headset { get; private set; }
+        public static Headset Headset
+        {
+            get; private set;
+        }
         private Vector2I DesktopResolution;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -136,7 +139,7 @@ namespace SpaceEngineersVR.Plugin
             Logger.Info("Patching game");
             Harmony = new Harmony(Common.Name);
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            
+
             Logger.Info("Creating VR environment");
             Headset = new Headset();
             Headset.CreatePopup("Booted successfully");
@@ -152,7 +155,7 @@ namespace SpaceEngineersVR.Plugin
 
         private void CustomUpdate()
         {
-            if (MySession.Static?.LocalCharacter != null && 
+            if (MySession.Static?.LocalCharacter != null &&
                 !MySession.Static.LocalCharacter.Components.Contains(typeof(VRMovementComponent)))
             {
                 MySession.Static.LocalCharacter.Components.Add(new VRMovementComponent());

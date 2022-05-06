@@ -1,6 +1,5 @@
 ﻿using ClientPlugin.Player.Components;
 using Sandbox.Game.Entities.Character;
-using System;
 using System.Runtime.CompilerServices;
 using Valve.VR;
 using VRageMath;
@@ -57,8 +56,8 @@ namespace SpaceEngineersVR.Util
         public static Matrix ToMatrix(this HmdMatrix34_t hmd)
         {
             return new Matrix(
-                hmd.m0, hmd.m1, hmd.m2,  0f,
-                hmd.m4, hmd.m5, hmd.m6,  0f,
+                hmd.m0, hmd.m1, hmd.m2, 0f,
+                hmd.m4, hmd.m5, hmd.m6, 0f,
                 hmd.m8, hmd.m9, hmd.m10, 0f,
                 hmd.m3, hmd.m7, hmd.m11, 1f);
         }
@@ -66,8 +65,8 @@ namespace SpaceEngineersVR.Util
         public static Matrix ToMatrix(this HmdMatrix44_t hmd)
         {
             return new Matrix(
-                hmd.m0, hmd.m1, hmd.m2,  hmd.m12,
-                hmd.m4, hmd.m5, hmd.m6,  hmd.m13,
+                hmd.m0, hmd.m1, hmd.m2, hmd.m12,
+                hmd.m4, hmd.m5, hmd.m6, hmd.m13,
                 hmd.m8, hmd.m9, hmd.m10, hmd.m14,
                 hmd.m3, hmd.m7, hmd.m11, hmd.m15);
         }

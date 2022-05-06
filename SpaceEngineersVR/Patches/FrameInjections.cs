@@ -3,10 +3,6 @@ using SpaceEngineersVR.Plugin;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Emit;
-using VRageMath;
-using VRageRender.Messages;
-using VRage.Library.Utils;
 
 namespace SpaceEngineersVR.Patches
 {
@@ -15,7 +11,7 @@ namespace SpaceEngineersVR.Patches
 
         public static Func<bool> DrawScene;
         public static bool DisablePresent = false;
-        
+
         static FrameInjections()
         {
             Type t = AccessTools.TypeByName("VRageRender.MyRender11");
@@ -47,14 +43,15 @@ namespace SpaceEngineersVR.Patches
                 MethodInfo getMySessionStatic = AccessTools.PropertyGetter(typeof(Sandbox.Game.World.MySession), "Static");
                 MethodInfo getMySessionCameraController = AccessTools.PropertyGetter(typeof(Sandbox.Game.World.MySession), "CameraController");
                 MethodInfo controlCamera = AccessTools.Method(typeof(VRage.Game.ModAPI.Interfaces.IMyCameraController), "ControlCamera");
-                for(int i = 0; i < code.Count - 3; ++i)
+                for (int i = 0; i < code.Count - 3; ++i)
                 {
-                    if(
+                    if (
                         code[i + 0].Calls(getMySessionStatic) &&
                         code[i + 1].Calls(getMySessionCameraController) &&
                         code[i + 2].Calls(getMySectorMainCamera) &&
                         code[i + 3].Calls(controlCamera)
-                    ) {
+                    )
+                    {
                         //TODO: FIXME: Not moving lables/blocks that may have been added by other patches
                         code.RemoveRange(i, 4);
                         --i;
@@ -64,13 +61,14 @@ namespace SpaceEngineersVR.Patches
 
             {
                 MethodInfo cameraUpdate = AccessTools.Method(typeof(VRage.Game.Utils.MyCamera), "Update");
-                for(int i = 0; i < code.Count - 2; ++i)
+                for (int i = 0; i < code.Count - 2; ++i)
                 {
-                    if(
+                    if (
                         code[i + 0].Calls(getMySectorMainCamera) &&
                         code[i + 1].LoadsConstant() &&
                         code[i + 2].Calls(cameraUpdate)
-                    ) {
+                    )
+                    {
                         //TODO: FIXME: Not moving lables/blocks that may have been added by other patches
                         code.RemoveRange(i, 3);
                         --i;

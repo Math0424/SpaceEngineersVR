@@ -2,13 +2,7 @@
 using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Plugin;
 using SpaceEngineersVR.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VRage.Game;
-using VRage.Game.Components;
 
 namespace ClientPlugin.Player.Components
 {
@@ -47,7 +41,7 @@ namespace ClientPlugin.Player.Components
         {
             var right = Controls.Static.RightHand;
             var left = Controls.Static.LeftHand;
-               
+
             if (right.Valid)
             {
                 Util.DrawDebugMatrix(right.AbsoluteTracking.Translation, right.AbsoluteTracking, "RightHand");

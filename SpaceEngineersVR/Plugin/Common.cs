@@ -1,16 +1,21 @@
-using SpaceEngineersVR.Util;
+using ClientPlugin.Plugin;
 using SpaceEngineersVR.Config;
 using System;
 using System.Drawing;
 using System.IO;
-using ClientPlugin.Plugin;
 
 namespace SpaceEngineersVR.Plugin
 {
     public static class Common
     {
-        public static IVRPlugin Plugin { get; private set; }
-        public static IPluginConfig Config { get; private set; }
+        public static IVRPlugin Plugin
+        {
+            get; private set;
+        }
+        public static IPluginConfig Config
+        {
+            get; private set;
+        }
 
         public static readonly string Name = "SpaceEngineersVR";
         public static readonly string PublicName = "Space Engineers VR";

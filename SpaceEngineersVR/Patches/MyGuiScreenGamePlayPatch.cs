@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using SpaceEngineersVR.Plugin;
 using Sandbox.Game.Gui;
 using SpaceEngineersVR.Player;
+using SpaceEngineersVR.Plugin;
 
 namespace SpaceEngineersVR.Patches
 {
