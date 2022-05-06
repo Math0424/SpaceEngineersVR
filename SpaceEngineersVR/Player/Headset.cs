@@ -155,16 +155,17 @@ namespace SpaceEngineersVR.Player
 
             MatrixD eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            VRGUIManager.Draw(viewMatrix);
             DrawScene(EVREye.Eye_Left);
 
             eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            VRGUIManager.Draw(viewMatrix);
             DrawScene(EVREye.Eye_Right);
 
             if (MyInput.Static.IsKeyPress(MyKeys.NumPad5))
                 offset = new Vector3(0);
 
-            VRGUIManager.Draw(viewMatrix);
 
             return true;
         }
