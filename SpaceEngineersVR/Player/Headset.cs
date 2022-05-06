@@ -1,4 +1,5 @@
-﻿using ParallelTasks;
+﻿using ClientPlugin.Player.Components;
+using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
@@ -163,6 +164,8 @@ namespace SpaceEngineersVR.Player
             if (MyInput.Static.IsKeyPress(MyKeys.NumPad5))
                 offset = new Vector3(0);
 
+            VRGUIManager.Draw(viewMatrix);
+
             return true;
         }
 
@@ -289,6 +292,7 @@ namespace SpaceEngineersVR.Player
 
         #region Control logic
 
+        //TODO: move this elsewhere
         private void UpdateBeforeSimulation()
         {
             //UNTESTED
