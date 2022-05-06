@@ -89,7 +89,6 @@ namespace SpaceEngineersVR.Player
 
         private bool firstUpdate = true;
         private BorrowedRtvTexture texture;
-        public static bool UsingControllerMovement;
 
         private bool FrameUpdate()
         {

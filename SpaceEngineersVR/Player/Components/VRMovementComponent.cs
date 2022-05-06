@@ -30,10 +30,10 @@ namespace ClientPlugin.Player.Components
         private RotationType rotationType = RotationType.Continuous;
         private MovementType movementType = MovementType.Head;
 
-
         private Vector2 previousRotation = Vector2.Zero;
         private Vector2I hasSnapped = Vector2I.Zero;
 
+        public static bool UsingControllerMovement;        
 
         // TODO: Configurable rotation speed
         public float RotationSpeed = 10;
@@ -264,8 +264,12 @@ namespace ClientPlugin.Player.Components
         {
             move = Vector3.Clamp(move, -Vector3.One, Vector3.One);
 
-
-            if (move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f)
+            // Setting this statis variable is required to prevent the game from
+            // zeroing out the control input. Do not optimize this.
+            // See MyGuiScreenGamePlayPatch on how this flag is used 
+            UsingControllerMovement = move != Vector3.Zero || rotate != Vector2.Zero || roll != 0f;
+            
+            if (UsingControllerMovement)
                 MySession.Static.ControlledEntity?.MoveAndRotate(move, rotate, roll);
             else
                 MySession.Static.ControlledEntity?.MoveAndRotateStopped();
