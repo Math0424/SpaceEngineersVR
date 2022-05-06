@@ -23,7 +23,24 @@ namespace ClientPlugin.Player.Components
 
     internal class VRMovementComponent : MyCharacterComponent
     {
+        public enum RotationType
+        {
+            Step,
+            Continuous,
+        }
+
+        public enum MovementType
+        {
+            Head,
+            Hand
+        }
+
+        public Matrix cameraMatrix = Matrix.Identity;
         public Matrix rotationOffset = Matrix.Identity;
+
+        public RotationType rotationType = RotationType.Continuous;
+        public MovementType movementType = MovementType.Hand;
+
         public bool ControllerMovement;
         // TODO: Configurable rotation speed and step by step rotation instead of continuous
         public float RotationSpeed = 10;
@@ -75,6 +92,7 @@ namespace ClientPlugin.Player.Components
                 ControlWalk();
             }
             ControlCommonFunctions();
+            OrientateCharacterToHMD();
         }
 
 
@@ -90,52 +108,43 @@ namespace ClientPlugin.Player.Components
         {
             var controls = Controls.Static;
 
+            controls.UpdateWalk();
+
             var move = Vector3.Zero;
             var rotate = Vector2.Zero;
-            var roll = 0f;
 
-            controls.UpdateFlight();
-
-            if (controls.ThrustLRUD.Active)
+            if (controls.Walk.Active)
             {
-                var v = controls.ThrustLRUD.Position;
-                move.X += v.X;
-                move.Y += v.Y;
-            }
-
-            if (controls.ThrustLRFB.Active)
-            {
-                var v = controls.ThrustLRFB.Position;
+                var v = controls.Walk.Position;
                 move.X += v.X;
                 move.Z -= v.Y;
             }
 
-            if (controls.ThrustUp.Active)
-                move.Y += controls.ThrustUp.Position.X;
+            if (controls.WalkForward.Active)
+                move.Z -= controls.WalkForward.Position.X;
 
-            if (controls.ThrustDown.Active)
-                move.Y -= controls.ThrustDown.Position.X;
+            if (controls.WalkBackward.Active)
+                move.Z += controls.WalkForward.Position.X;
 
-            if (controls.ThrustForward.Active)
-                move.Z -= controls.ThrustForward.Position.X;
-
-            if (controls.ThrustBackward.Active)
-                move.Z += controls.ThrustBackward.Position.X;
-
-            if (controls.ThrustRotate.Active)
+            // TODO: Configurable rotation speed and step by step rotation instead of continuous
+            if (controls.WalkRotate.Active)
             {
-                var v = controls.ThrustRotate.Position;
-
-                if (controls.ThrustRoll.IsPressed)
-                    roll = v.X * RotationSpeed;
-                else
-                    rotate.Y = v.X * RotationSpeed;
-
+                var v = controls.WalkRotate.Position;
+                rotate.Y = v.X * RotationSpeed;
                 rotate.X = -v.Y * RotationSpeed;
             }
 
-            if (controls.Dampener.HasPressed)
-                MySession.Static.ControlledEntity?.SwitchDamping();
+            if (controls.JumpOrClimbUp.HasPressed)
+                Character.Jump(Vector3.Up);
+
+            if (controls.CrouchOrClimbDown.HasPressed)
+                Character.Crouch();
+
+            if (controls.JumpOrClimbUp.IsPressed)
+                move.Y = 1f;
+
+            if (controls.CrouchOrClimbDown.IsPressed)
+                move.Y = -1f;
 
             ApplyMoveAndRotation(move, rotate, 0f);
         }
