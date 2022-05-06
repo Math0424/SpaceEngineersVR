@@ -22,10 +22,11 @@ using VRage.Game.ModAPI;
 using VRageMath;
 using VRageRender;
 using VRage.Utils;
+using EmptyKeys.UserInterface.Controls;
+using EmptyKeys.UserInterface;
+using VRage.Input;
 using Sandbox.Graphics.GUI;
-using Sandbox.Graphics;
 using Sandbox.Game.Gui;
-using Sandbox.Game;
 
 // See MyRadialMenuItemFactory for actions
 
@@ -102,8 +103,8 @@ namespace SpaceEngineersVR.Player
 
             MyRenderDeviceSettings x = MyRender11.m_Settings;
             x.RefreshRate = refreshRate;
-            x.BackBufferHeight = (int)height;
-            x.BackBufferWidth = (int)width;
+            //x.BackBufferHeight = (int)height;
+            //x.BackBufferWidth = (int)width;
             x.SettingsMandatory = true;
             MySandboxGame.Static.SwitchSettings(x);
 
@@ -128,6 +129,8 @@ namespace SpaceEngineersVR.Player
 
             if (firstUpdate)
             {
+                MyRender11.Resolution = new Vector2I((int)width, (int)height);
+                MyRender11.CreateScreenResources();
                 SetOffset();
                 firstUpdate = false;
                 return true;
@@ -160,13 +163,16 @@ namespace SpaceEngineersVR.Player
             envMats.FovH = FovH;
             envMats.FovV = FovV;
 
-            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
+            MatrixD eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
             DrawScene(EVREye.Eye_Left);
 
             eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
             LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
             DrawScene(EVREye.Eye_Right);
+
+            if (MyInput.Static.IsKeyPress(MyKeys.NumPad5))
+                offset = new Vector3(0);
 
             return true;
         }
@@ -245,7 +251,7 @@ namespace SpaceEngineersVR.Player
             //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
         }
 
-        private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, float nearPlane)
+        private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, double nearPlane)
         {
             float left = 0f, right = 0f, top = 0f, bottom = 0f;
             OpenVR.System.GetProjectionRaw(eye, ref left, ref right, ref top, ref bottom);
@@ -253,10 +259,10 @@ namespace SpaceEngineersVR.Player
             //Adapted from decompilation of Matrix.CreatePerspectiveFovRhInfiniteComplementary, Matrix.CreatePerspectiveFieldOfView
             //and https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetProjectionRaw
 
-            float idx = 1f / (right - left);
-            float idy = 1f / (bottom - top);
-            float sx = right + left;
-            float sy = bottom + top;
+            double idx = 1f / (right - left);
+            double idy = 1f / (bottom - top);
+            double sx = right + left;
+            double sy = bottom + top;
 
             return new MatrixD(
                 2*idx,  0f,     0f,        0f,
@@ -708,11 +714,11 @@ namespace SpaceEngineersVR.Player
 
         public void CreatePopup(string message)
         {
-            Bitmap img = new Bitmap(File.OpenRead(Common.IconPngPath));
-            CreatePopup(EVRNotificationType.Transient, message, ref img);
+            //System.Drawing.Bitmap img = new Bitmap(File.OpenRead(Common.IconPngPath));
+            //CreatePopup(EVRNotificationType.Transient, message, ref img);
         }
 
-        public void CreatePopup(EVRNotificationType type, string message, ref Bitmap bitmap)
+        public void CreatePopup(EVRNotificationType type, string message, ref System.Drawing.Bitmap bitmap)
         {
             if (!enableNotifications)
                 return;
@@ -752,7 +758,7 @@ namespace SpaceEngineersVR.Player
             Parallel.Start(() =>
             {
                 Logger.Info($"Messagebox created with the message: {msg}");
-                DialogResult result = MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
+                DialogResult result = System.Windows.Forms.MessageBox.Show(msg, caption, MessageBoxButtons.OKCancel);
                 return result;
             });
             return DialogResult.None;
