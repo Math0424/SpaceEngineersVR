@@ -2,8 +2,6 @@
 using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.World;
-using Sandbox.Game.Gui;
-using Sandbox.Graphics.GUI;
 using Sandbox.ModAPI;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -117,7 +115,7 @@ namespace SpaceEngineersVR.Player
             EnvironmentMatrices envMats = MyRender11.Environment_Matrices;
             MatrixD viewMatrix = hmdAbsolute;
             viewMatrix.Translation += offset;
-            viewMatrix = envMats.ViewD * Matrix.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
+            viewMatrix = envMats.ViewD * MatrixD.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
 
 
             BoundingFrustumD viewFrustum = envMats.ViewFrustumClippedD;
@@ -138,12 +136,12 @@ namespace SpaceEngineersVR.Player
             envMats.FovV = FovV;
 
             MatrixD eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
-            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * MatrixD.Invert(eyeToHead), ref envMats);
             VRGUIManager.Draw(viewMatrix);
             DrawScene(EVREye.Eye_Left);
 
             eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
-            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * Matrix.Invert(eyeToHead), ref envMats);
+            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * MatrixD.Invert(eyeToHead), ref envMats);
             VRGUIManager.Draw(viewMatrix);
             DrawScene(EVREye.Eye_Right);
 
@@ -210,7 +208,7 @@ namespace SpaceEngineersVR.Player
             //VRage.Render11.Scene.MyScene11.Instance.Environment.CameraPosition = cameraPosition;
         }
 
-        private static Matrix GetPerspectiveFovRhInfiniteComplementary(EVREye eye, double nearPlane)
+        private static MatrixD GetPerspectiveFovRhInfiniteComplementary(EVREye eye, double nearPlane)
         {
             float left = 0f, right = 0f, top = 0f, bottom = 0f;
             OpenVR.System.GetProjectionRaw(eye, ref left, ref right, ref top, ref bottom);
