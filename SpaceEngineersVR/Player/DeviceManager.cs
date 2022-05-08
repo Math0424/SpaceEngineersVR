@@ -116,7 +116,7 @@ public static class DeviceManager
             }
         }
         {
-            uint leftHandIndex = OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.RightHand);
+            uint leftHandIndex = OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand);
             if (leftHandIndex != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
                 LeftHand.deviceId = leftHandIndex;

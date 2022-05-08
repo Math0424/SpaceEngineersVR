@@ -46,20 +46,22 @@ namespace ClientPlugin.Player.Components
 
             if (right.isTracked)
             {
-                Util.DrawDebugMatrix(right.transformCalibrated.Translation, right.transformCalibrated, "RightHand");
+                Matrix world = right.transform * Character.WorldMatrix;
+                Util.DrawDebugMatrix(world.Translation, world, "RightHand");
                 SetBoneTransform(right, "SE_RigRPalm");
             }
 
             if (left.isTracked)
             {
-                Util.DrawDebugMatrix(left.transformCalibrated.Translation, left.transformCalibrated, "LeftHand");
+                Matrix world = left.transform * Character.WorldMatrix;
+                Util.DrawDebugMatrix(world.Translation, world, "LeftHand");
                 SetBoneTransform(left, "SE_RigLPalm");
             }
 
 
             void SetBoneTransform(Controller hand, string boneName)
             {
-                Matrix mat = hand.transformCalibrated;
+                Matrix mat = hand.transform;
                 Vector3 position = mat.Translation;
                 Quaternion rotation = Quaternion.CreateFromRotationMatrix(mat);
 

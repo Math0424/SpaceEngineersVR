@@ -8,7 +8,7 @@ namespace SpaceEngineersVR.Player;
 
 public class TrackedDevice
 {
-    public Matrix worldTransform => mainPose.transformCalibrated;
+    public Matrix transform => mainPose.transformCalibrated;
     public Vector3 velocity => mainPose.velocity;
     public Vector3 angularVelocity => mainPose.angularVelocity;
 
