@@ -1,6 +1,7 @@
 ﻿using Sandbox.Game.Entities.Character;
 using Sandbox.Game.Entities.Character.Components;
 using SpaceEngineersVR.Plugin;
+using System;
 using System.Reflection;
 using VRageMath;
 using VRageRender.Animations;
@@ -11,14 +12,28 @@ namespace SpaceEngineersVR.Player.Components
     {
         public BodyCalibration characterCalibration;
 
+        private static readonly Matrix RightHandExtraTransform = Matrix.CreateRotationZ(MathHelper.Pi / 2f) * Matrix.CreateRotationY(MathHelper.Pi);
+        private static readonly Matrix LeftHandExtraTransform = Matrix.CreateRotationZ(MathHelper.Pi / 2f);
+
         private static readonly FieldInfo RightHandIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_rightHandIKEndBone");
         private static readonly FieldInfo LeftHandIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_leftHandIKEndBone");
 
         private static readonly FieldInfo RightArmIKStartIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_rightHandIKStartBone");
         private static readonly FieldInfo LeftArmIKStartIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_leftHandIKStartBone");
 
+        private static readonly MethodInfo CalculateHandIK = HarmonyLib.AccessTools.Method(typeof(MyCharacter), "CalculateHandIK", new Type[]
+        {
+            typeof(int), //startBoneIndex
+            typeof(int), //endBoneIndex
+            typeof(MatrixD).MakeByRefType(), //targetTransform
+        });
+
         private int rightHandIndex;
         private int leftHandIndex;
+
+        private int rightArmIKStartIndex;
+        private int leftArmIKStartIndex;
+
 
         public override void OnAddedToScene()
         {
@@ -52,8 +67,8 @@ namespace SpaceEngineersVR.Player.Components
             MyCharacterBone rightHandBone = bones[rightHandIndex];
             MyCharacterBone leftHandBone =  bones[leftHandIndex];
 
-            int rightArmIKStartIndex = (int)RightArmIKStartIndexField.GetValue(Character);
-            int leftArmIKStartIndex = (int)LeftArmIKStartIndexField.GetValue(Character);
+            rightArmIKStartIndex = (int)RightArmIKStartIndexField.GetValue(Character);
+            leftArmIKStartIndex = (int)LeftArmIKStartIndexField.GetValue(Character);
 
             MyCharacterBone leftShoulder = bones[leftArmIKStartIndex];
             MyCharacterBone rightShoulder = bones[rightArmIKStartIndex];
@@ -81,19 +96,16 @@ namespace SpaceEngineersVR.Player.Components
 
         public override void UpdateBeforeSimulation()
         {
-            Update(Player.RightHand, rightHandIndex);
-            Update(Player.LeftHand,  leftHandIndex);
+            Update(Player.RightHand, rightArmIKStartIndex, rightHandIndex, RightHandExtraTransform);
+            Update(Player.LeftHand,  leftArmIKStartIndex,  leftHandIndex,  LeftHandExtraTransform);
 
-            void Update(Controller controller, int boneIndex)
+            void Update(Controller controller, int ikStartIndex, int handBoneIndex, Matrix rotationMatrix)
             {
                 if (!controller.pose_Main.isTracked)
                     return;
 
-                MyCharacterBone hand = Character.AnimationController.CharacterBones[boneIndex];
-
-                Matrix mat = controller.deviceToPlayer;
-
-                hand.SetCompleteTransformFromAbsoluteMatrix(ref mat, false);
+                MatrixD mat = rotationMatrix * controller.deviceToPlayer * Character.WorldMatrix;
+                CalculateHandIK.Invoke(Character, new object[] { ikStartIndex, handBoneIndex, mat });
             }
         }
 
