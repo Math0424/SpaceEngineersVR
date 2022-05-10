@@ -5,7 +5,7 @@ using SpaceEngineersVR.Wrappers;
 using Valve.VR;
 using VRageMath;
 
-namespace ClientPlugin.Player.Components
+namespace SpaceEngineersVR.Player.Components
 {
     public static class VRGUIManager
     {

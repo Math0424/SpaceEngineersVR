@@ -1,12 +1,10 @@
-﻿using ClientPlugin.Player.Components;
-using ClientPlugin.Plugin;
+﻿using SpaceEngineersVR.Player.Components;
 using HarmonyLib;
 using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SpaceEngineersVR.Config;
 using SpaceEngineersVR.GUI;
-using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Wrappers;
 using System;
 using System.IO;
@@ -20,10 +18,10 @@ using VRageMath;
 namespace SpaceEngineersVR.Plugin
 {
     // ReSharper disable once UnusedType.Global
-    public class Main : IPlugin, IVRPlugin
+    public class Main : IPlugin
     {
         public Harmony Harmony { get; private set; }
-        public IPluginConfig Config => config?.Data;
+        public PluginConfig Config => config?.Data;
 
         private PersistentConfig<PluginConfig> config;
         private static readonly string ConfigFileName = $"{Common.Name}.cfg";
@@ -138,13 +136,13 @@ namespace SpaceEngineersVR.Plugin
 
         private void CustomUpdate()
         {
-            DeviceManager.UpdateMain();
+            Player.Player.MainUpdate();
 
             if (MySession.Static?.LocalCharacter != null &&
                 !MySession.Static.LocalCharacter.Components.Contains(typeof(VRMovementComponent)))
             {
                 MySession.Static.LocalCharacter.Components.Add(new VRMovementComponent());
-                MySession.Static.LocalCharacter.Components.Add(new VRHandsComponent());
+                MySession.Static.LocalCharacter.Components.Add(new VRBodyComponent());
             }
         }
 
@@ -157,14 +155,14 @@ namespace SpaceEngineersVR.Plugin
         public void AfterLoadedWorld()
         {
             Logger.Info("Loading SE game");
-            DeviceManager.Headset.CreatePopup("Loaded Game");
+            Player.Player.Headset.CreatePopup("Loaded Game");
         }
 
         public void UnloadingWorld()
         {
             MyRender11.Resolution = DesktopResolution;
             Logger.Info("Unloading SE game");
-            DeviceManager.Headset.CreatePopup("Unloaded Game");
+            Player.Player.Headset.CreatePopup("Unloaded Game");
         }
     }
 }

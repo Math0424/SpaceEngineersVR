@@ -10,7 +10,7 @@ using VRage.Game;
 using VRage.Game.ModAPI;
 using VRageMath;
 
-namespace ClientPlugin.Player.Components
+namespace SpaceEngineersVR.Player.Components
 {
 
     internal class VRMovementComponent : MyCharacterComponent

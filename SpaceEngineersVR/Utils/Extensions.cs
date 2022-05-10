@@ -1,4 +1,4 @@
-﻿using ClientPlugin.Player.Components;
+﻿using SpaceEngineersVR.Player.Components;
 using Sandbox.Game.Entities.Character;
 using System.Runtime.CompilerServices;
 using Valve.VR;
@@ -36,9 +36,9 @@ namespace SpaceEngineersVR.Util
         {
             return c.Components.Get<VRMovementComponent>();
         }
-        public static VRHandsComponent VRHands(this MyCharacter c)
+        public static VRBodyComponent VRBody(this MyCharacter c)
         {
-            return c.Components.Get<VRHandsComponent>();
+            return c.Components.Get<VRBodyComponent>();
         }
 
         //Matrix
@@ -48,26 +48,26 @@ namespace SpaceEngineersVR.Util
         //41 42 43 translation
 
         //HmdMatrix34_t
-        //0 1  2 right
-        //4 5  6 up
-        //8 9 10 backward
+        //0 4  8 right
+        //1 5  9 up
+        //2 6 10 backward
         //3 7 11 translation
 
         public static Matrix ToMatrix(this HmdMatrix34_t hmd)
         {
             return new Matrix(
-                hmd.m0, hmd.m1, hmd.m2, 0f,
-                hmd.m4, hmd.m5, hmd.m6, 0f,
-                hmd.m8, hmd.m9, hmd.m10, 0f,
+                hmd.m0, hmd.m4, hmd.m8,  0f,
+                hmd.m1, hmd.m5, hmd.m9,  0f,
+                hmd.m2, hmd.m6, hmd.m10, 0f,
                 hmd.m3, hmd.m7, hmd.m11, 1f);
         }
 
         public static Matrix ToMatrix(this HmdMatrix44_t hmd)
         {
             return new Matrix(
-                hmd.m0, hmd.m1, hmd.m2, hmd.m12,
-                hmd.m4, hmd.m5, hmd.m6, hmd.m13,
-                hmd.m8, hmd.m9, hmd.m10, hmd.m14,
+                hmd.m0, hmd.m4, hmd.m8,  hmd.m12,
+                hmd.m1, hmd.m5, hmd.m9,  hmd.m13,
+                hmd.m2, hmd.m6, hmd.m10, hmd.m14,
                 hmd.m3, hmd.m7, hmd.m11, hmd.m15);
         }
     }

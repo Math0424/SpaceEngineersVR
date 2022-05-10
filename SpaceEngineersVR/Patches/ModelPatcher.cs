@@ -1,4 +1,4 @@
-﻿namespace ClientPlugin.Patches
+﻿namespace SpaceEngineersVR.Patches
 {
     internal static class ModelPatcher
     {

@@ -58,7 +58,7 @@ public class Controller : TrackedDevice
 
     private void UpdateBeforeSimulation()
     {
-        rollingVelocity[rollingVelocityUpdate++ % RollingVelocityFrames] = velocity;
+        rollingVelocity[rollingVelocityUpdate++ % RollingVelocityFrames] = pose_Main.velocity;
     }
 
     protected override void OnConnected()

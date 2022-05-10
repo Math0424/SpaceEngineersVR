@@ -1,4 +1,4 @@
-﻿using ClientPlugin.Player.Components;
+﻿using SpaceEngineersVR.Player.Components;
 using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.World;
@@ -40,8 +40,6 @@ namespace SpaceEngineersVR.Player
         {
             deviceId = OpenVR.k_unTrackedDeviceIndex_Hmd;
 
-            SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
-
             OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Left, ref pnX, ref pnY, ref width, ref height);
 
             float left = 0f, right = 0f, top = 0f, bottom = 0f;
@@ -78,7 +76,7 @@ namespace SpaceEngineersVR.Player
         private bool firstUpdate = true;
         private BorrowedRtvTexture texture;
 
-        public void UpdateRender()
+        public void RenderUpdate()
         {
             if (!MyRender11.m_DrawScene)
             {
@@ -86,11 +84,10 @@ namespace SpaceEngineersVR.Player
                 return;
             }
 
-            if (firstUpdate && renderPose.isTracked)
+            if (firstUpdate && pose_Render.isTracked)
             {
                 MyRender11.Resolution = new Vector2I((int)width, (int)height);
                 MyRender11.CreateScreenResources();
-                CalibrateIgnorePitchRoll(renderPose.transformAbsolute);
                 firstUpdate = false;
                 return;
             }
@@ -98,12 +95,12 @@ namespace SpaceEngineersVR.Player
             texture?.Release();
             texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)width, (int)height, Format.R8G8B8A8_UNorm_SRgb);
 
-            if (MyInput.Static.IsKeyPress(MyKeys.NumPad0))
-                CalibrateIgnorePitchRoll(renderPose.transformAbsolute);
-
             EnvironmentMatrices envMats = MyRender11.Environment_Matrices;
-            MatrixD viewMatrix = renderPose.transformCalibrated;
-            viewMatrix = envMats.ViewD * MatrixD.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
+
+            Matrix deviceToAbsolute = pose_Render.deviceToAbsolute.matrix;
+            deviceToAbsolute.M42 -= Player.GetBodyCalibration().height;
+            Matrix m = deviceToAbsolute * Player.RenderPlayerToAbsolute.inverted;
+            MatrixD viewMatrix = envMats.ViewD * MatrixD.Invert(m);
 
 
             //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
@@ -123,12 +120,10 @@ namespace SpaceEngineersVR.Player
             envMats.FovH = FovH;
             envMats.FovV = FovV;
 
-            MatrixD eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
-            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * MatrixD.Invert(eyeToHead), ref envMats);
+            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix, ref envMats);
             DrawScene(EVREye.Eye_Left);
 
-            eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
-            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * MatrixD.Invert(eyeToHead), ref envMats);
+            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix, ref envMats);
             DrawScene(EVREye.Eye_Right);
         }
 
@@ -148,6 +143,9 @@ namespace SpaceEngineersVR.Player
 
         private void LoadEnviromentMatrices(EVREye eye, MatrixD viewMatrix, ref EnvironmentMatrices envMats)
         {
+            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(eye).ToMatrix();
+            viewMatrix *= Matrix.Invert(eyeToHead);
+
             MatrixD worldMat = MatrixD.Invert(viewMatrix);
             Vector3D cameraPosition = worldMat.Translation;
 
@@ -237,9 +235,14 @@ namespace SpaceEngineersVR.Player
             }
         }
 
+        protected override void OnStartTracking()
+        {
+            Player.ResetPlayerFloor();
+        }
 
 
-        private void UpdateBeforeSimulation()
+
+        public override void MainUpdate()
         {
             var character = MyAPIGateway.Session?.Player?.Character;
             if (character == null)

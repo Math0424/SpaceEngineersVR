@@ -1,4 +1,4 @@
-﻿using ClientPlugin.Player.Components;
+﻿using SpaceEngineersVR.Player.Components;
 using HarmonyLib;
 using SpaceEngineersVR.Plugin;
 using System;
@@ -23,8 +23,8 @@ namespace SpaceEngineersVR.Patches
 
         private static bool Prefix_DrawScene()
         {
-            Player.DeviceManager.UpdateRender();
-            Player.DeviceManager.Headset.UpdateRender();
+            Player.Player.RenderUpdate();
+            Player.Player.Headset.RenderUpdate();
             VRGUIManager.Draw();
 
             return true;
