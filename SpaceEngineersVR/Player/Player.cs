@@ -16,8 +16,8 @@ public static class Player
 
 
     public static readonly Headset Headset = new();
-    public static readonly Controller LeftHand = new("/actions/common/in/LeftHand", "/actions/feedback/out/LeftHaptic");
-    public static readonly Controller RightHand = new("/actions/common/in/RightHand", "/actions/feedback/out/RightHaptic");
+    public static readonly Controller HandL = new("/actions/common/in/LeftHand", "/actions/feedback/out/LeftHaptic");
+    public static readonly Controller HandR = new("/actions/common/in/RightHand", "/actions/feedback/out/RightHaptic");
     public static readonly MyConcurrentList<TrackedDevice> AllDevices = new(3);
 
     public static BodyCalibration GetBodyCalibration()
@@ -39,7 +39,7 @@ public static class Player
 
     public static MatrixAndInvert PlayerToAbsolute { get; private set; } = MatrixAndInvert.Identity;
 
-    //Gets PlayerToAbsolute that is synced for render thread
+    //PlayerToAbsolute that is synced for render thread
     public static MatrixAndInvert RenderPlayerToAbsolute = MatrixAndInvert.Identity;
 
     private static readonly FastResourceLock SyncPlayerToAbsoluteLock = new();
@@ -54,13 +54,13 @@ public static class Player
     private static readonly object SyncPosesLock = new();
     private static TrackedDevicePose_t[] SyncPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 
-    private static TrackedDevicePose_t[] MainPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+    private static TrackedDevicePose_t[] Poses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 
     static Player()
     {
         AllDevices.Add(Headset);
-        AllDevices.Add(LeftHand);
-        AllDevices.Add(RightHand);
+        AllDevices.Add(HandL);
+        AllDevices.Add(HandR);
 
         using (PlayerCalibrationLock.AcquireExclusiveUsing())
         {
@@ -138,14 +138,14 @@ public static class Player
             uint rightHandIndex = OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.RightHand);
             if (rightHandIndex != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
-                RightHand.deviceId = rightHandIndex;
+                HandR.deviceId = rightHandIndex;
             }
         }
         {
             uint leftHandIndex = OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand);
             if (leftHandIndex != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
-                LeftHand.deviceId = leftHandIndex;
+                HandL.deviceId = leftHandIndex;
             }
         }
 
@@ -180,8 +180,8 @@ public static class Player
         try
         {
             Monitor.Enter(SyncPosesLock);
-            TrackedDevicePose_t[] tmp = MainPoses;
-            MainPoses = SyncPoses;
+            TrackedDevicePose_t[] tmp = Poses;
+            Poses = SyncPoses;
             SyncPoses = tmp;
         }
         finally
@@ -193,7 +193,7 @@ public static class Player
         {
             if (device.deviceId is not OpenVR.k_unTrackedDeviceIndexInvalid)
             {
-                device.SetMainPoseData(MainPoses[device.deviceId]);
+                device.SetMainPoseData(Poses[device.deviceId]);
             }
         }
 
@@ -228,19 +228,19 @@ public static class Player
 
     private static void CalibrationUpdate()
     {
-        if (Headset.pose_Main.isTracked)
+        if (Headset.pose.isTracked)
         {
-            Vector3 headPos = Headset.pose_Main.deviceToAbsolute.matrix.Translation;
+            Vector3 headPos = Headset.pose.deviceToAbsolute.matrix.Translation;
             float height = headPos.Y;
 
             if (CalibrationInProgress.height < height)
                 CalibrationInProgress.height = height;
         }
 
-        if (LeftHand.pose_Main.isTracked && RightHand.pose_Main.isTracked)
+        if (HandL.pose.isTracked && HandR.pose.isTracked)
         {
-            Vector3 lPos = LeftHand.pose_Main.deviceToAbsolute.matrix.Translation;
-            Vector3 rPos = RightHand.pose_Main.deviceToAbsolute.matrix.Translation;
+            Vector3 lPos = HandL.pose.deviceToAbsolute.matrix.Translation;
+            Vector3 rPos = HandR.pose.deviceToAbsolute.matrix.Translation;
             float armSpan = Vector2.Distance(new(lPos.X, lPos.Z), new(rPos.X, rPos.Z));
 
             if (CalibrationInProgress.armSpan < armSpan)
@@ -291,9 +291,9 @@ public static class Player
     {
         Matrix floor;
         if (Common.Config.UseHeadRotationForCharacter)
-            floor = Util.Util.ZeroPitchAndRoll(Headset.pose_Main.deviceToAbsolute.matrix);
+            floor = Util.Util.ZeroPitchAndRoll(Headset.pose.deviceToAbsolute.matrix);
         else
-            floor = Matrix.CreateTranslation(Headset.pose_Main.deviceToAbsolute.matrix.Translation);
+            floor = Matrix.CreateTranslation(Headset.pose.deviceToAbsolute.matrix.Translation);
 
         floor.M42 = 0f; //Translation.Y = 0f
 

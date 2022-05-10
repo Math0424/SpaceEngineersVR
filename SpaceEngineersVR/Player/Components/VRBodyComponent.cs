@@ -12,14 +12,14 @@ namespace SpaceEngineersVR.Player.Components
     {
         public BodyCalibration characterCalibration;
 
-        private static readonly Matrix RightHandExtraTransform = Matrix.CreateRotationZ(MathHelper.Pi / 2f) * Matrix.CreateRotationY(MathHelper.Pi);
-        private static readonly Matrix LeftHandExtraTransform = Matrix.CreateRotationZ(MathHelper.Pi / 2f);
+        private static readonly Matrix HandExtraTransformL = Matrix.CreateRotationZ(MathHelper.Pi / 2f);
+        private static readonly Matrix HandExtraTransformR = Matrix.CreateRotationZ(MathHelper.Pi / 2f) * Matrix.CreateRotationY(MathHelper.Pi);
 
-        private static readonly FieldInfo RightHandIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_rightHandIKEndBone");
-        private static readonly FieldInfo LeftHandIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_leftHandIKEndBone");
+        private static readonly FieldInfo HandIndexFieldL = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_leftHandIKEndBone");
+        private static readonly FieldInfo HandIndexFieldR = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_rightHandIKEndBone");
 
-        private static readonly FieldInfo RightArmIKStartIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_rightHandIKStartBone");
-        private static readonly FieldInfo LeftArmIKStartIndexField = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_leftHandIKStartBone");
+        private static readonly FieldInfo ArmIKStartIndexFieldL = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_leftHandIKStartBone");
+        private static readonly FieldInfo ArmIKStartIndexFieldR = HarmonyLib.AccessTools.Field(typeof(MyCharacter), "m_rightHandIKStartBone");
 
         private static readonly MethodInfo CalculateHandIK = HarmonyLib.AccessTools.Method(typeof(MyCharacter), "CalculateHandIK", new Type[]
         {
@@ -28,11 +28,11 @@ namespace SpaceEngineersVR.Player.Components
             typeof(MatrixD).MakeByRefType(), //targetTransform
         });
 
-        private int rightHandIndex;
-        private int leftHandIndex;
+        private int handIndexL;
+        private int handIndexR;
 
-        private int rightArmIKStartIndex;
-        private int leftArmIKStartIndex;
+        private int armIKStartIndexL;
+        private int armIKStartIndexR;
 
 
         public override void OnAddedToScene()
@@ -61,25 +61,25 @@ namespace SpaceEngineersVR.Player.Components
             characterCalibration.height = headPos.Y;
 
 
-            rightHandIndex = (int)RightHandIndexField.GetValue(Character);
-            leftHandIndex = (int)LeftHandIndexField.GetValue(Character);
+            handIndexL = (int)HandIndexFieldL.GetValue(Character);
+            handIndexR = (int)HandIndexFieldR.GetValue(Character);
 
-            MyCharacterBone rightHandBone = bones[rightHandIndex];
-            MyCharacterBone leftHandBone =  bones[leftHandIndex];
+            armIKStartIndexL = (int)ArmIKStartIndexFieldL.GetValue(Character);
+            armIKStartIndexR = (int)ArmIKStartIndexFieldR.GetValue(Character);
 
-            rightArmIKStartIndex = (int)RightArmIKStartIndexField.GetValue(Character);
-            leftArmIKStartIndex = (int)LeftArmIKStartIndexField.GetValue(Character);
+            MyCharacterBone handBoneL = handIndexL >= 0 ? bones[handIndexL] : null;
+            MyCharacterBone handBoneR = handIndexR >= 0 ? bones[handIndexR] : null;
 
-            MyCharacterBone leftShoulder = bones[leftArmIKStartIndex];
-            MyCharacterBone rightShoulder = bones[rightArmIKStartIndex];
+            MyCharacterBone shoulderL = armIKStartIndexL >= 0 ? bones[armIKStartIndexL] : null;
+            MyCharacterBone shoulderR = armIKStartIndexR >= 0 ? bones[armIKStartIndexR] : null;
 
-            float lengthR = CalculateArmLength(leftHandBone, leftShoulder,  headPos);
-            float lengthL = CalculateArmLength(rightHandBone, rightShoulder, headPos);
-            float shoulderWidth = Vector3.Distance(leftShoulder.GetAbsoluteRigTransform().Translation, rightShoulder.GetAbsoluteRigTransform().Translation);
+            float lengthL = CalculateArmLength(handBoneL, shoulderL);
+            float lengthR = CalculateArmLength(handBoneR, shoulderR);
+            float shoulderWidth = Vector3.Distance(shoulderL.GetAbsoluteRigTransform().Translation, shoulderR.GetAbsoluteRigTransform().Translation);
 
             characterCalibration.armSpan = lengthL + lengthR + shoulderWidth;
 
-            static float CalculateArmLength(MyCharacterBone hand, MyCharacterBone shoulder, Vector3 headPos)
+            static float CalculateArmLength(MyCharacterBone hand, MyCharacterBone shoulder)
             {
                 float totalLength = 0f;
                 for (MyCharacterBone bone = hand; bone != shoulder; bone = bone.Parent)
@@ -96,12 +96,12 @@ namespace SpaceEngineersVR.Player.Components
 
         public override void UpdateBeforeSimulation()
         {
-            Update(Player.RightHand, rightArmIKStartIndex, rightHandIndex, RightHandExtraTransform);
-            Update(Player.LeftHand,  leftArmIKStartIndex,  leftHandIndex,  LeftHandExtraTransform);
+            Update(Player.HandL, armIKStartIndexL, handIndexL, HandExtraTransformL);
+            Update(Player.HandR, armIKStartIndexR, handIndexR, HandExtraTransformR);
 
             void Update(Controller controller, int ikStartIndex, int handBoneIndex, Matrix rotationMatrix)
             {
-                if (!controller.pose_Main.isTracked)
+                if (!controller.pose.isTracked)
                     return;
 
                 MatrixD mat = rotationMatrix * controller.deviceToPlayer * Character.WorldMatrix;

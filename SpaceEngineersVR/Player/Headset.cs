@@ -84,7 +84,7 @@ namespace SpaceEngineersVR.Player
                 return;
             }
 
-            if (firstUpdate && pose_Render.isTracked)
+            if (firstUpdate && renderPose.isTracked)
             {
                 MyRender11.Resolution = new Vector2I((int)width, (int)height);
                 MyRender11.CreateScreenResources();
@@ -97,7 +97,7 @@ namespace SpaceEngineersVR.Player
 
             EnvironmentMatrices envMats = MyRender11.Environment_Matrices;
 
-            Matrix deviceToAbsolute = pose_Render.deviceToAbsolute.matrix;
+            Matrix deviceToAbsolute = renderPose.deviceToAbsolute.matrix;
             deviceToAbsolute.M42 -= Player.GetBodyCalibration().height;
             Matrix m = deviceToAbsolute * Player.RenderPlayerToAbsolute.inverted;
             MatrixD viewMatrix = envMats.ViewD * MatrixD.Invert(m);

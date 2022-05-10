@@ -6,7 +6,7 @@ namespace SpaceEngineersVR.Player;
 
 public class TrackedDevice
 {
-    public Matrix deviceToPlayer => pose_Main.deviceToAbsolute.matrix * Player.PlayerToAbsolute.inverted;
+    public Matrix deviceToPlayer => pose.deviceToAbsolute.matrix * Player.PlayerToAbsolute.inverted;
 
     public struct Pose
     {
@@ -18,8 +18,8 @@ public class TrackedDevice
         public Vector3 velocity;
         public Vector3 angularVelocity;
     }
-    public Pose pose_Render = new();
-    public Pose pose_Main = new();
+    public Pose renderPose = new();
+    public Pose pose = new();
 
     public uint deviceId = OpenVR.k_unTrackedDeviceIndexInvalid;
 
@@ -46,9 +46,9 @@ public class TrackedDevice
     {
     }
 
-    public void SetMainPoseData(TrackedDevicePose_t pose)
+    public void SetMainPoseData(TrackedDevicePose_t value)
     {
-        SetPoseData(ref pose_Main, pose, out bool wasConnected, out bool wasDisconnected, out bool startedTracking, out bool lostTracking);
+        SetPoseData(ref pose, value, out bool wasConnected, out bool wasDisconnected, out bool startedTracking, out bool lostTracking);
 
         if (wasConnected)
             OnConnected();
@@ -61,9 +61,9 @@ public class TrackedDevice
             OnLostTracking();
     }
 
-    public void SetRenderPoseData(TrackedDevicePose_t pose)
+    public void SetRenderPoseData(TrackedDevicePose_t value)
     {
-        SetPoseData(ref pose_Render, pose, out _, out _, out _, out _);
+        SetPoseData(ref renderPose, value, out _, out _, out _, out _);
     }
 
     private static void SetPoseData(ref Pose pose, TrackedDevicePose_t value, out bool wasConnected, out bool wasDisconnected, out bool startedTracking, out bool lostTracking)
