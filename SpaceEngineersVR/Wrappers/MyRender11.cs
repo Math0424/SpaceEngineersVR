@@ -25,6 +25,7 @@ namespace SpaceEngineersVR.Wrappers
             m_rc = AccessTools.Field(t, "m_rc");
             settings = AccessTools.Field(t, "Settings");
             m_settings = AccessTools.Field(t, "m_settings");
+            m_drawScene = AccessTools.Field(t, "m_drawScene");
 
             setupCameraMatricesDel = (Action<MyRenderMessageSetCameraViewMatrix>)Delegate.CreateDelegate(typeof(Action<MyRenderMessageSetCameraViewMatrix>), AccessTools.Method(t, "SetupCameraMatrices"));
             createScreenResourcesDel = (Action)Delegate.CreateDelegate(typeof(Action), AccessTools.Method(t, "CreateScreenResources"));
@@ -70,6 +71,9 @@ namespace SpaceEngineersVR.Wrappers
             get => (MyRenderDeviceSettings)m_settings.GetValue(null);
             set => settings.SetValue(null, value);
         }
+
+        private static readonly FieldInfo m_drawScene;
+        public static bool m_DrawScene => (bool)m_drawScene.GetValue(null);
 
 
         private static readonly MethodInfo resizeSwapChain;

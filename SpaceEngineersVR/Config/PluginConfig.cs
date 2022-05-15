@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace SpaceEngineersVR.Config
 {
-    public class PluginConfig : IPluginConfig
+    public class PluginConfig : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -30,6 +30,12 @@ namespace SpaceEngineersVR.Config
         private bool enableKeyboardAndMouseControls = true;
         private bool enableCharacterRendering = true;
 
+        private bool useHeadRotationForCharacter = true;
+
+
+        private float playerHeight = 1.69f;
+        private float playerArmSpan = 1.66f;
+
         public bool EnableKeyboardAndMouseControls
         {
             get => enableKeyboardAndMouseControls;
@@ -40,6 +46,23 @@ namespace SpaceEngineersVR.Config
         {
             get => enableCharacterRendering;
             set => SetValue(ref enableCharacterRendering, value);
+        }
+
+        public bool UseHeadRotationForCharacter
+        {
+            get => useHeadRotationForCharacter;
+            set => SetValue(ref useHeadRotationForCharacter, value);
+        }
+
+        public float PlayerHeight
+        {
+            get => playerHeight;
+            set => SetValue(ref playerHeight, value);
+        }
+        public float PlayerArmSpan
+        {
+            get => playerArmSpan;
+            set => SetValue(ref playerArmSpan, value);
         }
     }
 }

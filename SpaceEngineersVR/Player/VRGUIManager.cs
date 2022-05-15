@@ -1,21 +1,11 @@
-﻿using Sandbox;
-using Sandbox.Game.Entities;
-using Sandbox.Game.Entities.Character.Components;
-using Sandbox.Game.Gui;
-using Sandbox.Game.Screens.Helpers.RadialMenuActions;
-using Sandbox.Game.SessionComponents.Clipboard;
-using Sandbox.Game.World;
+﻿using Sandbox.Game.Gui;
 using Sandbox.Graphics.GUI;
 using SharpDX.Direct3D11;
-using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Wrappers;
-using System.Runtime.CompilerServices;
 using Valve.VR;
-using VRage.Game;
-using VRage.Game.ModAPI;
 using VRageMath;
 
-namespace ClientPlugin.Player.Components
+namespace SpaceEngineersVR.Player.Components
 {
     public static class VRGUIManager
     {
@@ -42,7 +32,7 @@ namespace ClientPlugin.Player.Components
 
         //called in Headset draw method
         //so make sure its fast :)
-        public static void Draw(Matrix viewMatrix)
+        public static void Draw()
         {
             DrawOverlay();
         }

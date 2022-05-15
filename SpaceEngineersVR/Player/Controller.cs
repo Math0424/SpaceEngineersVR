@@ -1,10 +1,14 @@
-﻿using ClientPlugin.Utill;
+﻿using Sandbox;
+using Sandbox.Game.World;
+using SpaceEngineersVR.Patches;
+using SpaceEngineersVR.Plugin;
 using System;
-using System.Collections.Generic;
 using Valve.VR;
 using VRageMath;
 
-namespace ClientPlugin.Player
+namespace SpaceEngineersVR.Player;
+
+public class Controller : TrackedDevice
 {
     [Flags]
     public enum Button : ulong
@@ -20,7 +24,7 @@ namespace ClientPlugin.Player
 
         DPadDown = 1ul << EVRButtonId.k_EButton_DPad_Down,
     }
-
+    /*
     public enum Axis
     {
         Joystick = 0,
@@ -29,142 +33,68 @@ namespace ClientPlugin.Player
         Axis3 = 3,
         Axis4 = 4,
     }
+    */
 
-    internal struct Controller
+    private const int RollingVelocityFrames = 10;
+    public Vector3 RollingVelocity
     {
-        private Queue<Vector3> TenFrameSpeed;
-
-        public MatrixD WorldPos;
-
-        public Vector3 TenFramVel;
-        public Vector3 CurrentVel;
-        public Vector3 AngularVel;
-
-        public VRControllerState_t PrevState;
-        public VRControllerState_t CurrentState;
-        public uint ControllerID;
-
-        public bool IsValid;
-        public bool IsConnected;
-
-        private float hairTriggerLimit;
-        private bool hairTriggerState, hairTriggerPrevState;
-
-        public bool IsButtonDown(Button btn)
+        get
         {
-            return (CurrentState.ulButtonPressed & (ulong)btn) != 0;
+            Vector3 result = Vector3.Zero;
+            for (int i = 0; i < RollingVelocityFrames; i++)
+                result += rollingVelocity[i];
+            return (result / RollingVelocityFrames);
         }
+    }
+    private Vector3[] rollingVelocity = new Vector3[RollingVelocityFrames];
+    private int rollingVelocityUpdate = 0;
 
-        public bool IsNewButtonDown(Button btn)
+    public Controller(string actionName, string hapticsName)
+        : base(actionName, hapticsName)
+    {
+        SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
+    }
+
+
+    private void UpdateBeforeSimulation()
+    {
+        rollingVelocity[rollingVelocityUpdate++ % RollingVelocityFrames] = pose.velocity;
+    }
+
+    protected override void OnConnected()
+    {
+        if (MySession.Static == null)
+            return;
+
+        if (MySession.Static.IsPausable())
         {
-            return (CurrentState.ulButtonPressed & (ulong)btn) != 0 && (PrevState.ulButtonPressed & (ulong)btn) == 0;
+            MySandboxGame.PausePop();
+            Logger.Info("Controller reconnected, unpausing game.");
         }
-
-        public bool IsNewButtonUp(Button btn)
+        else
         {
-            return (CurrentState.ulButtonPressed & (ulong)btn) == 0 && (PrevState.ulButtonPressed & (ulong)btn) != 0;
+            Logger.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
         }
+    }
+    protected override void OnDisconnected()
+    {
+        if (MySession.Static == null)
+            return;
 
-        public bool IsTouchDown(Button btn)
+        //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
+        if (MySession.Static.IsPausable())
         {
-            return (CurrentState.ulButtonTouched & (ulong)btn) != 0;
+            MySandboxGame.PausePush();
+            Logger.Info("Controller disconnected, pausing game.");
         }
-
-        public bool IsNewTouchDown(Button btn)
+        else
         {
-            return (CurrentState.ulButtonTouched & (ulong)btn) != 0 && (PrevState.ulButtonTouched & (ulong)btn) == 0;
+            Logger.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
         }
+    }
 
-        public bool IsNewTouchUp(Button btn)
-        {
-            return (CurrentState.ulButtonTouched & (ulong)btn) == 0 && (PrevState.ulButtonTouched & (ulong)btn) != 0;
-        }
-
-        public ulong GetButtonPushed => CurrentState.ulButtonPressed;
-
-
-        public bool IsHairTrigger()
-        {
-            return hairTriggerState;
-        }
-
-        public bool IsNewHairTriggerDown()
-        {
-            return hairTriggerState && !hairTriggerPrevState;
-        }
-
-        public bool IsNewHairTriggerUp()
-        {
-            return !hairTriggerState && hairTriggerPrevState;
-        }
-
-        public Vector2 GetAxis(Axis axis = Axis.Joystick)
-        {
-            switch (axis)
-            {
-                case Axis.Joystick: return new Vector2(CurrentState.rAxis0.x, CurrentState.rAxis0.y);
-                case Axis.Trigger: return new Vector2(CurrentState.rAxis1.x, CurrentState.rAxis1.y);
-                case Axis.Grip: return new Vector2(CurrentState.rAxis2.x, CurrentState.rAxis2.y);
-                case Axis.Axis3: return new Vector2(CurrentState.rAxis3.x, CurrentState.rAxis3.y);
-                case Axis.Axis4: return new Vector2(CurrentState.rAxis4.x, CurrentState.rAxis4.y);
-            }
-            return Vector2.Zero;
-        }
-
-        public void TriggerHapticPulse(ushort duration = 500, Button button = Button.Touchpad)
-        {
-            OpenVR.System.TriggerHapticPulse(ControllerID, (uint)button, (char)duration);
-        }
-
-        public void UpdateControllerPosition(TrackedDevicePose_t pos)
-        {
-            PrevState = CurrentState;
-
-            IsConnected = pos.bDeviceIsConnected;
-            IsValid = OpenVR.System.GetControllerStateWithPose(ETrackingUniverseOrigin.TrackingUniverseStanding, ControllerID, ref CurrentState, ref pos);
-
-            WorldPos = pos.mDeviceToAbsoluteTracking.ToMatrix();
-
-            AngularVel = pos.vAngularVelocity.ToVector();
-            CurrentVel = pos.vVelocity.ToVector();
-
-            if (TenFrameSpeed == null)
-            {
-                TenFrameSpeed = new Queue<Vector3>();
-            }
-
-            TenFrameSpeed.Enqueue(CurrentVel);
-            if (TenFrameSpeed.Count > 10)
-            {
-                TenFrameSpeed.Dequeue();
-            }
-
-            foreach (Vector3 q in TenFrameSpeed)
-            {
-                TenFramVel += q;
-            }
-
-            TenFramVel /= 10;
-
-
-            hairTriggerPrevState = hairTriggerState;
-            float value = CurrentState.rAxis1.x;
-            if (hairTriggerState)
-            {
-                if (value < hairTriggerLimit - 0.1 || value <= 0.0f)
-                {
-                    hairTriggerState = false;
-                }
-            }
-            else
-            {
-                if (value > hairTriggerLimit + 0.1 || value >= 1.0f)
-                {
-                    hairTriggerState = true;
-                }
-            }
-            hairTriggerLimit = hairTriggerState ? Math.Max(hairTriggerLimit, value) : Math.Min(hairTriggerLimit, value);
-        }
-
+    public void TriggerHapticPulse(ushort duration = 500, Button button = Button.Touchpad)
+    {
+        OpenVR.System.TriggerHapticPulse(deviceId, (uint)button, (char)duration);
     }
 }

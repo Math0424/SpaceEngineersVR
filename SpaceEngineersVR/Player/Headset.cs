@@ -1,4 +1,4 @@
-﻿using ClientPlugin.Player.Components;
+﻿using SpaceEngineersVR.Player.Components;
 using ParallelTasks;
 using Sandbox;
 using Sandbox.Game.World;
@@ -10,7 +10,6 @@ using SpaceEngineersVR.Plugin;
 using SpaceEngineersVR.Util;
 using SpaceEngineersVR.Wrappers;
 using System;
-using System.Text;
 using System.Windows.Forms;
 using Valve.VR;
 using VRage.Input;
@@ -22,15 +21,8 @@ using VRageRender;
 
 namespace SpaceEngineersVR.Player
 {
-    public class Headset
+    public class Headset : TrackedDevice
     {
-        public Matrix hmdAbsolute = Matrix.Identity;
-
-        public bool IsHeadsetConnected => OpenVR.IsHmdPresent();
-        public bool IsHeadsetAlreadyDisconnected = false;
-        public bool IsControllersConnected => true; //(LeftHand.IsConnected = true) && (RightHand.IsConnected = true);
-        public bool IsControllersAlreadyDisconnected = false;
-
         private readonly uint pnX;
         private readonly uint pnY;
         private readonly uint height;
@@ -40,24 +32,20 @@ namespace SpaceEngineersVR.Player
         private readonly float FovV;
 
         private VRTextureBounds_t imageBounds;
-        private readonly TrackedDevicePose_t[] renderPositions;
-        private readonly TrackedDevicePose_t[] gamePositions;
 
         private bool enableNotifications = false;
 
-        private Vector3 offset = new Vector3(0f, -1.73f, 0f);
-
         public Headset()
+            : base(actionName: "")
         {
-            FrameInjections.DrawScene += FrameUpdate;
-            SimulationUpdater.UpdateBeforeSim += UpdateBeforeSimulation;
+            deviceId = OpenVR.k_unTrackedDeviceIndex_Hmd;
 
             OpenVR.ExtendedDisplay.GetEyeOutputViewport(EVREye.Eye_Left, ref pnX, ref pnY, ref width, ref height);
-            FovH = MathHelper.Atan((pnY - pnX) / 2) * 2f;
-            FovV = MathHelper.Atan((height - width) / 2) * 2f;
 
-            renderPositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-            gamePositions = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+            float left = 0f, right = 0f, top = 0f, bottom = 0f;
+            OpenVR.System.GetProjectionRaw(EVREye.Eye_Left, ref left, ref right, ref top, ref bottom);
+            FovH = MathHelper.Atan((right - left) / 2) * 2f;
+            FovV = MathHelper.Atan((bottom - top) / 2) * 2f;
 
             imageBounds = new VRTextureBounds_t
             {
@@ -88,35 +76,36 @@ namespace SpaceEngineersVR.Player
         private bool firstUpdate = true;
         private BorrowedRtvTexture texture;
 
-        private bool FrameUpdate()
+        public void RenderUpdate()
         {
-            GetNewPositions();
-
-            if (MySector.MainCamera == null)
+            if (!MyRender11.m_DrawScene)
             {
                 firstUpdate = true;
-                return true;
+                return;
             }
 
-            if (firstUpdate)
+            if (firstUpdate && renderPose.isTracked)
             {
                 MyRender11.Resolution = new Vector2I((int)width, (int)height);
                 MyRender11.CreateScreenResources();
-                SetOffset();
                 firstUpdate = false;
-                return true;
+                return;
             }
 
             texture?.Release();
             texture = MyManagers.RwTexturesPool.BorrowRtv("SpaceEngineersVR", (int)width, (int)height, Format.R8G8B8A8_UNorm_SRgb);
 
-
             EnvironmentMatrices envMats = MyRender11.Environment_Matrices;
-            MatrixD viewMatrix = hmdAbsolute;
-            viewMatrix.Translation += offset;
-            viewMatrix = envMats.ViewD * MatrixD.CreateTranslation(-viewMatrix.Translation) * viewMatrix.GetOrientation();
+
+            Matrix deviceToAbsolute = renderPose.deviceToAbsolute.matrix;
+            deviceToAbsolute.M42 -= Player.GetBodyCalibration().height;
+            Matrix m = deviceToAbsolute * Player.RenderPlayerToAbsolute.inverted;
+            MatrixD viewMatrix = envMats.ViewD * MatrixD.Invert(m);
 
 
+            //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
+            //theres a thread on unity forums with the math involved, will have to do some searching to find it again.
+            //I think someone posted a link to it in the discord
             BoundingFrustumD viewFrustum = envMats.ViewFrustumClippedD;
             MyUtils.Init(ref viewFrustum);
             viewFrustum.Matrix = viewMatrix * envMats.OriginalProjection;
@@ -127,33 +116,15 @@ namespace SpaceEngineersVR.Player
             viewFrustumFar.Matrix = viewMatrix * envMats.OriginalProjectionFar;
             envMats.ViewFrustumClippedFarD = viewFrustumFar;
 
-            //TODO: Redo this frustum culling such that it encompasses both eye's projection matrixes
-            //theres a thread on unity forums with the math involved, will have to do some searching to find it again.
-            //I think someone posted a link to it in the discord
 
             envMats.FovH = FovH;
             envMats.FovV = FovV;
 
-            MatrixD eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Left).ToMatrix();
-            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix * MatrixD.Invert(eyeToHead), ref envMats);
-            VRGUIManager.Draw(viewMatrix);
+            LoadEnviromentMatrices(EVREye.Eye_Left, viewMatrix, ref envMats);
             DrawScene(EVREye.Eye_Left);
 
-            eyeToHead = OpenVR.System.GetEyeToHeadTransform(EVREye.Eye_Right).ToMatrix();
-            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix * MatrixD.Invert(eyeToHead), ref envMats);
-            VRGUIManager.Draw(viewMatrix);
+            LoadEnviromentMatrices(EVREye.Eye_Right, viewMatrix, ref envMats);
             DrawScene(EVREye.Eye_Right);
-
-            if (MyInput.Static.IsKeyPress(MyKeys.NumPad5))
-                offset = new Vector3(0);
-
-
-            return true;
-        }
-
-        private void SetOffset()
-        {
-            offset = -hmdAbsolute.Translation;
         }
 
         private void DrawScene(EVREye eye)
@@ -172,6 +143,8 @@ namespace SpaceEngineersVR.Player
 
         private void LoadEnviromentMatrices(EVREye eye, MatrixD viewMatrix, ref EnvironmentMatrices envMats)
         {
+            Matrix eyeToHead = OpenVR.System.GetEyeToHeadTransform(eye).ToMatrix();
+            viewMatrix *= Matrix.Invert(eyeToHead);
 
             MatrixD worldMat = MatrixD.Invert(viewMatrix);
             Vector3D cameraPosition = worldMat.Translation;
@@ -215,119 +188,62 @@ namespace SpaceEngineersVR.Player
             //Adapted from decompilation of Matrix.CreatePerspectiveFovRhInfiniteComplementary, Matrix.CreatePerspectiveFieldOfView
             //and https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetProjectionRaw
 
-            double idx = 1f / (right - left);
-            double idy = 1f / (bottom - top);
+            double idx = 1d / (right - left);
+            double idy = 1d / (bottom - top);
             double sx = right + left;
             double sy = bottom + top;
 
             return new MatrixD(
-                2 * idx, 0f, 0f, 0f,
-                0f, 2 * idy, 0f, 0f,
-                sx * idx, sy * idy, 0f, -1f,
-                0f, 0f, nearPlane, 0f);
-        }
-
-        private void GetNewPositions()
-        {
-            OpenVR.Compositor.WaitGetPoses(renderPositions, gamePositions);
-            Compositor_FrameTiming timings = default;
-            OpenVR.Compositor.GetFrameTiming(ref timings, 0);
-            if (timings.m_nNumDroppedFrames != 0)
-            {
-                Logger.Warning("Dropping frames!");
-                Logger.IncreaseIndent();
-                StringBuilder builder = new StringBuilder();
-                builder.AppendLine("FrameInterval: " + timings.m_flClientFrameIntervalMs);
-                builder.AppendLine("IdleTime     : " + timings.m_flCompositorIdleCpuMs);
-                builder.AppendLine("RenderCPU    : " + timings.m_flCompositorRenderCpuMs);
-                builder.AppendLine("RenderGPU    : " + timings.m_flCompositorRenderGpuMs);
-                builder.AppendLine("SubmitTime   : " + timings.m_flSubmitFrameMs);
-                builder.AppendLine("DroppedFrames: " + timings.m_nNumDroppedFrames);
-                Logger.Warning(builder.ToString());
-                Logger.Warning("");
-            }
-
-            //Update positions
-            if (!renderPositions[0].bPoseIsValid || !renderPositions[0].bDeviceIsConnected)
-            {
-                Logger.Error("HMD pos invalid!");
-                return;
-            }
-
-            hmdAbsolute = renderPositions[0].mDeviceToAbsoluteTracking.ToMatrix();
+                2d * idx, 0d,       0d,        0d,
+                0d,       2d * idy, 0d,        0d,
+                sx * idx, sy * idy, 0d,        -1d,
+                0d,       0d,       nearPlane, 0d);
         }
 
         #endregion
-
         #region Control logic
 
-        //TODO: move this elsewhere
-        private void UpdateBeforeSimulation()
+        protected override void OnConnected()
         {
-            //UNTESTED
-            //Checks if one of the controllers got disconnected, shows a message if a controller is disconnected.
-            if (!IsControllersConnected && !IsControllersAlreadyDisconnected)
+            if (MySession.Static == null)
+                return;
+
+            if (MySession.Static.IsPausable())
             {
-                //CreatePopup("Error: One of your controllers got disconnected, please reconnect it to continue gameplay.");
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePush();
-                    Logger.Info("Controller disconnected, pausing game.");
-                }
-                else
-                {
-                    Logger.Info("Controller disconnected, unable to pause game since it is a multiplayer session.");
-                }
-
-                IsControllersAlreadyDisconnected = true;
+                MySandboxGame.PausePop();
+                Logger.Info("Headset reconnected, unpausing game.");
             }
-            else if (IsControllersConnected && IsControllersAlreadyDisconnected)
+            else
             {
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePop();
-                    Logger.Info("Controller reconnected, unpausing game.");
-                }
-                else
-                {
-                    Logger.Info("Controller reconnected, unable to unpause game as game is already unpaused.");
-                }
-
-                IsControllersAlreadyDisconnected = false;
+                Logger.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
             }
+        }
+        protected override void OnDisconnected()
+        {
+            if (MySession.Static == null)
+                return;
 
-            //UNTESTED
-            //Checks if the headset got disconnected, shows a message if the headset is disconnected.
-            if (!IsHeadsetConnected && !IsHeadsetAlreadyDisconnected)
+            //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
+            if (MySession.Static.IsPausable())
             {
-                //ShowMessageBoxAsync("Your headset got disconnected, please reconnect it to continue gameplay.", "Headset Disconnected");
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePush();
-                    Logger.Info("Headset disconnected, pausing game.");
-                }
-                else
-                {
-                    Logger.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
-                }
-
-                IsHeadsetAlreadyDisconnected = true;
+                MySandboxGame.PausePush();
+                Logger.Info("Headset disconnected, pausing game.");
             }
-            else if (IsHeadsetConnected && IsHeadsetAlreadyDisconnected)
+            else
             {
-                if (MySession.Static.IsPausable())
-                {
-                    MySandboxGame.PausePop();
-                    Logger.Info("Headset reconnected, unpausing game.");
-                }
-                else
-                {
-                    Logger.Info("Headset reconnected, unable to unpause game as game is already unpaused.");
-                }
-
-                IsHeadsetAlreadyDisconnected = false;
+                Logger.Info("Headset disconnected, unable to pause game since it is a multiplayer session.");
             }
+        }
 
+        protected override void OnStartTracking()
+        {
+            Player.ResetPlayerFloor();
+        }
+
+
+
+        public override void MainUpdate()
+        {
             var character = MyAPIGateway.Session?.Player?.Character;
             if (character == null)
                 return;

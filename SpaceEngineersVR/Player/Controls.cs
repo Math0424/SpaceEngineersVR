@@ -1,4 +1,4 @@
-﻿using SpaceEngineersVR.Player.Controller;
+﻿using SpaceEngineersVR.Player.Control;
 using SpaceEngineersVR.Plugin;
 using System.Diagnostics.CodeAnalysis;
 using Valve.VR;
@@ -80,14 +80,6 @@ namespace SpaceEngineersVR.Player
         public readonly Button SpectatorMode;
         public readonly Button Teleport;
 
-        // Hands
-        public readonly Pose LeftHand;
-        public readonly Pose RightHand;
-
-        // Feedback
-        public readonly Haptic LeftHaptic;
-        public readonly Haptic RightHaptic;
-
         // Action sets
         private readonly ActionSets WalkingSets;
         private readonly ActionSets FlyingSets;
@@ -146,12 +138,6 @@ namespace SpaceEngineersVR.Player
             SignalMode = new Button("/actions/common/in/SignalMode");
             SpectatorMode = new Button("/actions/common/in/SpectatorMode");
             Teleport = new Button("/actions/common/in/Teleport");
-
-            LeftHand = new Pose("/actions/common/in/LeftHand");
-            RightHand = new Pose("/actions/common/in/RightHand");
-
-            LeftHaptic = new Haptic("/actions/feedback/out/LeftHaptic");
-            RightHaptic = new Haptic("/actions/feedback/out/RightHaptic");
 
             WalkingSets = new ActionSets("/actions/walking", "/actions/common");
             FlyingSets = new ActionSets("/actions/flying", "/actions/common");
@@ -228,8 +214,6 @@ namespace SpaceEngineersVR.Player
             SignalMode.Update();
             SpectatorMode.Update();
             Teleport.Update();
-            LeftHand.Update();
-            RightHand.Update();
         }
     }
 }

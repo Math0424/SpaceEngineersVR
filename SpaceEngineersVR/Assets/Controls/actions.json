@@ -306,6 +306,11 @@
       "name": "/actions/feedback/out/RightHaptic",
       "requirement": "optional",
       "type": "vibration"
+    },
+    {
+      "name": "/actions/feedback/out/GenericHaptic",
+      "requirement": "optional",
+      "type": "vibration"
     }
   ],
   "action_sets": [

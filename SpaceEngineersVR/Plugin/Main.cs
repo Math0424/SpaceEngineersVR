@@ -1,19 +1,15 @@
-﻿using ClientPlugin.Player.Components;
-using ClientPlugin.Plugin;
+﻿using SpaceEngineersVR.Player.Components;
 using HarmonyLib;
 using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SpaceEngineersVR.Config;
 using SpaceEngineersVR.GUI;
-using SpaceEngineersVR.Player;
 using SpaceEngineersVR.Wrappers;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Windows.Forms;
 using Valve.VR;
-using VRage;
 using VRage.FileSystem;
 using VRage.Plugins;
 using VRage.Utils;
@@ -22,23 +18,16 @@ using VRageMath;
 namespace SpaceEngineersVR.Plugin
 {
     // ReSharper disable once UnusedType.Global
-    public class Main : IPlugin, IVRPlugin
+    public class Main : IPlugin
     {
-        public Harmony Harmony
-        {
-            get; private set;
-        }
-        public IPluginConfig Config => config?.Data;
+        public Harmony Harmony { get; private set; }
+        public PluginConfig Config => config?.Data;
 
         private PersistentConfig<PluginConfig> config;
         private static readonly string ConfigFileName = $"{Common.Name}.cfg";
 
         private static bool failed;
 
-        public static Headset Headset
-        {
-            get; private set;
-        }
         private Vector2I DesktopResolution;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -124,25 +113,17 @@ namespace SpaceEngineersVR.Plugin
             }
 
             Logger.Info("Starting enviroment");
-            Form GameWindow = (Form)AccessTools.Field(MyVRage.Platform.Windows.GetType(), "m_form").GetValue(MyVRage.Platform.Windows);
-            GameWindow.Icon = Common.Icon;
-            GameWindow.Text = Common.PublicName;
-            GameWindow.AccessibleName = Common.PublicName;
-
             MyPerGameSettings.GameIcon = Common.IconIcoPath;
             MyPerGameSettings.BasicGameInfo.GameName = Common.PublicName;
             MyPerGameSettings.BasicGameInfo.ApplicationName = Common.PublicName;
             MyPerGameSettings.BasicGameInfo.SplashScreenImage = Common.IconPngPath;
             MyPerGameSettings.BasicGameInfo.GameAcronym = Common.ShortName;
 
-
             Logger.Info("Patching game");
             Harmony = new Harmony(Common.Name);
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            Logger.Info("Creating VR environment");
-            Headset = new Headset();
-            Headset.CreatePopup("Booted successfully");
+            Util.InitialiseOnStartAttribute.FindAndInitialise();
 
             MySession.AfterLoading += AfterLoadedWorld;
             MySession.OnUnloading += UnloadingWorld;
@@ -155,11 +136,13 @@ namespace SpaceEngineersVR.Plugin
 
         private void CustomUpdate()
         {
+            Player.Player.MainUpdate();
+
             if (MySession.Static?.LocalCharacter != null &&
                 !MySession.Static.LocalCharacter.Components.Contains(typeof(VRMovementComponent)))
             {
                 MySession.Static.LocalCharacter.Components.Add(new VRMovementComponent());
-                MySession.Static.LocalCharacter.Components.Add(new VRHandsComponent());
+                MySession.Static.LocalCharacter.Components.Add(new VRBodyComponent());
             }
         }
 
@@ -172,14 +155,14 @@ namespace SpaceEngineersVR.Plugin
         public void AfterLoadedWorld()
         {
             Logger.Info("Loading SE game");
-            Headset.CreatePopup("Loaded Game");
+            Player.Player.Headset.CreatePopup("Loaded Game");
         }
 
         public void UnloadingWorld()
         {
             MyRender11.Resolution = DesktopResolution;
             Logger.Info("Unloading SE game");
-            Headset.CreatePopup("Unloaded Game");
+            Player.Player.Headset.CreatePopup("Unloaded Game");
         }
     }
 }

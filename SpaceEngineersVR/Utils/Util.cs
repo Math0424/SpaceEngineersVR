@@ -7,11 +7,10 @@ using VRage.Game;
 using VRage.Utils;
 using VRageMath;
 using VRageRender;
-using Vector4 = VRageMath.Vector4;
 
 namespace SpaceEngineersVR.Util
 {
-    internal class Util
+    internal static class Util
     {
         private static MyStringId SQUARE = MyStringId.GetOrCompute("Square");
 
@@ -105,5 +104,15 @@ namespace SpaceEngineersVR.Util
             return angle;
         }
 
+        public static Matrix ZeroPitchAndRoll(Matrix matrix)
+        {
+            Vector3 right = Vector3.Normalize(Vector3.Cross(matrix.Forward, Vector3.Up));
+            Vector3 forward = Vector3.Cross(Vector3.Up, right);
+
+            matrix.Up = Vector3.Up;
+            matrix.Forward = forward;
+            matrix.Right = right;
+            return matrix;
+        }
     }
 }

@@ -10,7 +10,7 @@ using VRage.Game;
 using VRage.Game.ModAPI;
 using VRageMath;
 
-namespace ClientPlugin.Player.Components
+namespace SpaceEngineersVR.Player.Components
 {
 
     internal class VRMovementComponent : MyCharacterComponent
@@ -33,7 +33,7 @@ namespace ClientPlugin.Player.Components
         private Vector2 previousRotation = Vector2.Zero;
         private Vector2I hasSnapped = Vector2I.Zero;
 
-        public static bool UsingControllerMovement;        
+        public static bool UsingControllerMovement;
 
         // TODO: Configurable rotation speed
         public float RotationSpeed = 10;

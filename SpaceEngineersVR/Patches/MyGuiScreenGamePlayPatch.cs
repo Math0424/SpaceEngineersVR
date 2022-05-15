@@ -1,4 +1,4 @@
-﻿using ClientPlugin.Player.Components;
+﻿using SpaceEngineersVR.Player.Components;
 using HarmonyLib;
 using Sandbox.Game.Gui;
 using SpaceEngineersVR.Player;

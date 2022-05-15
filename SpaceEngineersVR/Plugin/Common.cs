@@ -1,4 +1,3 @@
-using ClientPlugin.Plugin;
 using SpaceEngineersVR.Config;
 using System;
 using System.Drawing;
@@ -8,11 +7,11 @@ namespace SpaceEngineersVR.Plugin
 {
     public static class Common
     {
-        public static IVRPlugin Plugin
+        public static Main Plugin
         {
             get; private set;
         }
-        public static IPluginConfig Config
+        public static PluginConfig Config
         {
             get; private set;
         }
