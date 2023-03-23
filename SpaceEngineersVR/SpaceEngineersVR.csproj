@@ -30,5 +30,12 @@
   <Target Name="Kill" BeforeTargets="PreBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <Exec Command="taskkill /F /IM SpaceEngineers.exe" ContinueOnError="true" EchoOff="true" IgnoreStandardErrorWarningFormat="true" IgnoreExitCode="true" />
   </Target>
+  
+  <Target Name="CopyAssets" AfterTargets="Build" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <ItemGroup>
+      <Assets Include="$(ProjectDir)Assets\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="$(Assets)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" />
+  </Target>
 
 </Project>

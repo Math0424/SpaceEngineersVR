@@ -29,6 +29,10 @@ jobs:
       - run: dotnet restore SpaceEngineersVR/SpaceEngineersVR.csproj --locked-mode
 
       - run: dotnet publish -c Release -o ./pub SpaceEngineersVR/SpaceEngineersVR.csproj --no-restore -p:Version=${{ steps.version.outputs.version }}
+        
+      - name: Copy Assets
+        run: mkdir SEVRAssets && cp -TRv ../SpaceEngineersVR/Assets/ SEVRAssets/
+        working-directory: ./pub
 
       - run: zip -qq -r ../pub.zip ./
         working-directory: ./pub
