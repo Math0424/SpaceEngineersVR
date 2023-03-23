@@ -15,12 +15,8 @@ public class TrackedDevice
 
         public MatrixAndInvert deviceToAbsolute = MatrixAndInvert.Identity;
 
-        public Vector3 velocity = default;
-        public Vector3 angularVelocity = default;
-
-        public Pose()
-        {
-        }
+        public Vector3 velocity;
+        public Vector3 angularVelocity;
     }
     public Pose renderPose = new();
     public Pose pose = new();
