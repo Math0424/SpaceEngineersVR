@@ -32,6 +32,7 @@ namespace SpaceEngineersVR.Config
 
         private bool useHeadRotationForCharacter = true;
 
+		private bool enableDebugHUD = false;
 
         private float playerHeight = 1.69f;
         private float playerArmSpan = 1.66f;
@@ -53,6 +54,12 @@ namespace SpaceEngineersVR.Config
             get => useHeadRotationForCharacter;
             set => SetValue(ref useHeadRotationForCharacter, value);
         }
+
+		public bool EnableDebugHUD
+		{
+			get => enableDebugHUD;
+			set => SetValue(ref enableDebugHUD, value);
+		}
 
         public float PlayerHeight
         {

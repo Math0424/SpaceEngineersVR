@@ -1,15 +1,17 @@
 ﻿using Sandbox.Game.Gui;
 using Sandbox.Graphics.GUI;
 using SharpDX.Direct3D11;
+using SpaceEngineersVR.Plugin;
 using SpaceEngineersVR.Wrappers;
 using Valve.VR;
 using VRageMath;
+
 
 namespace SpaceEngineersVR.Player.Components
 {
     public static class VRGUIManager
     {
-        public static bool IsDebugHUDEnabled = true;
+        public static bool IsDebugHUDEnabled => Common.Config.EnableDebugHUD;
 
         private static readonly ulong overlayHandle = 0uL;
 

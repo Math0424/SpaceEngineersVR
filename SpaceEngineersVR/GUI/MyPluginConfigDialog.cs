@@ -26,6 +26,9 @@ namespace SpaceEngineersVR.GUI
         private MyGuiControlLabel useHeadRotationForCharacterLabel;
         private MyGuiControlCheckbox useHeadRotationForCharacterCheckbox;
 
+		private MyGuiControlLabel enableDebugHUDLabel;
+		private MyGuiControlCheckbox enableDebugHUDCheckbox;
+
         // TODO: Add member variables for your UI controls here
 
         private MyGuiControlMultilineText infoText;
@@ -63,6 +66,7 @@ namespace SpaceEngineersVR.GUI
             CreateCheckbox(out enableKeyboardAndMouseControlsLabel, out enableKeyboardAndMouseControlsCheckbox, config.EnableKeyboardAndMouseControls, value => config.EnableKeyboardAndMouseControls = value, "Enable Keyboard And Mouse Controls", "Enables keyboard and mouse controls.");
             CreateCheckbox(out enableCharacterRenderingLabel, out enableCharacterRenderingCheckbox, config.EnableCharacterRendering, value => config.EnableCharacterRendering = value, "Enable Character Rendering", "Enables rendering the character.");
             CreateCheckbox(out useHeadRotationForCharacterLabel, out useHeadRotationForCharacterCheckbox, config.UseHeadRotationForCharacter, value => config.UseHeadRotationForCharacter = value, "Use Head Rotation For Character", "Character turns when you turn your head, otherwise they always face your SteamVR forward direction.");
+			CreateCheckbox(out enableDebugHUDLabel, out enableDebugHUDCheckbox, config.EnableDebugHUD, value => config.EnableDebugHUD = value, "Enable Debug HUD", "Enables the debug HUD.");
 
             infoText = new MyGuiControlMultilineText
             {
