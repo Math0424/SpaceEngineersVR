@@ -1,0 +1,64 @@
+name: Classic Game Build
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    name: Build .Net Framework
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.7.1
+
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - uses: montudor/action-zip@v1
+
+      - run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github https://nuget.pkg.github.com/PveTeam/index.json
+
+      - run: dotnet restore SpaceEngineersVR/SpaceEngineersVR.csproj --locked-mode
+
+      - run: dotnet publish -c Release -o ./pub SpaceEngineersVR/SpaceEngineersVR.csproj --no-restore -p:Version=${{ steps.version.outputs.version }}
+        
+      - name: Copy Assets
+        run: mkdir SEVRAssets && cp -TRv ../SpaceEngineersVR/Assets/ SEVRAssets/
+        working-directory: ./pub
+
+      - run: zip -qq -r ../pub.zip ./
+        working-directory: ./pub
+
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Classic Game Release
+          draft: true
+          prerelease: false
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./pub.zip
+          asset_name: SpaceEngineersVR.zip
+          asset_content_type: application/zip
+
+      - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
