@@ -66,7 +66,7 @@ namespace SpaceEngineersVR.Player.Components
         {
             foreach (MyGuiScreenBase screen in MyScreenManager.Screens)
             {
-                if (screen is not MyGuiScreenGamePlay && screen is not MyGuiScreenHudSpace)
+                if (!(screen is MyGuiScreenGamePlay) && !(screen is MyGuiScreenHudSpace))
                 {
                     return true;
                 }

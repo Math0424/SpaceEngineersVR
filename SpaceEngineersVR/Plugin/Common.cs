@@ -22,15 +22,47 @@ namespace SpaceEngineersVR.Plugin
 
         public static readonly Version Version = typeof(Main).Assembly.GetName().Version;
 
-        public static readonly Icon Icon = new Icon(Path.Combine(Util.Util.GetAssetFolder(), "icon.ico"));
-        public static readonly string IconPngPath = Path.Combine(Util.Util.GetAssetFolder(), "logo.png");
-        public static readonly string IconIcoPath = Path.Combine(Util.Util.GetAssetFolder(), "logo.ico");
+        public static string AssetFolder
+        {
+            get; private set;
+        }
 
-        public static readonly string ActionJsonPath = Path.Combine(Util.Util.GetAssetFolder(), "Controls", "actions.json");
+        public static Icon Icon
+        {
+            get; private set;
+        }
+        public static string IconPngPath
+        {
+            get; private set;
+        }
+        public static string IconIcoPath
+        {
+            get; private set;
+        }
+        public static string ActionJsonPath
+        {
+            get; private set;
+        }
+
         public static void SetPlugin(Main plugin)
         {
             Plugin = plugin;
             Config = plugin.Config;
+            if (AssetFolder == null)
+                SetAssetPath(Util.Util.GetDefaultAssetFolder());
+        }
+
+        public static void SetAssetPath(string folder)
+        {
+            if (string.IsNullOrEmpty(folder))
+                throw new ArgumentException("Folder must not be null", folder);
+            if (!Directory.Exists(folder))
+                throw new DirectoryNotFoundException("Asset folder not found");
+            AssetFolder = folder;
+            Icon = new Icon(Path.Combine(folder, "icon.ico"));
+            IconPngPath = Path.Combine(folder, "logo.png");
+            IconIcoPath = Path.Combine(folder, "logo.ico");
+            ActionJsonPath = Path.Combine(folder, "Controls", "actions.json");
         }
     }
 }

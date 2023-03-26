@@ -19,4 +19,11 @@ You can use links here, players can click on them! For example add a Discord inv
 
 Don't touch the SourceDirectories, unless you rename or consolidate your projects inside the solution.
   </Description>
+  <AssetFolder>SpaceEngineersVR/Assets</AssetFolder>
+  <NuGetReferences>
+    <Package>
+      <Name>OVRSharp</Name>
+      <Version>1.2.0</Version>
+    </Package>
+  </NuGetReferences>
 </PluginData>
