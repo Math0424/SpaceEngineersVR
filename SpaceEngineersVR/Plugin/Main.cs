@@ -24,11 +24,16 @@ namespace SpaceEngineersVR.Plugin
         public PluginConfig Config => config?.Data;
 
         private PersistentConfig<PluginConfig> config;
-        private static readonly string ConfigFileName = $"{Common.Name}.cfg";
+        private static string ConfigFileName = $"{Common.Name}.cfg";
 
         private static bool failed;
 
         private Vector2I DesktopResolution;
+
+        public void LoadAssets(string folder)
+        {
+            Common.SetAssetPath(folder);
+        }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public void Init(object gameInstance)

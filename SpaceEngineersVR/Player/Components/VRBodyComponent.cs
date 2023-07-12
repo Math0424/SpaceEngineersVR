@@ -79,7 +79,7 @@ namespace SpaceEngineersVR.Player.Components
 
             characterCalibration.armSpan = lengthL + lengthR + shoulderWidth;
 
-            static float CalculateArmLength(MyCharacterBone hand, MyCharacterBone shoulder)
+            float CalculateArmLength(MyCharacterBone hand, MyCharacterBone shoulder)
             {
                 float totalLength = 0f;
                 for (MyCharacterBone bone = hand; bone != shoulder; bone = bone.Parent)

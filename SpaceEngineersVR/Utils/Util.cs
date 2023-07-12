@@ -14,14 +14,12 @@ namespace SpaceEngineersVR.Util
     {
         private static MyStringId SQUARE = MyStringId.GetOrCompute("Square");
 
-        public static string GetAssetFolder()
+        public static string GetDefaultAssetFolder()
         {
-            return Path.Combine(GetPluginsFolder(), "SEVRAssets");
-        }
-
-        public static string GetPluginsFolder()
-        {
-            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+            if (string.IsNullOrEmpty(assemblyLocation))
+                return null;
+            return Path.Combine(Path.GetDirectoryName(assemblyLocation), "SEVRAssets");
         }
 
         public static void DrawDebugLine(Vector3D pos, Vector3D dir, int r, int g, int b)

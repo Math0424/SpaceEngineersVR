@@ -1,7 +1,8 @@
-﻿namespace SpaceEngineersVR.Player;
-
-public struct BodyCalibration
+﻿namespace SpaceEngineersVR.Player
 {
-    public float height;
-    public float armSpan;
+    public struct BodyCalibration
+    {
+        public float height;
+        public float armSpan;
+    }
 }

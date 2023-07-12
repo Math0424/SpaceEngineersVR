@@ -11,7 +11,7 @@
     <AssemblyName>SpaceEngineersVR</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.2.1\lib\net48\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net48\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="DirectShowLib, Version=2.1.0.1599, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\Bin64\DirectShowLib.dll</HintPath>
