@@ -21,9 +21,6 @@ Don't touch the SourceDirectories, unless you rename or consolidate your project
   </Description>
   <AssetFolder>SpaceEngineersVR/Assets</AssetFolder>
   <NuGetReferences>
-    <Package>
-      <Name>OVRSharp</Name>
-      <Version>1.2.0</Version>
-    </Package>
+    <PackageReference Include="OVRSharp" Version="1.2.0" />
   </NuGetReferences>
 </PluginData>
