@@ -26,6 +26,12 @@ namespace SpaceEngineersVR.GUI
         private MyGuiControlLabel useHeadRotationForCharacterLabel;
         private MyGuiControlCheckbox useHeadRotationForCharacterCheckbox;
 
+        private MyGuiControlLabel enableDebugHUDLabel;
+        private MyGuiControlCheckbox enableDebugHUDCheckbox;
+
+        private MyGuiControlLabel disableVRControlsLabel;
+        private MyGuiControlCheckbox disableVRControlsCheckbox;
+
         // TODO: Add member variables for your UI controls here
 
         private MyGuiControlMultilineText infoText;
@@ -63,6 +69,8 @@ namespace SpaceEngineersVR.GUI
             CreateCheckbox(out enableKeyboardAndMouseControlsLabel, out enableKeyboardAndMouseControlsCheckbox, config.EnableKeyboardAndMouseControls, value => config.EnableKeyboardAndMouseControls = value, "Enable Keyboard And Mouse Controls", "Enables keyboard and mouse controls.");
             CreateCheckbox(out enableCharacterRenderingLabel, out enableCharacterRenderingCheckbox, config.EnableCharacterRendering, value => config.EnableCharacterRendering = value, "Enable Character Rendering", "Enables rendering the character.");
             CreateCheckbox(out useHeadRotationForCharacterLabel, out useHeadRotationForCharacterCheckbox, config.UseHeadRotationForCharacter, value => config.UseHeadRotationForCharacter = value, "Use Head Rotation For Character", "Character turns when you turn your head, otherwise they always face your SteamVR forward direction.");
+            CreateCheckbox(out enableDebugHUDLabel, out enableDebugHUDCheckbox, config.EnableDebugHUD, value => config.EnableDebugHUD = value, "Enable Debug HUD", "Enables the debug HUD.");
+            CreateCheckbox(out disableVRControlsLabel, out disableVRControlsCheckbox, config.DisableVRControls, value => config.DisableVRControls = value, "Disable VR Controls", "Disables VR controls.");
 
             infoText = new MyGuiControlMultilineText
             {
@@ -102,7 +110,7 @@ namespace SpaceEngineersVR.GUI
             layoutTable = new MyLayoutTable(this, -0.3f * size, 0.6f * size);
             layoutTable.SetColumnWidths(400f, 100f);
             // TODO: Add more row heights here as needed
-            layoutTable.SetRowHeights(90f, 90f, 150f, 60f);
+            layoutTable.SetRowHeights(90f, 90f, 90f, 90f, 90f, 150f, 60f);
 
             var row = 0;
 
@@ -112,6 +120,19 @@ namespace SpaceEngineersVR.GUI
 
             layoutTable.Add(enableCharacterRenderingLabel, MyAlignH.Left, MyAlignV.Center, row, 0);
             layoutTable.Add(enableCharacterRenderingCheckbox, MyAlignH.Left, MyAlignV.Center, row, 1);
+            row++;
+
+            // WARN: This causes a crash when you try to open the settings, IDK why
+            layoutTable.Add(useHeadRotationForCharacterLabel, MyAlignH.Left, MyAlignV.Center, row, 0);
+            layoutTable.Add(useHeadRotationForCharacterCheckbox, MyAlignH.Left, MyAlignV.Center, row, 1);
+            row++;
+
+            layoutTable.Add(enableDebugHUDLabel, MyAlignH.Left, MyAlignV.Center, row, 0);
+            layoutTable.Add(enableDebugHUDCheckbox, MyAlignH.Left, MyAlignV.Center, row, 1);
+            row++;
+
+            layoutTable.Add(disableVRControlsLabel, MyAlignH.Left, MyAlignV.Center, row, 0);
+            layoutTable.Add(disableVRControlsCheckbox, MyAlignH.Left, MyAlignV.Center, row, 1);
             row++;
 
             // TODO: Layout your UI controls here

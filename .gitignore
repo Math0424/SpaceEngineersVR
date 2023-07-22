@@ -364,6 +364,7 @@ FodyWeavers.xsd
 
 # Linked game binary folder
 /Bin64
+/AppData
 
 # Rider
 /.idea

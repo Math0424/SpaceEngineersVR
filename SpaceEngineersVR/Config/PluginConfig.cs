@@ -28,37 +28,48 @@ namespace SpaceEngineersVR.Config
         }
 
         private bool enableKeyboardAndMouseControls = true;
-        private bool enableCharacterRendering = true;
-
-        private bool useHeadRotationForCharacter = true;
-
-
-        private float playerHeight = 1.69f;
-        private float playerArmSpan = 1.66f;
-
         public bool EnableKeyboardAndMouseControls
         {
             get => enableKeyboardAndMouseControls;
             set => SetValue(ref enableKeyboardAndMouseControls, value);
         }
+		
+		private bool disableVRControls = false;
+		public bool DisableVRControls
+		{
+			get => disableVRControls;
+			set => SetValue(ref disableVRControls, value);
+		}
 
+		private bool enableCharacterRendering = true;
         public bool EnableCharacterRendering
         {
             get => enableCharacterRendering;
             set => SetValue(ref enableCharacterRendering, value);
         }
 
+		private bool useHeadRotationForCharacter = true;
         public bool UseHeadRotationForCharacter
         {
             get => useHeadRotationForCharacter;
             set => SetValue(ref useHeadRotationForCharacter, value);
         }
 
+		private bool enableDebugHUD = false;
+		public bool EnableDebugHUD
+		{
+			get => enableDebugHUD;
+			set => SetValue(ref enableDebugHUD, value);
+		}
+
+        private float playerHeight = 1.69f;
         public float PlayerHeight
         {
             get => playerHeight;
             set => SetValue(ref playerHeight, value);
         }
+
+        private float playerArmSpan = 1.66f;
         public float PlayerArmSpan
         {
             get => playerArmSpan;

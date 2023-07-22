@@ -5,6 +5,8 @@ using Sandbox.Game.Screens.Helpers.RadialMenuActions;
 using Sandbox.Game.SessionComponents.Clipboard;
 using Sandbox.Game.World;
 using SpaceEngineersVR.Player;
+using SpaceEngineersVR.Plugin;
+using SpaceEngineersVR.Wrappers;
 using System.Runtime.CompilerServices;
 using VRage.Game;
 using VRage.Game.ModAPI;
@@ -77,20 +79,26 @@ namespace SpaceEngineersVR.Player.Components
                 return;
             }
 
-            if (MySession.Static.ControlledEntity is MyShipController)
-            {
-                ControlShip();
-            }
+            // if DisableVRControls is true, dont do this
+            if (!Common.Config.DisableVRControls)
+			{
+					
+				if (MySession.Static.ControlledEntity is MyShipController)
+				{
+					ControlShip();
+				}
 
-            else if (((IMyCharacter)Character).EnabledThrusts)
-            {
-                ControlFlight();
-            }
-            else
-            {
-                ControlWalk();
-            }
-            ControlCommonFunctions();
+				else if (((IMyCharacter)Character).EnabledThrusts)
+				{
+					ControlFlight();
+				}
+				else
+				{
+					ControlWalk();
+				}
+				ControlCommonFunctions();
+			}
+            
             OrientateCharacterToHMD();
         }
 
